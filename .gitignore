@@ -43,3 +43,13 @@ Temporary Items
 .apdisk
 *.suo
 *.sdf
+*.log
+*.log
+*.lastbuildstate
+*.obj
+*.lib
+*.tlog
+*.exe
+*.ilk
+*.pdb
+*.idb
