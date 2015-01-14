@@ -15,8 +15,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libprotobuf-lite", "protobu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libprotoc", "protobuf-2.6.1\vsprojects\libprotoc.vcxproj", "{B84FF31A-5F9A-46F8-AB22-DBFC9BECE3BE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lite-test", "protobuf-2.6.1\vsprojects\lite-test.vcxproj", "{12015ACE-42BE-4952-A5A0-44A9A46908E2}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "protoc", "protobuf-2.6.1\vsprojects\protoc.vcxproj", "{1738D5F6-ED1E-47E0-B2F0-456864B93C1E}"
 EndProject
 Global
@@ -59,14 +57,6 @@ Global
 		{B84FF31A-5F9A-46F8-AB22-DBFC9BECE3BE}.Release|Win32.Build.0 = Release|Win32
 		{B84FF31A-5F9A-46F8-AB22-DBFC9BECE3BE}.Release|x64.ActiveCfg = Release|x64
 		{B84FF31A-5F9A-46F8-AB22-DBFC9BECE3BE}.Release|x64.Build.0 = Release|x64
-		{12015ACE-42BE-4952-A5A0-44A9A46908E2}.Debug|Win32.ActiveCfg = Debug|Win32
-		{12015ACE-42BE-4952-A5A0-44A9A46908E2}.Debug|Win32.Build.0 = Debug|Win32
-		{12015ACE-42BE-4952-A5A0-44A9A46908E2}.Debug|x64.ActiveCfg = Debug|x64
-		{12015ACE-42BE-4952-A5A0-44A9A46908E2}.Debug|x64.Build.0 = Debug|x64
-		{12015ACE-42BE-4952-A5A0-44A9A46908E2}.Release|Win32.ActiveCfg = Release|Win32
-		{12015ACE-42BE-4952-A5A0-44A9A46908E2}.Release|Win32.Build.0 = Release|Win32
-		{12015ACE-42BE-4952-A5A0-44A9A46908E2}.Release|x64.ActiveCfg = Release|x64
-		{12015ACE-42BE-4952-A5A0-44A9A46908E2}.Release|x64.Build.0 = Release|x64
 		{1738D5F6-ED1E-47E0-B2F0-456864B93C1E}.Debug|Win32.ActiveCfg = Debug|Win32
 		{1738D5F6-ED1E-47E0-B2F0-456864B93C1E}.Debug|Win32.Build.0 = Debug|Win32
 		{1738D5F6-ED1E-47E0-B2F0-456864B93C1E}.Debug|x64.ActiveCfg = Debug|x64
