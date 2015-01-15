@@ -18,17 +18,9 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\openCV\openCV\openCV.vcxproj">
-      <Project>{c3126b2c-02a3-40f9-a91b-a6d9432abc75}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\pcl\pcl\pcl.vcxproj">
-      <Project>{c68745cb-6058-42c1-ba33-527e1b2c76f1}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F62E2797-CF7C-4460-979A-913F332D4F06}</ProjectGuid>
-    <RootNamespace>eyeKin</RootNamespace>
+    <ProjectGuid>{C3126B2C-02A3-40F9-A91B-A6D9432ABC75}</ProjectGuid>
+    <RootNamespace>openCV</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -62,63 +54,35 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\openCV\openCV_includes.props" />
-    <Import Project="..\openCV\openCV_x86.props" />
-    <Import Project="..\openCV\openCV_debug.props" />
-    <Import Project="..\pcl\pcl_includes.props" />
-    <Import Project="..\pcl\pcl_x86.props" />
-    <Import Project="..\pcl\pcl_debug.props" />
+    <Import Project="..\openCV_includes.props" />
+    <Import Project="..\openCV_x86.props" />
+    <Import Project="..\openCV_debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\openCV\openCV_includes.props" />
-    <Import Project="..\openCV\openCV_x64.props" />
-    <Import Project="..\openCV\openCV_debug.props" />
-    <Import Project="..\pcl\pcl_includes.props" />
-    <Import Project="..\pcl\pcl_x64.props" />
-    <Import Project="..\pcl\pcl_debug.props" />
+    <Import Project="..\openCV_includes.props" />
+    <Import Project="..\openCV_x64.props" />
+    <Import Project="..\openCV_debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\openCV\openCV_includes.props" />
-    <Import Project="..\openCV\openCV_x86.props" />
-    <Import Project="..\openCV\openCV_release.props" />
-    <Import Project="..\pcl\pcl_includes.props" />
-    <Import Project="..\pcl\pcl_x86.props" />
-    <Import Project="..\pcl\pcl_release.props" />
+    <Import Project="..\openCV_includes.props" />
+    <Import Project="..\openCV_x86.props" />
+    <Import Project="..\openCV_release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\openCV\openCV_includes.props" />
-    <Import Project="..\openCV\openCV_x64.props" />
-    <Import Project="..\openCV\openCV_release.props" />
-    <Import Project="..\pcl\pcl_includes.props" />
-    <Import Project="..\pcl\pcl_x64.props" />
-    <Import Project="..\pcl\pcl_release.props" />
+    <Import Project="..\openCV_includes.props" />
+    <Import Project="..\openCV_x64.props" />
+    <Import Project="..\openCV_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(ProjectDir)\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(TEMP)\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(ProjectDir)\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(TEMP)\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(TEMP)\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(TEMP)\$(SolutionName)\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -129,7 +93,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -142,7 +105,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -157,7 +119,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -165,6 +126,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
