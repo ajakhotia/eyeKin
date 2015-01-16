@@ -15,7 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openCV", "openCV\openCV\ope
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcl", "pcl\pcl\pcl.vcxproj", "{C68745CB-6058-42C1-BA33-527E1B2C76F1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kinectSDK", "kinectSDK\kinectSDK\kinectSDK.vcxproj", "{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kinectV2", "kinectV2\kinectV2\kinectV2.vcxproj", "{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,14 +73,14 @@ Global
 		{C68745CB-6058-42C1-BA33-527E1B2C76F1}.Release|Win32.Build.0 = Release|Win32
 		{C68745CB-6058-42C1-BA33-527E1B2C76F1}.Release|x64.ActiveCfg = Release|x64
 		{C68745CB-6058-42C1-BA33-527E1B2C76F1}.Release|x64.Build.0 = Release|x64
-		{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}.Debug|Win32.ActiveCfg = Debug|Win32
-		{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}.Debug|Win32.Build.0 = Debug|Win32
-		{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}.Debug|x64.ActiveCfg = Debug|x64
-		{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}.Debug|x64.Build.0 = Debug|x64
-		{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}.Release|Win32.ActiveCfg = Release|Win32
-		{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}.Release|Win32.Build.0 = Release|Win32
-		{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}.Release|x64.ActiveCfg = Release|x64
-		{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}.Release|x64.Build.0 = Release|x64
+		{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}.Debug|Win32.Build.0 = Debug|Win32
+		{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}.Debug|x64.ActiveCfg = Debug|x64
+		{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}.Debug|x64.Build.0 = Debug|x64
+		{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}.Release|Win32.ActiveCfg = Release|Win32
+		{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}.Release|Win32.Build.0 = Release|Win32
+		{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}.Release|x64.ActiveCfg = Release|x64
+		{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

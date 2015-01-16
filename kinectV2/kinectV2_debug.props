@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalLibraryDirectories>$(KINECTSDK20_DIR)\Lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Kinect20.Face.lib;Kinect20.Fusion.lib;Kinect20.lib;Kinect20.VisualGestureBuilder.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

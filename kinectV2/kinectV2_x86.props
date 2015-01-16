@@ -5,7 +5,7 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalLibraryDirectories>$(KINECTSDK20_DIR)\Lib\x86</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(KINECTSDK20_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

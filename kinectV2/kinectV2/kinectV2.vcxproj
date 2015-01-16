@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{1C099C2B-48E6-49A0-ACAE-466AD468CCB3}</ProjectGuid>
-    <RootNamespace>kinectSDK</RootNamespace>
+    <ProjectGuid>{4E25BABF-57E2-46DB-8B3B-3F20BE0203E1}</ProjectGuid>
+    <RootNamespace>kinectV2</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -54,45 +54,30 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\kinectSDK_includes.props" />
-    <Import Project="..\kinectSDK_x86.props" />
-    <Import Project="..\kinectSDK_debug.props" />
+    <Import Project="..\kinectV2_includes.props" />
+    <Import Project="..\kinectV2_x86.props" />
+    <Import Project="..\kinectV2_debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\kinectSDK_includes.props" />
-    <Import Project="..\kinectSDK_x64.props" />
-    <Import Project="..\kinectSDK_debug.props" />
+    <Import Project="..\kinectV2_includes.props" />
+    <Import Project="..\kinectV2_x64.props" />
+    <Import Project="..\kinectV2_debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\kinectSDK_includes.props" />
-    <Import Project="..\kinectSDK_x86.props" />
-    <Import Project="..\kinectSDK_release.props" />
+    <Import Project="..\kinectV2_includes.props" />
+    <Import Project="..\kinectV2_x86.props" />
+    <Import Project="..\kinectV2_release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\kinectSDK_includes.props" />
-    <Import Project="..\kinectSDK_x64.props" />
-    <Import Project="..\kinectSDK_release.props" />
+    <Import Project="..\kinectV2_includes.props" />
+    <Import Project="..\kinectV2_x64.props" />
+    <Import Project="..\kinectV2_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(ProjectDir)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(ProjectDir)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
