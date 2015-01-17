@@ -19,6 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\boost\boost\boost.vcxproj">
+      <Project>{14506b05-ab56-4911-9990-d1466e7ed37f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\kinectV2\kinectV2\kinectV2.vcxproj">
+      <Project>{4e25babf-57e2-46db-8b3b-3f20be0203e1}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\openCV\openCV\openCV.vcxproj">
       <Project>{c3126b2c-02a3-40f9-a91b-a6d9432abc75}</Project>
     </ProjectReference>
@@ -71,6 +77,9 @@
     <Import Project="..\kinectV2\kinectV2_includes.props" />
     <Import Project="..\kinectV2\kinectV2_x86.props" />
     <Import Project="..\kinectV2\kinectV2_debug.props" />
+    <Import Project="..\boost\boost_includes.props" />
+    <Import Project="..\boost\boost_x86.props" />
+    <Import Project="..\boost\boost_debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -83,6 +92,9 @@
     <Import Project="..\kinectV2\kinectV2_includes.props" />
     <Import Project="..\kinectV2\kinectV2_x64.props" />
     <Import Project="..\kinectV2\kinectV2_debug.props" />
+    <Import Project="..\boost\boost_includes.props" />
+    <Import Project="..\boost\boost_x64.props" />
+    <Import Project="..\boost\boost_debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -95,6 +107,9 @@
     <Import Project="..\kinectV2\kinectV2_includes.props" />
     <Import Project="..\kinectV2\kinectV2_x86.props" />
     <Import Project="..\kinectV2\kinectV2_release.props" />
+    <Import Project="..\boost\boost_includes.props" />
+    <Import Project="..\boost\boost_x86.props" />
+    <Import Project="..\boost\boost_release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -107,6 +122,9 @@
     <Import Project="..\kinectV2\kinectV2_includes.props" />
     <Import Project="..\kinectV2\kinectV2_x64.props" />
     <Import Project="..\kinectV2\kinectV2_release.props" />
+    <Import Project="..\boost\boost_includes.props" />
+    <Import Project="..\boost\boost_x64.props" />
+    <Import Project="..\boost\boost_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
