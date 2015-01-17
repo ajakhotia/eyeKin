@@ -32,6 +32,25 @@
       <Project>{c68745cb-6058-42c1-ba33-527e1b2c76f1}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\entity.h" />
+    <ClInclude Include="include\kinectReader.h" />
+    <ClInclude Include="include\objectSegmentation.h" />
+    <ClInclude Include="include\ofApp.h" />
+    <ClInclude Include="include\pcl.h" />
+    <ClInclude Include="include\settings.h" />
+    <ClInclude Include="include\timer.h" />
+    <ClInclude Include="include\utilities.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\entity.cpp" />
+    <ClCompile Include="src\kinectReader.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\objectSegmentation.cpp" />
+    <ClCompile Include="src\ofApp.cpp" />
+    <ClCompile Include="src\timer.cpp" />
+    <ClCompile Include="src\utilities.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F62E2797-CF7C-4460-979A-913F332D4F06}</ProjectGuid>
     <RootNamespace>eyeKin</RootNamespace>
@@ -80,6 +99,7 @@
     <Import Project="..\boost\boost_includes.props" />
     <Import Project="..\boost\boost_x86.props" />
     <Import Project="..\boost\boost_debug.props" />
+    <Import Project="..\eyeKin_includes.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -95,6 +115,7 @@
     <Import Project="..\boost\boost_includes.props" />
     <Import Project="..\boost\boost_x64.props" />
     <Import Project="..\boost\boost_debug.props" />
+    <Import Project="..\eyeKin_includes.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -110,6 +131,7 @@
     <Import Project="..\boost\boost_includes.props" />
     <Import Project="..\boost\boost_x86.props" />
     <Import Project="..\boost\boost_release.props" />
+    <Import Project="..\eyeKin_includes.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -125,6 +147,7 @@
     <Import Project="..\boost\boost_includes.props" />
     <Import Project="..\boost\boost_x64.props" />
     <Import Project="..\boost\boost_release.props" />
+    <Import Project="..\eyeKin_includes.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
