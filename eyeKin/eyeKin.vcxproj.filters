@@ -24,9 +24,6 @@
     <ClInclude Include="include\objectSegmentation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ofApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\pcl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -37,6 +34,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\eyeKin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,13 +53,13 @@
     <ClCompile Include="src\objectSegmentation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ofApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\eyeKin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

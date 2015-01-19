@@ -3,8 +3,7 @@
 
 #include "Kinect.h"
 #include "boost/thread.hpp"
-#include "opencv2/opencv.hpp"
-#include "opencv2/opencv_modules.hpp"
+#include "opencv.h"
 
 namespace personalRobotics
 {

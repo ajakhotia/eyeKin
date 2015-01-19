@@ -34,9 +34,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\entity.h" />
+    <ClInclude Include="include\eyeKin.h" />
     <ClInclude Include="include\kinectReader.h" />
     <ClInclude Include="include\objectSegmentation.h" />
-    <ClInclude Include="include\ofApp.h" />
     <ClInclude Include="include\pcl.h" />
     <ClInclude Include="include\settings.h" />
     <ClInclude Include="include\timer.h" />
@@ -44,10 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\entity.cpp" />
+    <ClCompile Include="src\eyeKin.cpp" />
     <ClCompile Include="src\kinectReader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\objectSegmentation.cpp" />
-    <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\timer.cpp" />
     <ClCompile Include="src\utilities.cpp" />
   </ItemGroup>
@@ -172,6 +172,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -183,6 +184,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -196,6 +198,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -211,6 +214,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -1,14 +1,8 @@
 #ifndef __PROCAM_UTILTIES_H__
 #define __PROCAM_UTILTIES_H__
 
-#include <iostream>
-#include <string.h>
 #include <math.h>
-#include "ofmain.h"
-#include "Kinect.h"
-#include "opencv2/opencv.hpp"
-#include "opencv2/opencv_modules.hpp"
-#include "pcl.h"
+#include "opencv.h"
 #include "settings.h"
 #include "timer.h"
 
@@ -31,9 +25,8 @@ namespace personalRobotics
 	public:
 		Entity();
 		Entity(cv::Point2f centroid, float angle, float xLenght, float yLenght);
-		void generateData(cv::Mat& homography, cv::Mat& rgbImage);
-		void drawBoundingBox();
 		~Entity();
+		void generateData(cv::Mat& homography, cv::Mat& rgbImage);
 	};
 }
 #endif

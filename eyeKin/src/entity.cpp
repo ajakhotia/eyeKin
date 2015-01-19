@@ -8,7 +8,7 @@ personalRobotics::Entity::Entity()
 personalRobotics::Entity::Entity(cv::Point2f centroid, float angle, float xLength, float yLenght)
 {
 	pose2Drgb.position = centroid;
-	pose2Drgb.angle = 180.f*angle/PI;
+	pose2Drgb.angle = 180.f*angle / ((float)(CV_PI));
 	boundingSize = cv::Size2f(xLength, yLenght);
 }
 
@@ -36,9 +36,9 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	cv::RotatedRect rect(pose2Drgb.position, boundingSize, pose2Drgb.angle);
 	cv::Rect boundingRect = rect.boundingRect();
 	cv::getRectSubPix(rgbImage, boundingRect.size(), rect.center, rgbPatch);
-	cv::Mat rotationMatrix = cv::getRotationMatrix2D(cv::Point2f(boundingRect.width / 2, boundingRect.height / 2), rect.angle, 1);
+	cv::Mat rotationMatrix = cv::getRotationMatrix2D(cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), rect.angle, 1);
 	cv::warpAffine(rgbPatch, rgbPatch, rotationMatrix, rgbPatch.size(), cv::INTER_CUBIC);
-	cv::getRectSubPix(rgbPatch, boundingSize, cv::Point2f(boundingRect.width / 2, boundingRect.height / 2), rgbPatch);
+	cv::getRectSubPix(rgbPatch, boundingSize, cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), rgbPatch);
 		
 	//Generate bounding points in RGB and prjector space
 	cv::Point2f points[4];
@@ -56,7 +56,7 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	std::vector<cv::Vec4i> hierarchy;
 	cv::findContours(cannyOut, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 	int largestContourIdx = 0;
-	int largestArea = 0;
+	double largestArea = 0;
 	for (int i = 0; i < contours.size(); i++)
 	{
 		double area = cv::contourArea(contours[i]);
@@ -78,22 +78,6 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 		cv::imwrite("mask.jpg", mask);
 		cv::imwrite("patch.jpg", patch);
 	#endif
-	#ifdef DEBUG_PROFILER
-		timer.toc();
-	#endif
-}
-
-void personalRobotics::Entity::drawBoundingBox()
-{
-	//Debug
-	#ifdef DEBUG_PROFILER
-		Timer timer("drawBoundingBox()");
-	#endif
-
-	for (int i = 0; i < 4; i++)
-		ofLine(ofPoint(boundingCornersProj[i % 4].x, boundingCornersProj[i % 4].y), ofPoint(boundingCornersProj[(i + 1) % 4].x, boundingCornersProj[(i + 1) % 4].y));
-	
-	//Debug
 	#ifdef DEBUG_PROFILER
 		timer.toc();
 	#endif
