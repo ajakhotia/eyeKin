@@ -1,7 +1,10 @@
 #ifndef __EYEKIN_H__
 #define __EYEKIN_H__
 
+#include "tcp.h"
 #include "objectSegmentation.h"
+
+#define PORT1 9000
 
 namespace personalRobotics
 {
@@ -10,7 +13,8 @@ namespace personalRobotics
 	protected:
 		// Interface
 		ObjectSegmentor segmentor;
-		
+		TcpServer tcpServer;
+
 		// Calibration
 		cv::Mat checkerboard;
 		int numCheckerPtsX;

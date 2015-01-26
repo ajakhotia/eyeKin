@@ -1,6 +1,6 @@
 #include "eyeKin.h"
 
-personalRobotics::EyeKin::EyeKin()
+personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 {
 	// Configuration
 	screenWidth = DEFAULT_SCREEN_WIDTH;
@@ -35,7 +35,7 @@ void personalRobotics::EyeKin::findHomography()
 	if (foundCorners)
 	{
 		cv::Mat invertedHomography = cv::findHomography(detectedCorners, checkerboardCorners, CV_RANSAC);
-		cv::Mat homographyCorrection = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, -1, (DEFAULT_SCREEN_HEIGHT), 0, 0, 1);
+		cv::Mat homographyCorrection = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, -1, screenHeight, 0, 0, 1);
 		homography = homographyCorrection*invertedHomography;
 		homographyFound = true;
 	}

@@ -1,0 +1,17 @@
+import "pose2D.proto";
+import "tuple.proto";
+
+package prProcam;
+
+message Entity
+{
+	optional personalRobotics.Pose2D projSpacePose = 1;
+	optional personalRobotics.Tuple boundingSize = 2;
+	optional personalRobotics.Tuple pixelSize = 3;
+	repeated bytes buffer = 4;
+}
+
+message EntityList
+{
+	repeated Entity entityList = 1;
+}
