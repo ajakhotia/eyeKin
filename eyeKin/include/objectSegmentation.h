@@ -33,10 +33,12 @@ namespace personalRobotics
 		// Container locks
 		boost::mutex pclPtrLock;
 		boost::mutex entityListLock;
+		boost::mutex newListGeneratedFlagLock;
 
 		// Control flags
 		bool stopSegmentorFlag;
 		bool homographySetFlag;
+		bool newListGeneratedFlag;
 
 		// Runner threads
 		boost::thread segementorThread;
@@ -53,6 +55,8 @@ namespace personalRobotics
 		void unlockList();
 		void lockPcl();
 		void unlockPcl();
+		void lockNewListGenFlag();
+		void unlockNewListGenFlag();
 		std::vector<personalRobotics::Entity>* getEntityList();
 
 		// Setters

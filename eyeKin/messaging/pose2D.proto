@@ -1,0 +1,29 @@
+//	Copyright (c) 2014, Anurag Jakhotia.  All rights reserved. Licensed under the
+//	terms of the BSD 3-clause license as included in LICENSE.
+
+//	Functional description:	pose2D.proto defines a message to represent 2D pose i.e.
+//							X, Y, and angle.
+
+//	Dependencies:
+//		point2D.proto	->	point2D.proto defines a message for 2D data.
+
+//	Documentation for protocol buffers:
+//		https://developers.google.com/protocol-buffers/docs/proto
+
+//	These messages description are compiled using protoc of libprotobuf to generate
+//	classes with methods to easily serialize and deserialize objects to stream over
+//	sockets.
+
+import "point2D.proto";
+
+package personalRobotics;
+
+//	Details:
+//	pose2D defines a proto buffer message for representing 2-dimensional pose, that
+//	is, position in X, position in Y and angle with respect to X axis in radians.
+
+message Pose2D
+{
+	required Point2D position = 1;
+	required float angle = 2 [default = 0];
+}

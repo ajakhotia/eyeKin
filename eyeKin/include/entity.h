@@ -21,6 +21,7 @@ namespace personalRobotics
 		cv::Size2f boundingSize;
 		std::vector<cv::Point2f> boundingCornersProj;
 		std::vector<cv::Point2f> boundingCornersRgb;
+		std::vector<cv::Point> contour;
 		cv::Mat patch;
 	public:
 		Entity();

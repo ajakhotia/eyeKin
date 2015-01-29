@@ -1,0 +1,123 @@
+//	Copyright (c) 2014, Anurag Jakhotia.  All rights reserved. Licensed under the
+//	terms of the BSD 3-clause license as included in LICENSE.
+
+//	Functional description: entity.proto defines messages to represent a list of
+//							entities. The list of entities uses a entity message
+//							which contains description of an detected object such
+//							as pose2D(Pose2D), boundingSize(Tuple), pixelSize(Tuple)
+//							image patch(byte buffer)
+
+//	Dependencies:
+//		pose2D.proto 	->	pose2D.proto represents 2D pose i.e. X, Y and angle.
+//		point2D.proto	->	point2D.proto defines a message for 2D data.
+
+//	Documentation for protocol buffers:
+//		https://developers.google.com/protocol-buffers/docs/proto
+
+//	These messages description are compiled using protoc of libprotobuf to generate
+//	classes with methods to easily serialize and deserialize objects to stream over
+//	sockets.
+
+import "pose2D.proto";
+import "point2D.proto";
+
+package procamPRL;
+
+//	Details:
+//	Entity list:	It is a repeated list of entities that are observed in a scene.
+//					This is the message that will be sent over the socket.
+//
+//	Entity:			Each entity is created corresponding to an object seen in the
+//					scene. Each entity has a 2D pose, bounding Size, pixel size, edge-
+//					contours, and image patch.
+//	ProjectorSpace:	Projector space is defined using a 2D frame fixed at the top-left
+//					corner of the image. The x axis is along the longer dimension of
+//					the projected screen and y axis is along the other perpendicular
+//					direction.
+//	
+// Variable description:
+//	timestamps:		The wall-clock time of the frame, encoded as seconds and
+//					nanoseconds in the UNIX Epoch. timestamp_secs are the number of
+//					lapsed seconds and timestamp_nsecs are the number of nanoseconds
+//					lapsed after the last second.
+//
+//	frameID:		The index of the given frame within the current run. With each
+//					start of the server, the ID counts will reset to zero.
+//	
+//	command:		An enum which defines the commands that the server can send
+//					to the connected client. NONE implies that there is no action that
+//					needs to be taken. SEND_DISP_INFO_PACKET requests the client to
+//					send the information regarding the screen resolution and other
+//					detail that will be updated here as needed. START_CALIBRATION
+//					denotes start of calibration duirng which the client is required
+//					to display a checkerboard sent by the server. Specifications will 
+//					updated as we go on. STOP_CALIBRATION marks the end of calibration
+//					after which the client is no longer needed to display the
+//					information sent by the server. STREAM commands marks that the
+//					data being sent is regular stream of Entity information.
+//	
+//	pose:			2D pose consisting of (x,y) coordinates in the projector space and
+//					the angle of the major principle dimension of the object from the
+//					x axis measured counter clockwise. The range is -pi to pi.
+//					The x and y variables are foalting point numbers denoting
+//					location of the object in number of pixels in the projector space.
+//					Its kept as floating point number in order to accommodate the
+//					output of algorithms which return values with sub-pixels accuracy.
+//	
+//	boundingSize:	A tuple denoting the approximate extense of each object along each
+//					each of its principle directions in the units of pixels. The x
+//					varible denotes the extense along the most dominant direction and
+//					y denotes extense along the	perpendicular direction to x.
+//	
+//	pixelSize:		A tuple denoting the size of the pixels when projected on the
+//					table. A tuple is used because the size of pixels may along the
+//					x and y directions of the projector space. The units are mm/pixel.
+//	
+//	contours:		A list of floating point tuples containing the contour information
+//					of the object in the imagePatch. The tuples represent the edge
+//					points of the object with reference to the top left corner of the
+//					imagePatch. The units of each of the tuples is in pixels.
+//
+//	imagePatch:		A BGRA image patch extarcted from the color stream using the pose
+//					and the bounding box informaton. The patces are corrected for
+//					orientation such that the most dominant direction of the object is
+//					along the horizontal(or the most dominant direction or the full
+//					color image. Its a 4 channel image with BGR channels and an alpha
+//					channel which encodes whether a pixel belongs to the foreground
+//					or the background. Each channel of each pixel is a
+//					uint8(1 byte). The pixels are stored as a sequence of B-G-R-A
+//					bytes stored in a row-major format similar to that of cv::Mat
+//					in opencv. The lenght of this array is (width*height*4).		
+
+message Entity
+{
+	optional int64 timestamp_secs = 1;
+	optional int32 timestamp_nsecs = 2;
+	optional int32 frameId = 3;
+	enum Command
+	{
+		NONE = 1;
+		SEND_DISP_INFO_PACKET = 2;
+		START_CALIBRATION = 3;
+		STOP_CALIBRATION = 4;
+		STREAM = 5;
+	}
+	optional Command command = 4 [default = NONE];
+	optional personalRobotics.Pose2D pose = 5;
+	optional personalRobotics.Point2D boundingSize = 6;
+	optional personalRobotics.Point2D pixelSize = 7;
+	repeated personalRobotics.Point2D contours = 8;
+	message Image
+	{
+		optional int32 width = 1;
+		optional int32 height = 2;
+		optional bytes data = 3;
+	}
+	optional Image image = 9;
+}
+
+// This is the message that will actually be sent over the socket
+message EntityList
+{
+	repeated Entity entityList = 1;
+}

@@ -1,7 +1,0 @@
-package personalRobotics;
-
-enum AngleUnits
-{
-	RADIANS = 1;
-	DEGREES = 2;
-}

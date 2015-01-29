@@ -1,0 +1,27 @@
+//	Copyright (c) 2014, Anurag Jakhotia.  All rights reserved. Licensed under the
+//	terms of the BSD 3-clause license as included in LICENSE.
+
+//	Functional description: point2D.proto defines a message for 2D data.
+
+//	Dependencies:
+//		None
+
+//	Documentation for protocol buffers:
+//		https://developers.google.com/protocol-buffers/docs/proto
+
+//	These messages description are compiled using protoc of libprotobuf to generate
+//	classes with methods to easily serialize and deserialize objects to stream over
+//	sockets.
+
+package personalRobotics;
+
+//	Details:
+//	Point2D wraps two floating point numbers together to represent two dimensional
+//	data.
+//	The length along the first dimension is stored in x and the other in y.
+
+message Point2D
+{
+	required float x = 1 [default = 0];
+	required float y = 2 [default = 0];
+}

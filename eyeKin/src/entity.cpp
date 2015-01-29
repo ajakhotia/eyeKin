@@ -47,7 +47,7 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	cv::perspectiveTransform(boundingCornersRgb, boundingCornersProj, homography);
 
 	//Perform contour finding and filling
-	cv::Mat gray, cannyOut,mask;
+	cv::Mat gray, cannyOut, mask;
 	mask = cv::Mat::zeros(rgbPatch.rows, rgbPatch.cols, CV_8UC1);
 	cv::cvtColor(rgbPatch, gray, cv::COLOR_BGR2GRAY);
 	cv::blur(gray, gray, cv::Size(3, 3));
@@ -68,16 +68,14 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 
 	}
 	cv::drawContours(mask, contours, largestContourIdx, cv::Scalar(255), CV_FILLED);
-	rgbPatch.copyTo(patch,mask);
+	contour = contours[largestContourIdx];
+	patch = cv::Mat(rgbPatch.rows, rgbPatch.cols, CV_8UC4);
+	cv::Mat tempPatch;
+	rgbPatch.copyTo(tempPatch, mask);
+	int fromTo[] = {0,0, 1,1, 2,2, 3,3};
+	cv::Mat inMatArray[] = {tempPatch, mask};
+	cv::mixChannels(inMatArray, 2, &patch, 1, fromTo, 4);
 	
-	//Debug
-	#ifdef DEBUG_WRITE_PATCHES_TO_DISK
-		cv::imwrite("rgbPatch.jpg", rgbPatch);
-		cv::imwrite("gray.jpg", gray);
-		cv::imwrite("cannyOut.jpg", cannyOut);
-		cv::imwrite("mask.jpg", mask);
-		cv::imwrite("patch.jpg", patch);
-	#endif
 	#ifdef DEBUG_PROFILER
 		timer.toc();
 	#endif
