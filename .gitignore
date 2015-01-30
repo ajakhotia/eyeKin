@@ -74,3 +74,5 @@ boost/boost/boost_1_57_0/bin.v2/project-cache.jam
 boost/boost/boost_1_57_0/bin.v2/standalone/ac/main.cpp
 boost/boost/boost_1_57_0/bin.v2/standalone/ac/zlib.h.cpp
 boost/boost/boost_1_57_0/project-config.jam
+*.opensdf
+*.cache

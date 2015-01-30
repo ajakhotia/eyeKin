@@ -31,6 +31,9 @@
     <ProjectReference Include="..\pcl\pcl\pcl.vcxproj">
       <Project>{c68745cb-6058-42c1-ba33-527e1b2c76f1}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\protobuf-2.6.1\vsprojects\protoc.vcxproj">
+      <Project>{1738d5f6-ed1e-47e0-b2f0-456864b93c1e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\entity.h" />
@@ -179,6 +182,12 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>generateProtoBufs _Debx86</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Building the protobuf files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -191,6 +200,12 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>generateProtoBufs_Debx64</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Building the protobuf files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -207,6 +222,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PreBuildEvent>
+      <Command>generateProtoBufs_Relx86</Command>
+      <Message>Building the protobuf files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -223,6 +242,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PreBuildEvent>
+      <Command>generateProtoBufs_Relx64</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Building the protobuf files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
