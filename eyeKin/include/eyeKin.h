@@ -2,6 +2,7 @@
 #define __EYEKIN_H__
 
 #include "tcp.h"
+#include "entity.pb.h"
 #include "objectSegmentation.h"
 
 #define PORT1 9000
@@ -14,6 +15,7 @@ namespace personalRobotics
 		// Interface
 		ObjectSegmentor segmentor;
 		TcpServer tcpServer;
+		procamPRL::EntityList list;
 
 		// Calibration
 		cv::Mat checkerboard;
