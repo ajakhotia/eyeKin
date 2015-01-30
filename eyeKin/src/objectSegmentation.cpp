@@ -179,7 +179,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			// Map the points to RGB space
 			cv::Mat points(pointNum, 2, CV_32F);
 			coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)points.data);
-			delete cameraSpacePoints;
+			delete[] cameraSpacePoints;
 
 			//Find mean and covariance
 			cv::Mat cvCentroid, cvCovar;
