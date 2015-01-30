@@ -8,7 +8,7 @@
 
 namespace personalRobotics
 {
-	struct Pose2D
+	struct Pose2Dim
 	{
 		cv::Point2f position;
 		float angle;
@@ -16,8 +16,8 @@ namespace personalRobotics
 	class Entity
 	{
 	public:
-		Pose2D pose2Dproj;
-		Pose2D pose2Drgb;
+		Pose2Dim pose2Dproj;
+		Pose2Dim pose2Drgb;
 		cv::Size2f boundingSize;
 		std::vector<cv::Point2f> boundingCornersProj;
 		std::vector<cv::Point2f> boundingCornersRgb;
