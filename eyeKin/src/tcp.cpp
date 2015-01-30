@@ -123,6 +123,11 @@ void personalRobotics::Tcp::asyncRead(int length, char* bufferPtr, std::mutex *b
 		bufferMutex->unlock();
 }
 
+bool personalRobotics::Tcp::connected()
+{
+	return isConnected;
+}
+
 void personalRobotics::Tcp::disconnect()
 {
 	// Close the send channel

@@ -71,6 +71,7 @@ namespace personalRobotics
 		void read(int length, char* bufferPtr);
 		void asyncSend(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock = false, bool unlock = true);
 		void asyncRead(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock = false, bool unlock = true);
+		bool connected();
 		void disconnect();
 	};
 

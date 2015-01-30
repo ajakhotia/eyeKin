@@ -57,6 +57,9 @@ namespace personalRobotics
 		void unlockPcl();
 		void lockNewListGenFlag();
 		void unlockNewListGenFlag();
+		void setNewListGeneratedFlag();
+		void unsetNewListGeneratedFlag();
+		bool newListGenerated();
 		std::vector<personalRobotics::Entity>* getEntityList();
 
 		// Setters

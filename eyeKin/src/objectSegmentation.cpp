@@ -163,9 +163,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		// Extract cloud for each object
 		lockList();
 		entityList.clear();
-		lockNewListGenFlag();
-		newListGeneratedFlag = true;
-		unlockNewListGenFlag();
+		setNewListGeneratedFlag();
 		for (std::vector<pcl::PointIndices>::const_iterator it = clusterIndices.begin(); it != clusterIndices.end(); ++it)
 		{
 			CameraSpacePoint *cameraSpacePoints = new CameraSpacePoint[it->indices.size()];
@@ -231,9 +229,32 @@ void personalRobotics::ObjectSegmentor::lockNewListGenFlag()
 {
 	newListGeneratedFlagLock.lock();
 }
+
 void personalRobotics::ObjectSegmentor::unlockNewListGenFlag()
 {
 	newListGeneratedFlagLock.unlock();
+}
+
+void personalRobotics::ObjectSegmentor::setNewListGeneratedFlag()
+{
+	lockNewListGenFlag();
+	newListGeneratedFlag = true;
+	unlockNewListGenFlag();
+}
+
+void personalRobotics::ObjectSegmentor::unsetNewListGeneratedFlag()
+{
+	lockNewListGenFlag();
+	newListGeneratedFlag = false;
+	unlockNewListGenFlag();
+}
+
+bool personalRobotics::ObjectSegmentor::newListGenerated()
+{
+	lockNewListGenFlag();
+	bool returnFlag = newListGeneratedFlag;
+	unlockNewListGenFlag();
+	return returnFlag;
 }
 
 std::vector<personalRobotics::Entity>* personalRobotics::ObjectSegmentor::getEntityList()
