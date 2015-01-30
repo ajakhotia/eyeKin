@@ -40,27 +40,29 @@ class Entity;
 class Entity_Image;
 class EntityList;
 
-enum Entity_Command {
-  Entity_Command_NONE = 1,
-  Entity_Command_SEND_DISP_INFO_PACKET = 2,
-  Entity_Command_START_CALIBRATION = 3,
-  Entity_Command_STOP_CALIBRATION = 4,
-  Entity_Command_STREAM = 5
+enum EntityList_Command {
+  EntityList_Command_NONE = 1,
+  EntityList_Command_SEND_DISPLAY_INFO_PACKET = 2,
+  EntityList_Command_START_CALIBRATION = 3,
+  EntityList_Command_CALIBRATION_COMPLETE = 4,
+  EntityList_Command_START_STREAM = 5,
+  EntityList_Command_STOP_STREAM = 6,
+  EntityList_Command_DISCONNECT = 7
 };
-bool Entity_Command_IsValid(int value);
-const Entity_Command Entity_Command_Command_MIN = Entity_Command_NONE;
-const Entity_Command Entity_Command_Command_MAX = Entity_Command_STREAM;
-const int Entity_Command_Command_ARRAYSIZE = Entity_Command_Command_MAX + 1;
+bool EntityList_Command_IsValid(int value);
+const EntityList_Command EntityList_Command_Command_MIN = EntityList_Command_NONE;
+const EntityList_Command EntityList_Command_Command_MAX = EntityList_Command_DISCONNECT;
+const int EntityList_Command_Command_ARRAYSIZE = EntityList_Command_Command_MAX + 1;
 
-const ::google::protobuf::EnumDescriptor* Entity_Command_descriptor();
-inline const ::std::string& Entity_Command_Name(Entity_Command value) {
+const ::google::protobuf::EnumDescriptor* EntityList_Command_descriptor();
+inline const ::std::string& EntityList_Command_Name(EntityList_Command value) {
   return ::google::protobuf::internal::NameOfEnum(
-    Entity_Command_descriptor(), value);
+    EntityList_Command_descriptor(), value);
 }
-inline bool Entity_Command_Parse(
-    const ::std::string& name, Entity_Command* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<Entity_Command>(
-    Entity_Command_descriptor(), name, value);
+inline bool EntityList_Command_Parse(
+    const ::std::string& name, EntityList_Command* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<EntityList_Command>(
+    EntityList_Command_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -221,94 +223,39 @@ class Entity : public ::google::protobuf::Message {
 
   typedef Entity_Image Image;
 
-  typedef Entity_Command Command;
-  static const Command NONE = Entity_Command_NONE;
-  static const Command SEND_DISP_INFO_PACKET = Entity_Command_SEND_DISP_INFO_PACKET;
-  static const Command START_CALIBRATION = Entity_Command_START_CALIBRATION;
-  static const Command STOP_CALIBRATION = Entity_Command_STOP_CALIBRATION;
-  static const Command STREAM = Entity_Command_STREAM;
-  static inline bool Command_IsValid(int value) {
-    return Entity_Command_IsValid(value);
-  }
-  static const Command Command_MIN =
-    Entity_Command_Command_MIN;
-  static const Command Command_MAX =
-    Entity_Command_Command_MAX;
-  static const int Command_ARRAYSIZE =
-    Entity_Command_Command_ARRAYSIZE;
-  static inline const ::google::protobuf::EnumDescriptor*
-  Command_descriptor() {
-    return Entity_Command_descriptor();
-  }
-  static inline const ::std::string& Command_Name(Command value) {
-    return Entity_Command_Name(value);
-  }
-  static inline bool Command_Parse(const ::std::string& name,
-      Command* value) {
-    return Entity_Command_Parse(name, value);
-  }
-
   // accessors -------------------------------------------------------
 
-  // optional int64 timestamp_secs = 1;
-  inline bool has_timestamp_secs() const;
-  inline void clear_timestamp_secs();
-  static const int kTimestampSecsFieldNumber = 1;
-  inline ::google::protobuf::int64 timestamp_secs() const;
-  inline void set_timestamp_secs(::google::protobuf::int64 value);
-
-  // optional int32 timestamp_nsecs = 2;
-  inline bool has_timestamp_nsecs() const;
-  inline void clear_timestamp_nsecs();
-  static const int kTimestampNsecsFieldNumber = 2;
-  inline ::google::protobuf::int32 timestamp_nsecs() const;
-  inline void set_timestamp_nsecs(::google::protobuf::int32 value);
-
-  // optional int32 frameId = 3;
-  inline bool has_frameid() const;
-  inline void clear_frameid();
-  static const int kFrameIdFieldNumber = 3;
-  inline ::google::protobuf::int32 frameid() const;
-  inline void set_frameid(::google::protobuf::int32 value);
-
-  // optional .procamPRL.Entity.Command command = 4 [default = NONE];
-  inline bool has_command() const;
-  inline void clear_command();
-  static const int kCommandFieldNumber = 4;
-  inline ::procamPRL::Entity_Command command() const;
-  inline void set_command(::procamPRL::Entity_Command value);
-
-  // optional .personalRobotics.Pose2D pose = 5;
+  // optional .personalRobotics.Pose2D pose = 1;
   inline bool has_pose() const;
   inline void clear_pose();
-  static const int kPoseFieldNumber = 5;
+  static const int kPoseFieldNumber = 1;
   inline const ::personalRobotics::Pose2D& pose() const;
   inline ::personalRobotics::Pose2D* mutable_pose();
   inline ::personalRobotics::Pose2D* release_pose();
   inline void set_allocated_pose(::personalRobotics::Pose2D* pose);
 
-  // optional .personalRobotics.Point2D boundingSize = 6;
+  // optional .personalRobotics.Point2D boundingSize = 2;
   inline bool has_boundingsize() const;
   inline void clear_boundingsize();
-  static const int kBoundingSizeFieldNumber = 6;
+  static const int kBoundingSizeFieldNumber = 2;
   inline const ::personalRobotics::Point2D& boundingsize() const;
   inline ::personalRobotics::Point2D* mutable_boundingsize();
   inline ::personalRobotics::Point2D* release_boundingsize();
   inline void set_allocated_boundingsize(::personalRobotics::Point2D* boundingsize);
 
-  // optional .personalRobotics.Point2D pixelSize = 7;
+  // optional .personalRobotics.Point2D pixelSize = 3;
   inline bool has_pixelsize() const;
   inline void clear_pixelsize();
-  static const int kPixelSizeFieldNumber = 7;
+  static const int kPixelSizeFieldNumber = 3;
   inline const ::personalRobotics::Point2D& pixelsize() const;
   inline ::personalRobotics::Point2D* mutable_pixelsize();
   inline ::personalRobotics::Point2D* release_pixelsize();
   inline void set_allocated_pixelsize(::personalRobotics::Point2D* pixelsize);
 
-  // repeated .personalRobotics.Point2D contours = 8;
+  // repeated .personalRobotics.Point2D contours = 4;
   inline int contours_size() const;
   inline void clear_contours();
-  static const int kContoursFieldNumber = 8;
+  static const int kContoursFieldNumber = 4;
   inline const ::personalRobotics::Point2D& contours(int index) const;
   inline ::personalRobotics::Point2D* mutable_contours(int index);
   inline ::personalRobotics::Point2D* add_contours();
@@ -317,10 +264,10 @@ class Entity : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::personalRobotics::Point2D >*
       mutable_contours();
 
-  // optional .procamPRL.Entity.Image image = 9;
+  // optional .procamPRL.Entity.Image image = 5;
   inline bool has_image() const;
   inline void clear_image();
-  static const int kImageFieldNumber = 9;
+  static const int kImageFieldNumber = 5;
   inline const ::procamPRL::Entity_Image& image() const;
   inline ::procamPRL::Entity_Image* mutable_image();
   inline ::procamPRL::Entity_Image* release_image();
@@ -328,14 +275,6 @@ class Entity : public ::google::protobuf::Message {
 
   // @@protoc_insertion_point(class_scope:procamPRL.Entity)
  private:
-  inline void set_has_timestamp_secs();
-  inline void clear_has_timestamp_secs();
-  inline void set_has_timestamp_nsecs();
-  inline void clear_has_timestamp_nsecs();
-  inline void set_has_frameid();
-  inline void clear_has_frameid();
-  inline void set_has_command();
-  inline void clear_has_command();
   inline void set_has_pose();
   inline void clear_has_pose();
   inline void set_has_boundingsize();
@@ -349,15 +288,11 @@ class Entity : public ::google::protobuf::Message {
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  ::google::protobuf::int64 timestamp_secs_;
-  ::google::protobuf::int32 timestamp_nsecs_;
-  ::google::protobuf::int32 frameid_;
   ::personalRobotics::Pose2D* pose_;
   ::personalRobotics::Point2D* boundingsize_;
   ::personalRobotics::Point2D* pixelsize_;
   ::google::protobuf::RepeatedPtrField< ::personalRobotics::Point2D > contours_;
   ::procamPRL::Entity_Image* image_;
-  int command_;
   friend void  protobuf_AddDesc_entity_2eproto();
   friend void protobuf_AssignDesc_entity_2eproto();
   friend void protobuf_ShutdownFile_entity_2eproto();
@@ -418,12 +353,62 @@ class EntityList : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
+  typedef EntityList_Command Command;
+  static const Command NONE = EntityList_Command_NONE;
+  static const Command SEND_DISPLAY_INFO_PACKET = EntityList_Command_SEND_DISPLAY_INFO_PACKET;
+  static const Command START_CALIBRATION = EntityList_Command_START_CALIBRATION;
+  static const Command CALIBRATION_COMPLETE = EntityList_Command_CALIBRATION_COMPLETE;
+  static const Command START_STREAM = EntityList_Command_START_STREAM;
+  static const Command STOP_STREAM = EntityList_Command_STOP_STREAM;
+  static const Command DISCONNECT = EntityList_Command_DISCONNECT;
+  static inline bool Command_IsValid(int value) {
+    return EntityList_Command_IsValid(value);
+  }
+  static const Command Command_MIN =
+    EntityList_Command_Command_MIN;
+  static const Command Command_MAX =
+    EntityList_Command_Command_MAX;
+  static const int Command_ARRAYSIZE =
+    EntityList_Command_Command_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Command_descriptor() {
+    return EntityList_Command_descriptor();
+  }
+  static inline const ::std::string& Command_Name(Command value) {
+    return EntityList_Command_Name(value);
+  }
+  static inline bool Command_Parse(const ::std::string& name,
+      Command* value) {
+    return EntityList_Command_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
-  // repeated .procamPRL.Entity entityList = 1;
+  // optional double timestamp = 1;
+  inline bool has_timestamp() const;
+  inline void clear_timestamp();
+  static const int kTimestampFieldNumber = 1;
+  inline double timestamp() const;
+  inline void set_timestamp(double value);
+
+  // optional int32 frameId = 2;
+  inline bool has_frameid() const;
+  inline void clear_frameid();
+  static const int kFrameIdFieldNumber = 2;
+  inline ::google::protobuf::int32 frameid() const;
+  inline void set_frameid(::google::protobuf::int32 value);
+
+  // optional .procamPRL.EntityList.Command command = 3 [default = NONE];
+  inline bool has_command() const;
+  inline void clear_command();
+  static const int kCommandFieldNumber = 3;
+  inline ::procamPRL::EntityList_Command command() const;
+  inline void set_command(::procamPRL::EntityList_Command value);
+
+  // repeated .procamPRL.Entity entityList = 4;
   inline int entitylist_size() const;
   inline void clear_entitylist();
-  static const int kEntityListFieldNumber = 1;
+  static const int kEntityListFieldNumber = 4;
   inline const ::procamPRL::Entity& entitylist(int index) const;
   inline ::procamPRL::Entity* mutable_entitylist(int index);
   inline ::procamPRL::Entity* add_entitylist();
@@ -434,11 +419,20 @@ class EntityList : public ::google::protobuf::Message {
 
   // @@protoc_insertion_point(class_scope:procamPRL.EntityList)
  private:
+  inline void set_has_timestamp();
+  inline void clear_has_timestamp();
+  inline void set_has_frameid();
+  inline void clear_has_frameid();
+  inline void set_has_command();
+  inline void clear_has_command();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
+  double timestamp_;
+  ::google::protobuf::int32 frameid_;
+  int command_;
   ::google::protobuf::RepeatedPtrField< ::procamPRL::Entity > entitylist_;
   friend void  protobuf_AddDesc_entity_2eproto();
   friend void protobuf_AssignDesc_entity_2eproto();
@@ -582,112 +576,15 @@ inline void Entity_Image::set_allocated_data(::std::string* data) {
 
 // Entity
 
-// optional int64 timestamp_secs = 1;
-inline bool Entity::has_timestamp_secs() const {
+// optional .personalRobotics.Pose2D pose = 1;
+inline bool Entity::has_pose() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Entity::set_has_timestamp_secs() {
+inline void Entity::set_has_pose() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void Entity::clear_has_timestamp_secs() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void Entity::clear_timestamp_secs() {
-  timestamp_secs_ = GOOGLE_LONGLONG(0);
-  clear_has_timestamp_secs();
-}
-inline ::google::protobuf::int64 Entity::timestamp_secs() const {
-  // @@protoc_insertion_point(field_get:procamPRL.Entity.timestamp_secs)
-  return timestamp_secs_;
-}
-inline void Entity::set_timestamp_secs(::google::protobuf::int64 value) {
-  set_has_timestamp_secs();
-  timestamp_secs_ = value;
-  // @@protoc_insertion_point(field_set:procamPRL.Entity.timestamp_secs)
-}
-
-// optional int32 timestamp_nsecs = 2;
-inline bool Entity::has_timestamp_nsecs() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void Entity::set_has_timestamp_nsecs() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void Entity::clear_has_timestamp_nsecs() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void Entity::clear_timestamp_nsecs() {
-  timestamp_nsecs_ = 0;
-  clear_has_timestamp_nsecs();
-}
-inline ::google::protobuf::int32 Entity::timestamp_nsecs() const {
-  // @@protoc_insertion_point(field_get:procamPRL.Entity.timestamp_nsecs)
-  return timestamp_nsecs_;
-}
-inline void Entity::set_timestamp_nsecs(::google::protobuf::int32 value) {
-  set_has_timestamp_nsecs();
-  timestamp_nsecs_ = value;
-  // @@protoc_insertion_point(field_set:procamPRL.Entity.timestamp_nsecs)
-}
-
-// optional int32 frameId = 3;
-inline bool Entity::has_frameid() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void Entity::set_has_frameid() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void Entity::clear_has_frameid() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void Entity::clear_frameid() {
-  frameid_ = 0;
-  clear_has_frameid();
-}
-inline ::google::protobuf::int32 Entity::frameid() const {
-  // @@protoc_insertion_point(field_get:procamPRL.Entity.frameId)
-  return frameid_;
-}
-inline void Entity::set_frameid(::google::protobuf::int32 value) {
-  set_has_frameid();
-  frameid_ = value;
-  // @@protoc_insertion_point(field_set:procamPRL.Entity.frameId)
-}
-
-// optional .procamPRL.Entity.Command command = 4 [default = NONE];
-inline bool Entity::has_command() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void Entity::set_has_command() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void Entity::clear_has_command() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void Entity::clear_command() {
-  command_ = 1;
-  clear_has_command();
-}
-inline ::procamPRL::Entity_Command Entity::command() const {
-  // @@protoc_insertion_point(field_get:procamPRL.Entity.command)
-  return static_cast< ::procamPRL::Entity_Command >(command_);
-}
-inline void Entity::set_command(::procamPRL::Entity_Command value) {
-  assert(::procamPRL::Entity_Command_IsValid(value));
-  set_has_command();
-  command_ = value;
-  // @@protoc_insertion_point(field_set:procamPRL.Entity.command)
-}
-
-// optional .personalRobotics.Pose2D pose = 5;
-inline bool Entity::has_pose() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void Entity::set_has_pose() {
-  _has_bits_[0] |= 0x00000010u;
-}
 inline void Entity::clear_has_pose() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline void Entity::clear_pose() {
   if (pose_ != NULL) pose_->::personalRobotics::Pose2D::Clear();
@@ -720,15 +617,15 @@ inline void Entity::set_allocated_pose(::personalRobotics::Pose2D* pose) {
   // @@protoc_insertion_point(field_set_allocated:procamPRL.Entity.pose)
 }
 
-// optional .personalRobotics.Point2D boundingSize = 6;
+// optional .personalRobotics.Point2D boundingSize = 2;
 inline bool Entity::has_boundingsize() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
+  return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void Entity::set_has_boundingsize() {
-  _has_bits_[0] |= 0x00000020u;
+  _has_bits_[0] |= 0x00000002u;
 }
 inline void Entity::clear_has_boundingsize() {
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void Entity::clear_boundingsize() {
   if (boundingsize_ != NULL) boundingsize_->::personalRobotics::Point2D::Clear();
@@ -761,15 +658,15 @@ inline void Entity::set_allocated_boundingsize(::personalRobotics::Point2D* boun
   // @@protoc_insertion_point(field_set_allocated:procamPRL.Entity.boundingSize)
 }
 
-// optional .personalRobotics.Point2D pixelSize = 7;
+// optional .personalRobotics.Point2D pixelSize = 3;
 inline bool Entity::has_pixelsize() const {
-  return (_has_bits_[0] & 0x00000040u) != 0;
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void Entity::set_has_pixelsize() {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000004u;
 }
 inline void Entity::clear_has_pixelsize() {
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void Entity::clear_pixelsize() {
   if (pixelsize_ != NULL) pixelsize_->::personalRobotics::Point2D::Clear();
@@ -802,7 +699,7 @@ inline void Entity::set_allocated_pixelsize(::personalRobotics::Point2D* pixelsi
   // @@protoc_insertion_point(field_set_allocated:procamPRL.Entity.pixelSize)
 }
 
-// repeated .personalRobotics.Point2D contours = 8;
+// repeated .personalRobotics.Point2D contours = 4;
 inline int Entity::contours_size() const {
   return contours_.size();
 }
@@ -832,15 +729,15 @@ Entity::mutable_contours() {
   return &contours_;
 }
 
-// optional .procamPRL.Entity.Image image = 9;
+// optional .procamPRL.Entity.Image image = 5;
 inline bool Entity::has_image() const {
-  return (_has_bits_[0] & 0x00000100u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 inline void Entity::set_has_image() {
-  _has_bits_[0] |= 0x00000100u;
+  _has_bits_[0] |= 0x00000010u;
 }
 inline void Entity::clear_has_image() {
-  _has_bits_[0] &= ~0x00000100u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void Entity::clear_image() {
   if (image_ != NULL) image_->::procamPRL::Entity_Image::Clear();
@@ -877,7 +774,80 @@ inline void Entity::set_allocated_image(::procamPRL::Entity_Image* image) {
 
 // EntityList
 
-// repeated .procamPRL.Entity entityList = 1;
+// optional double timestamp = 1;
+inline bool EntityList::has_timestamp() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void EntityList::set_has_timestamp() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void EntityList::clear_has_timestamp() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void EntityList::clear_timestamp() {
+  timestamp_ = 0;
+  clear_has_timestamp();
+}
+inline double EntityList::timestamp() const {
+  // @@protoc_insertion_point(field_get:procamPRL.EntityList.timestamp)
+  return timestamp_;
+}
+inline void EntityList::set_timestamp(double value) {
+  set_has_timestamp();
+  timestamp_ = value;
+  // @@protoc_insertion_point(field_set:procamPRL.EntityList.timestamp)
+}
+
+// optional int32 frameId = 2;
+inline bool EntityList::has_frameid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void EntityList::set_has_frameid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void EntityList::clear_has_frameid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void EntityList::clear_frameid() {
+  frameid_ = 0;
+  clear_has_frameid();
+}
+inline ::google::protobuf::int32 EntityList::frameid() const {
+  // @@protoc_insertion_point(field_get:procamPRL.EntityList.frameId)
+  return frameid_;
+}
+inline void EntityList::set_frameid(::google::protobuf::int32 value) {
+  set_has_frameid();
+  frameid_ = value;
+  // @@protoc_insertion_point(field_set:procamPRL.EntityList.frameId)
+}
+
+// optional .procamPRL.EntityList.Command command = 3 [default = NONE];
+inline bool EntityList::has_command() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void EntityList::set_has_command() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void EntityList::clear_has_command() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void EntityList::clear_command() {
+  command_ = 1;
+  clear_has_command();
+}
+inline ::procamPRL::EntityList_Command EntityList::command() const {
+  // @@protoc_insertion_point(field_get:procamPRL.EntityList.command)
+  return static_cast< ::procamPRL::EntityList_Command >(command_);
+}
+inline void EntityList::set_command(::procamPRL::EntityList_Command value) {
+  assert(::procamPRL::EntityList_Command_IsValid(value));
+  set_has_command();
+  command_ = value;
+  // @@protoc_insertion_point(field_set:procamPRL.EntityList.command)
+}
+
+// repeated .procamPRL.Entity entityList = 4;
 inline int EntityList::entitylist_size() const {
   return entitylist_.size();
 }
@@ -916,10 +886,10 @@ EntityList::mutable_entitylist() {
 namespace google {
 namespace protobuf {
 
-template <> struct is_proto_enum< ::procamPRL::Entity_Command> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::procamPRL::EntityList_Command> : ::google::protobuf::internal::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::procamPRL::Entity_Command>() {
-  return ::procamPRL::Entity_Command_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::procamPRL::EntityList_Command>() {
+  return ::procamPRL::EntityList_Command_descriptor();
 }
 
 }  // namespace google

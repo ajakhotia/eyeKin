@@ -67,10 +67,10 @@ namespace personalRobotics
 	public:
 		Tcp();
 		virtual ~Tcp();
-		int write(int length, char* bufferPtr);
-		int read(int length, char* bufferPtr);
-		void asyncSend(int length, char* bufferPtr);
-		void asyncRead(int length, char* bufferPtr);
+		void write(int length, char* bufferPtr);
+		void read(int length, char* bufferPtr);
+		void asyncSend(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock = false, bool unlock = true);
+		void asyncRead(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock = false, bool unlock = true);
 		void disconnect();
 	};
 

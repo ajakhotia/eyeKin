@@ -71,18 +71,16 @@ personalRobotics::Tcp::~Tcp()
 	}
 }
 
-int personalRobotics::Tcp::write(int length, char* bufferPtr)
+void personalRobotics::Tcp::write(int length, char* bufferPtr)
 {
 	int returnCode = send(dataSocket, bufferPtr, length, 0);
 	if (returnCode == SOCKET_ERROR)
 	{
 		throw SocketException("Error sending data over the socket");
 	}
-
-	return returnCode;
 }
 
-int personalRobotics::Tcp::read(int length, char* bufferPtr)
+void personalRobotics::Tcp::read(int length, char* bufferPtr)
 {
 	int returnCode = recv(dataSocket, bufferPtr, length, 0);
 	if (returnCode == 0)
@@ -105,18 +103,24 @@ int personalRobotics::Tcp::read(int length, char* bufferPtr)
 		gracefulShutdownMutex.unlock();
 		throw SocketException("Error in reading data from connection");
 	}
-
-	return returnCode;
 }
 
-void personalRobotics::Tcp::asyncSend(int length, char* bufferPtr)
+void personalRobotics::Tcp::asyncSend(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock, bool unlock)
 {
-
+	if (lock)
+		bufferMutex->lock();
+	sendThread = std::thread(&personalRobotics::TcpServer::write, this, length, bufferPtr);
+	if (unlock)
+		bufferMutex->unlock();
 }
 
-void personalRobotics::Tcp::asyncRead(int length, char* bufferPtr)
+void personalRobotics::Tcp::asyncRead(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock, bool unlock)
 {
-
+	if (lock)
+		bufferMutex->lock();
+	recvThread = std::thread(&personalRobotics::TcpServer::read, this, length, bufferPtr);
+	if (unlock)
+		bufferMutex->unlock();
 }
 
 void personalRobotics::Tcp::disconnect()
