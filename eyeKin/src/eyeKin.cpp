@@ -48,7 +48,7 @@ void personalRobotics::EyeKin::findHomography()
 		homography = homographyCorrection*invertedHomography;
 		homographyFound = true;
 	}*/
-	homography = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, -1, screenHeight, 0, 0, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
+	homography = (cv::Mat_<double>(3, 3) <<1.7456, 0.0337, -837.4711, -0.0143, -1.7469, 1411.6242, -3.04089, 0.0000, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
 	homographyFound = true;
 }
 

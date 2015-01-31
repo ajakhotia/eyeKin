@@ -193,7 +193,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>generateProtoBufs _Debx86</Command>
+      <Command>generateProtoBufs_Debx86</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Building the protobuf files</Message>

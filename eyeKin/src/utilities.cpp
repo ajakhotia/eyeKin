@@ -13,3 +13,7 @@ long int personalRobotics::gcdr(long int a, long int b)
 	if (b == 0) return a;
 	return gcdr(b, a%b);
 }
+personalRobotics::MutexBool::MutexBool()
+{
+
+}
