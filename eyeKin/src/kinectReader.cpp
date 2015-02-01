@@ -113,9 +113,9 @@ void personalRobotics::KinectReader::pollFrames()
 					rgbaImage.create(rgbHeight, rgbWidth, CV_8UC4);
 					rgbaMutex.unlock();
 					rgbMutex.unlock();
+					isColorAllocated.set();
 					safeRelease(colorFrameDescPtr);
 				}
-				isColorAllocated.set();
 			}
 			rgbaMutex.lock();
 			colorFramePtr->CopyConvertedFrameDataToArray(rgbWidth*rgbHeight*sizeof(RGBQUAD), rgbaImage.data, ColorImageFormat_Bgra);
@@ -144,9 +144,9 @@ void personalRobotics::KinectReader::pollFrames()
 					pointCloudMutex.lock();
 					pointCloudPtr = new CameraSpacePoint[depthWidth*depthHeight];
 					pointCloudMutex.unlock();
+					isDepthAllocated.set();
 					safeRelease(depthFrameDescription);
 				}
-				isDepthAllocated.set();
 			}
 			depthMutex.lock();
 			depthFramePtr->CopyFrameDataToArray(depthWidth*depthHeight, (UINT16*)depthImage.data);
@@ -171,15 +171,16 @@ void personalRobotics::KinectReader::pollFrames()
 					irMutex.lock();
 					irImage.create(depthHeight, depthWidth, CV_16UC1);
 					irMutex.unlock();
+					isIRallocated.set();
 					safeRelease(infraredFrameDescription);
 				}
-				isIRallocated.set();
 			}
 			irMutex.lock();
 			infraredFramePtr->CopyFrameDataToArray(depthWidth*depthHeight, (UINT16*)irImage.data);
 			irMutex.unlock();
 			safeRelease(infraredFramePtr);
 		}
+
 		// Report arrival of new frames
 		newFrameArrived.set();
 

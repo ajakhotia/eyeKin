@@ -8,9 +8,7 @@ void main(int argC, char **argV)
 	// Initialize and calibrate the kinect segmentation system. This also
 	// starts a tcp server and listens on port 9000 of the local host.
 	personalRobotics::EyeKin eyeKin;
-	std::cout << "Before calibration" << std::endl;
 	eyeKin.calibrate();
-	std::cout << "Calibration done" << std::endl;
 	// Loop to begin sending data
 	/*while (true)
 	{

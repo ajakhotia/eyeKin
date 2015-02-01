@@ -113,7 +113,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		// Suppress noise
 		pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
 		sor.setInputCloud(pclPtr);
-		sor.setMeanK(20);
+		sor.setMeanK(25);
 		sor.setStddevMulThresh(0.5);
 		sor.filter(*pclPtr);
 		
@@ -176,6 +176,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		}
 
 		// Generate patch and geometric data for each of the entity
+		std::cout << "List size = " << entityList.size() << std::endl;
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
 		{
 			entityPtr->generateData(homography, rgbImageCopy);

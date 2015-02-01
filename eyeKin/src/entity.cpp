@@ -67,13 +67,15 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 		}
 
 	}
+	std::cout << "Idx: "<< largestContourIdx << std::endl;
+	if (contours.size() != 0)
+	{
+		cv::approxPolyDP(contours[largestContourIdx], contour, 5, true);
+	}
 	cv::drawContours(mask, contours, largestContourIdx, cv::Scalar(255), CV_FILLED);
-	contour = contours[largestContourIdx];
-	patch = cv::Mat(rgbPatch.rows, rgbPatch.cols, CV_8UC4);
-	cv::Mat tempPatch;
-	rgbPatch.copyTo(tempPatch, mask);
+	patch.create(rgbPatch.rows, rgbPatch.cols, CV_8UC4);
 	int fromTo[] = {0,0, 1,1, 2,2, 3,3};
-	cv::Mat inMatArray[] = {tempPatch, mask};
+	cv::Mat inMatArray[] = {rgbPatch, mask};
 	cv::mixChannels(inMatArray, 2, &patch, 1, fromTo, 4);
 	
 	#ifdef DEBUG_PROFILER
