@@ -1,17 +1,22 @@
 #include "kinectReader.h"
 
+// Constructors & Destructors
 personalRobotics::KinectReader::KinectReader() :	kinectPtr(NULL),
 													readerPtr(NULL),
 													coordinateMapperPtr(NULL),
-													pointCloudPtr(NULL),
-													isColorAllocated(false),
-													isDepthAllocated(false),
-													isIRallocated(false)
+													pointCloudPtr(NULL)
 {
-	stopKinectFlag = false;
-	newFrameArrived = false;
+	// Unset all flags
+	stopKinectFlag.set();
+	newFrameArrived.unset();
+	isColorAllocated.unset();
+	isDepthAllocated.unset();
+	isIRallocated.unset();
+
+	// Load a dummy image
 	dummy = cv::imread("../data/dummy.jpg", CV_LOAD_IMAGE_COLOR);
 
+	// Initialize the sensor
 	HRESULT hrGDKS = GetDefaultKinectSensor(&kinectPtr);
 	if (SUCCEEDED(hrGDKS))
 	{
@@ -27,7 +32,6 @@ personalRobotics::KinectReader::KinectReader() :	kinectPtr(NULL),
 		}
 	}
 }
-
 personalRobotics::KinectReader::~KinectReader()
 {
 	safeRelease(readerPtr);
@@ -38,9 +42,10 @@ personalRobotics::KinectReader::~KinectReader()
 	safeRelease(kinectPtr);
 	
 	// Clear the heap
-	delete pointCloudPtr;
+	delete[] pointCloudPtr;
 }
 
+// Routines
 void personalRobotics::KinectReader::pollFrames()
 {
 	if (!readerPtr)
@@ -65,14 +70,15 @@ void personalRobotics::KinectReader::pollFrames()
 	HRESULT hrALF = readerPtr->AcquireLatestFrame(&multiSourceFramePtr);
 	if (SUCCEEDED(hrALF))
 	{
-		//Obtain the frame references for all 3 image streams
+		// Obtain the frame references for all 3 image streams
 		HRESULT hrGCFR = multiSourceFramePtr->get_ColorFrameReference(&colorFrameRefPtr);
 		HRESULT hrGDFR = multiSourceFramePtr->get_DepthFrameReference(&depthFrameRefPtr);
 		HRESULT hrGIFR = multiSourceFramePtr->get_InfraredFrameReference(&infraredFrameRefPtr);
 
+		// Check flags
 		HRESULT hrACF, hrADF, hrAIF;
 
-		//Check for the success of the frame reference and capture the frame if successful
+		// Check for the success of the frame reference and capture the frame if successful
 		if (SUCCEEDED(hrGCFR))
 		{
 			hrACF = colorFrameRefPtr->AcquireFrame(&colorFramePtr);
@@ -92,10 +98,11 @@ void personalRobotics::KinectReader::pollFrames()
 		//Access frame captured above
 		if (SUCCEEDED(hrACF))
 		{
-			newFrameArrFlagMutex.lock();
-			newFrameArrived = true;
-			newFrameArrFlagMutex.unlock();
-			if (!isColorAllocated)
+			// Report arrival of new frames
+			newFrameArrived.set();
+
+			// Get color images
+			if (!isColorAllocated.get())
 			{
 				IFrameDescription *colorFrameDescPtr = NULL;
 				HRESULT hrGCFD = colorFramePtr->get_FrameDescription(&colorFrameDescPtr);
@@ -111,7 +118,7 @@ void personalRobotics::KinectReader::pollFrames()
 					rgbMutex.unlock();
 					safeRelease(colorFrameDescPtr);
 				}
-				isColorAllocated = true;
+				isColorAllocated.set();
 			}
 			rgbaMutex.lock();
 			colorFramePtr->CopyConvertedFrameDataToArray(rgbWidth*rgbHeight*sizeof(RGBQUAD), rgbaImage.data, ColorImageFormat_Bgra);
@@ -122,9 +129,11 @@ void personalRobotics::KinectReader::pollFrames()
 			rgbMutex.unlock();
 			safeRelease(colorFramePtr);
 		}
+
+		// Get depth frame and generate point cloud
 		if (SUCCEEDED(hrADF))
 		{
-			if (!isDepthAllocated)
+			if (!isDepthAllocated.get())
 			{
 				IFrameDescription *depthFrameDescription = NULL;
 				HRESULT hrGDFD = depthFramePtr->get_FrameDescription(&depthFrameDescription);
@@ -140,16 +149,21 @@ void personalRobotics::KinectReader::pollFrames()
 					pointCloudMutex.unlock();
 					safeRelease(depthFrameDescription);
 				}
-				isDepthAllocated = true;
+				isDepthAllocated.set();
 			}
 			depthMutex.lock();
 			depthFramePtr->CopyFrameDataToArray(depthWidth*depthHeight, (UINT16*)depthImage.data);
+			pointCloudMutex.lock();
+			coordinateMapperPtr->MapDepthFrameToCameraSpace(depthWidth*depthHeight, (UINT16*)depthImage.data, depthWidth*depthHeight, pointCloudPtr);
+			pointCloudMutex.unlock();
 			depthMutex.unlock();
 			safeRelease(depthFramePtr);
 		}
+
+		// Get IR frame
 		if (SUCCEEDED(hrAIF))
 		{
-			if (!isIRallocated)
+			if (!isIRallocated.get())
 			{
 				IFrameDescription *infraredFrameDescription = NULL;
 				HRESULT hrGIFD = infraredFramePtr->get_FrameDescription(&infraredFrameDescription);
@@ -162,7 +176,7 @@ void personalRobotics::KinectReader::pollFrames()
 					irMutex.unlock();
 					safeRelease(infraredFrameDescription);
 				}
-				isIRallocated = true;
+				isIRallocated.set();
 			}
 			irMutex.lock();
 			infraredFramePtr->CopyFrameDataToArray(depthWidth*depthHeight, (UINT16*)irImage.data);
@@ -172,74 +186,60 @@ void personalRobotics::KinectReader::pollFrames()
 
 		//Release the reference to MultiSourceFrameptr
 		safeRelease(multiSourceFramePtr);
-
-		//Obtain the point cloud
-		if (SUCCEEDED(hrADF))
-		{
-			pointCloudMutex.lock();
-			coordinateMapperPtr->MapDepthFrameToCameraSpace(depthWidth*depthHeight, (UINT16*)depthImage.data, depthWidth*depthHeight, pointCloudPtr);
-			pointCloudMutex.unlock();
-		}
 	}
 }
-
-ICoordinateMapper* personalRobotics::KinectReader::getCoordinateMapper()
-{
-	return coordinateMapperPtr;
-}
-
-cv::Mat* personalRobotics::KinectReader::getColorImagePtr()
-{
-	if (isColorAllocated)
-		return &rgbImage;
-	else
-		return &dummy;
-}
-
-cv::Mat* personalRobotics::KinectReader::getDepthImagePtr()
-{
-	if (isDepthAllocated)
-		return &depthImage;
-	else
-		return &dummy;
-}
-
-cv::Mat* personalRobotics::KinectReader::getIRimagePtr()
-{
-	if (isIRallocated)
-		return &irImage;
-	else
-		return &dummy;
-}
-
-CameraSpacePoint* personalRobotics::KinectReader::getPointCloudPtr()
-{
-	if (isDepthAllocated)
-		return pointCloudPtr;
-	else
-		return NULL;
-}
-
-size_t personalRobotics::KinectReader::getPointCloudSize()
-{
-	return depthWidth*depthHeight;
-}
-
 void personalRobotics::KinectReader::kinectThreadRoutine()
 {
-	while (!stopKinectFlag)
+	while (!stopKinectFlag.get())
 	{
 		pollFrames();
 	}
 }
-
 void personalRobotics::KinectReader::startKinect()
 {
-	readerThread = boost::thread(&personalRobotics::KinectReader::kinectThreadRoutine, this);
+	stopKinectFlag.unset();
+	readerThread = std::thread(&personalRobotics::KinectReader::kinectThreadRoutine, this);
 }
-
 void personalRobotics::KinectReader::stopKinect()
 {
-	stopKinectFlag = true;
+	stopKinectFlag.set();
 	readerThread.join();
+}
+
+// Accessors
+ICoordinateMapper* personalRobotics::KinectReader::getCoordinateMapper()
+{
+	return coordinateMapperPtr;
+}
+cv::Mat* personalRobotics::KinectReader::getColorImagePtr()
+{
+	if (isColorAllocated.get())
+		return &rgbImage;
+	else
+		return &dummy;
+}
+cv::Mat* personalRobotics::KinectReader::getDepthImagePtr()
+{
+	if (isDepthAllocated.get())
+		return &depthImage;
+	else
+		return &dummy;
+}
+cv::Mat* personalRobotics::KinectReader::getIRimagePtr()
+{
+	if (isIRallocated.get())
+		return &irImage;
+	else
+		return &dummy;
+}
+CameraSpacePoint* personalRobotics::KinectReader::getPointCloudPtr()
+{
+	if (isDepthAllocated.get())
+		return pointCloudPtr;
+	else
+		return NULL;
+}
+size_t personalRobotics::KinectReader::getPointCloudSize()
+{
+	return depthWidth*depthHeight;
 }

@@ -1,22 +1,22 @@
 #include "entity.h"
 
+// Constructor and Destructor
 personalRobotics::Entity::Entity()
 {
 
 }
-
 personalRobotics::Entity::Entity(cv::Point2f centroid, float angle, float xLength, float yLenght)
 {
 	pose2Drgb.position = centroid;
 	pose2Drgb.angle = 180.f*angle / ((float)(CV_PI));
 	boundingSize = cv::Size2f(xLength, yLenght);
 }
-
 personalRobotics::Entity::~Entity()
 {
 
 }
 
+// Routines
 void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbImage)
 {
 	//Debug

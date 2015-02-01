@@ -1,10 +1,9 @@
 #ifndef __OBJECT_SEGMENTATION_H__
 #define __OBJECT_SEGMENTATION_H__
 
+#include "settings.h"
 #include "kinectReader.h"
 #include "entity.h"
-#include "utilities.h"
-#include "settings.h"
 #include "pcl.h"
 #include "timer.h"
 
@@ -31,45 +30,43 @@ namespace personalRobotics
 		cv::Mat homography;
 
 		// Container locks
-		boost::mutex pclPtrLock;
-		boost::mutex entityListLock;
-		boost::mutex newListGeneratedFlagLock;
+		std::mutex pclPtrLock;
+		std::mutex entityListLock;
 
 		// Control flags
-		bool stopSegmentorFlag;
-		bool homographySetFlag;
-		bool newListGeneratedFlag;
+		MutexBool stopSegmentorFlag;
+		MutexBool homographySetFlag;
 
 		// Runner threads
-		boost::thread segementorThread;
+		std::thread segementorThread;
 
-		// Methods
+		// Routines
 		void planeSegment();
 	public:
+		// Constructor and Destructor
 		ObjectSegmentor();
 		~ObjectSegmentor();
-		bool findTablePlane();
 
-		// Accessors
+		// Thread safety measures
 		void lockList();
 		void unlockList();
 		void lockPcl();
 		void unlockPcl();
-		void lockNewListGenFlag();
-		void unlockNewListGenFlag();
-		void setNewListGeneratedFlag();
-		void unsetNewListGeneratedFlag();
-		bool newListGenerated();
+		MutexBool newListGenerated;
+
+		// Accessors
 		std::vector<personalRobotics::Entity>* getEntityList();
 
 		// Setters
 		void setHomography(cv::Mat &inhomography);
 
 		// Routines
+		bool findTablePlane();
 		void startSegmentor();
 		void segmentorThreadRoutine();
 		void stopSegmentor();
 	};
+
 	void createCheckerboard(cv::Mat& checkerboard, int width, int height, int& numBlocksX, int& numBlocksY);
 }
 #endif

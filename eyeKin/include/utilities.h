@@ -13,17 +13,20 @@ namespace personalRobotics
 	}
 	class MutexBool
 	{
-	private:
-		std::mutex mutex;
-		bool flag;
+	protected:
+		std::mutex mMutex;
+		bool mFlag;
+		int counter;
 	public:
 		MutexBool();
+		MutexBool(const MutexBool &obj);
 		~MutexBool();
-		void lock();
-		void unlock();
+		void lockMutex();
+		void unlockMutex();
 		bool get();
-		bool set();
-		bool unset();
+		void set();
+		void unset();
+		MutexBool operator= (const bool &param);
 	};
 }
 #endif

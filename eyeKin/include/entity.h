@@ -13,6 +13,7 @@ namespace personalRobotics
 		cv::Point2f position;
 		float angle;
 	};
+	
 	class Entity
 	{
 	public:

@@ -2,7 +2,9 @@
 #define __KINECT_READER__
 
 #include "Kinect.h"
-#include "boost/thread.hpp"
+#include <thread>
+#include <mutex>
+#include "utilities.h"
 #include "opencv.h"
 
 namespace personalRobotics
@@ -10,45 +12,61 @@ namespace personalRobotics
 	class KinectReader
 	{
 	protected:
+		// Interfaces
 		IKinectSensor *kinectPtr;
 		IMultiSourceFrameReader *readerPtr;
 		ICoordinateMapper *coordinateMapperPtr;
-		boost::thread readerThread;
-		boost::mutex rgbMutex;
-		boost::mutex rgbaMutex;
-		boost::mutex depthMutex;
-		boost::mutex irMutex;
-		boost::mutex pointCloudMutex;
-		boost::mutex newFrameArrFlagMutex;
-		bool newFrameArrived;
-		bool stopKinectFlag;
+
+		// Reader thread
+		std::thread readerThread;
+
+		// Thread safety locks
+		std::mutex rgbMutex;
+		std::mutex rgbaMutex;
+		std::mutex depthMutex;
+		std::mutex irMutex;
+		std::mutex pointCloudMutex;
+
+		// Parameters
 		int rgbWidth;
 		int rgbHeight;
 		int depthWidth;
 		int depthHeight;
+
+		// Containers
 		cv::Mat rgbImage;
 		cv::Mat rgbaImage;
 		cv::Mat depthImage;
 		cv::Mat irImage;
-		CameraSpacePoint *pointCloudPtr;
 		cv::Mat dummy;
+		CameraSpacePoint *pointCloudPtr;
 	public:
+		// Constructor & Destructor
 		KinectReader();
 		~KinectReader();
+
+		// Routines
 		void pollFrames();
+		void kinectThreadRoutine();
+		void startKinect();
+		void stopKinect();
+
+		// Thread safe boolean flags
+		MutexBool newFrameArrived;
+		MutexBool stopKinectFlag;
+		MutexBool isColorAllocated;
+		MutexBool isDepthAllocated;
+		MutexBool isIRallocated;
+
+		// Accessors
 		ICoordinateMapper* getCoordinateMapper();
 		cv::Mat* getColorImagePtr();
 		cv::Mat* getIRimagePtr();
 		cv::Mat* getDepthImagePtr();
 		CameraSpacePoint* getPointCloudPtr();
 		size_t getPointCloudSize();
-		void kinectThreadRoutine();
-		void startKinect();
-		void stopKinect();
-		bool isColorAllocated;
-		bool isDepthAllocated;
-		bool isIRallocated;
 	};
+
 	template<class Interface> void safeRelease(Interface *&inInterface)
 	{
 		inInterface->Release();

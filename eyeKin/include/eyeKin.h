@@ -15,8 +15,6 @@ namespace personalRobotics
 		// Interface
 		ObjectSegmentor segmentor;
 		TcpServer tcpServer;
-		char *readBuffer;
-		char *writeBuffer;
 		procamPRL::EntityList serializableList;
 
 		// Calibration
@@ -29,16 +27,12 @@ namespace personalRobotics
 		long epoch;
 
 		// Control flags
-		bool tablePlaneFound;
-		bool homographyFound;
-		bool isCalibrating;
-		bool newSerializableListGeneratedFlag;
+		MutexBool tablePlaneFound;
+		MutexBool homographyFound;
+		MutexBool isCalibrating;
 
 		// Locks
-		boost::mutex serializableListMutex;
-		boost::mutex readBufferMutex;
-		boost::mutex writeBufferMutex;
-		boost::mutex newSerializableListGeneratedFlagMutex;
+		std::mutex serializableListMutex;
 		
 		// Configurations
 		int screenWidth;
@@ -53,34 +47,19 @@ namespace personalRobotics
 		void findHomography();
 		void calibrate();
 
-		// Conversion methods
+		// Routines
 		void generateSerializableList();
+
+		// Control flags
+		MutexBool serializableListGenerated;
 
 		// Accessors
 		TcpServer* getServer();
 		procamPRL::EntityList* getSerializableList();
 
-		// Lock accessors
+		// Thread safety methods
 		void lockSerializableList();
 		void unlockSerializableList();
-		void lockReadBuffer();
-		void unlockReadBuffer();
-		void lockWriteBuffer();
-		void unlockWriteBuffer();
-		bool newSerializableListGenerated()
-		{
-			bool returnFlag;
-			newSerializableListGeneratedFlagMutex.lock();
-			returnFlag = newSerializableListGeneratedFlag;
-			newSerializableListGeneratedFlagMutex.unlock();
-			return returnFlag;
-		}
-		void unsetNewSerializableListGeneratedFlag()
-		{
-			newSerializableListGeneratedFlagMutex.lock();
-			newSerializableListGeneratedFlag = false;
-			newSerializableListGeneratedFlagMutex.unlock();
-		}
 	};
 }
 

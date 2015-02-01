@@ -1,5 +1,6 @@
 #include "eyeKin.h"
 
+// Constructor and Destructor
 personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 {
 	// Configuration
@@ -15,27 +16,24 @@ personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 	personalRobotics::createCheckerboard(checkerboard, screenWidth, screenHeight, numCheckerPtsX, numCheckerPtsY);
 
 	//Flags
-	tablePlaneFound = false;
-	homographyFound = false;
-	isCalibrating = true;
-	newSerializableListGeneratedFlagMutex.lock();
-	newSerializableListGeneratedFlag = false;
-	newSerializableListGeneratedFlagMutex.unlock();
+	tablePlaneFound.unset();
+	homographyFound.unset();
+	isCalibrating.set();
+	serializableListGenerated.unset();
 
 	// Counters
 	epoch = 0;
 }
-
 personalRobotics::EyeKin::~EyeKin()
 {
 
 }
 
+// Calibration methods
 void personalRobotics::EyeKin::findTable()
 {
 	tablePlaneFound = segmentor.findTablePlane();
 }
-
 void personalRobotics::EyeKin::findHomography()
 {
 	/*std::vector<cv::Point2f> detectedCorners, checkerboardCorners;
@@ -49,38 +47,39 @@ void personalRobotics::EyeKin::findHomography()
 		homographyFound = true;
 	}*/
 	homography = (cv::Mat_<double>(3, 3) <<1.7456, 0.0337, -837.4711, -0.0143, -1.7469, 1411.6242, -3.04089, 0.0000, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
-	homographyFound = true;
+	homographyFound.set();
 }
-
 void personalRobotics::EyeKin::calibrate()
 {
-	if (!tablePlaneFound && segmentor.isDepthAllocated)
-		findTable();
-	if (!homographyFound && segmentor.isColorAllocated)
-		findHomography();
-	if (tablePlaneFound && homographyFound)
+	while (isCalibrating.get())
 	{
-		isCalibrating = false;
-		segmentor.setHomography(homography);
-		segmentor.startSegmentor();
+		if (!tablePlaneFound.get() && segmentor.isDepthAllocated.get())
+			findTable();
+		if (!homographyFound.get() && segmentor.isColorAllocated.get())
+			findHomography();
+		if (tablePlaneFound.get() && homographyFound.get())
+		{
+			isCalibrating.unset();
+			segmentor.setHomography(homography);
+			segmentor.startSegmentor();
+		}
 	}
 }
 
+// Routines
 void personalRobotics::EyeKin::generateSerializableList()
 {
-	if (segmentor.newListGenerated())
+	if (segmentor.newListGenerated.get())
 	{
-		// Set the non-serializable list to be old
-		segmentor.unsetNewListGeneratedFlag();
-
-		// Set the serializable list as new
-		newSerializableListGeneratedFlagMutex.lock();
-		newSerializableListGeneratedFlag = true;
-		newSerializableListGeneratedFlagMutex.unlock();
-
 		// Lock the lists
 		segmentor.lockList();
 		lockSerializableList();
+
+		// Set the non-serializable list to be old
+		segmentor.newListGenerated.unset();
+
+		// Set the serializable list as new
+		serializableListGenerated.set();
 
 		// Get access to entityList
 		std::vector<personalRobotics::Entity> *listPtr = segmentor.getEntityList();
@@ -94,7 +93,9 @@ void personalRobotics::EyeKin::generateSerializableList()
 		
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = listPtr->begin(); entityPtr != listPtr->end(); entityPtr++)
 		{
+			// Add an serializable entity to serializable entity list
 			procamPRL::Entity* serializableEntityPtr = serializableList.add_entitylist();
+			
 			// Set pose
 			personalRobotics::Pose2D *pose = new personalRobotics::Pose2D();
 			personalRobotics::Point2D *position = new personalRobotics::Point2D();
@@ -131,47 +132,27 @@ void personalRobotics::EyeKin::generateSerializableList()
 		}
 
 		// Unlock the lists
-		unlockSerializableList();
 		segmentor.unlockList();
+		unlockSerializableList();
 	}
 }
 
+// Accessors
 personalRobotics::TcpServer* personalRobotics::EyeKin::getServer()
 {
 	return &tcpServer;
 }
-
 procamPRL::EntityList* personalRobotics::EyeKin::getSerializableList()
 {
 	return &serializableList;
 }
 
+// Thread safety methods
 void personalRobotics::EyeKin::lockSerializableList()
 {
 	serializableListMutex.lock();
 }
-
 void personalRobotics::EyeKin::unlockSerializableList()
 {
 	serializableListMutex.unlock();
-}
-
-void personalRobotics::EyeKin::lockReadBuffer()
-{
-	readBufferMutex.lock();
-}
-
-void personalRobotics::EyeKin::unlockReadBuffer()
-{
-	readBufferMutex.unlock();
-}
-
-void personalRobotics::EyeKin::lockWriteBuffer()
-{
-	writeBufferMutex.lock();
-}
-
-void personalRobotics::EyeKin::unlockWriteBuffer()
-{
-	writeBufferMutex.unlock();
 }
