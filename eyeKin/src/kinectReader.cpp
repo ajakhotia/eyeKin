@@ -98,9 +98,6 @@ void personalRobotics::KinectReader::pollFrames()
 		//Access frame captured above
 		if (SUCCEEDED(hrACF))
 		{
-			// Report arrival of new frames
-			newFrameArrived.set();
-
 			// Get color images
 			if (!isColorAllocated.get())
 			{
@@ -183,6 +180,8 @@ void personalRobotics::KinectReader::pollFrames()
 			irMutex.unlock();
 			safeRelease(infraredFramePtr);
 		}
+		// Report arrival of new frames
+		newFrameArrived.set();
 
 		//Release the reference to MultiSourceFrameptr
 		safeRelease(multiSourceFramePtr);
@@ -203,7 +202,8 @@ void personalRobotics::KinectReader::startKinect()
 void personalRobotics::KinectReader::stopKinect()
 {
 	stopKinectFlag.set();
-	readerThread.join();
+	if (readerThread.joinable())
+		readerThread.join();
 }
 
 // Accessors

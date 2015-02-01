@@ -241,7 +241,8 @@ void personalRobotics::ObjectSegmentor::segmentorThreadRoutine()
 void personalRobotics::ObjectSegmentor::stopSegmentor()
 {
 	stopSegmentorFlag.set();
-	segementorThread.join();
+	if (segementorThread.joinable())
+		segementorThread.join();
 }
 
 

@@ -26,13 +26,13 @@ personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 }
 personalRobotics::EyeKin::~EyeKin()
 {
-
 }
 
 // Calibration methods
 void personalRobotics::EyeKin::findTable()
 {
-	tablePlaneFound = segmentor.findTablePlane();
+	if(segmentor.findTablePlane())
+		tablePlaneFound.set();
 }
 void personalRobotics::EyeKin::findHomography()
 {
@@ -53,17 +53,23 @@ void personalRobotics::EyeKin::calibrate()
 {
 	while (isCalibrating.get())
 	{
+		std::cout << "entered while" << std::endl;
 		if (!tablePlaneFound.get() && segmentor.isDepthAllocated.get())
 			findTable();
+		std::cout << "crossed findTable" << std::endl;
 		if (!homographyFound.get() && segmentor.isColorAllocated.get())
 			findHomography();
+		std::cout << "crossed findHomography" << std::endl;
 		if (tablePlaneFound.get() && homographyFound.get())
 		{
+			std::cout << "In flag setting" << std::endl;
 			isCalibrating.unset();
 			segmentor.setHomography(homography);
 			segmentor.startSegmentor();
 		}
+		std::cout << "About to exit while" << std::endl;
 	}
+	std::cout << "Exited while" << std::endl;
 }
 
 // Routines

@@ -41,9 +41,11 @@ personalRobotics::Tcp::Tcp()
 	socketCount++;
 	socketCountMutex.unlock();
 }
-
 personalRobotics::Tcp::~Tcp()
 {
+	// Disconnect any active connections
+	disconnect();
+
 	// Wait for threads to join
 	if (sendThread.joinable())
 		sendThread.join();
@@ -70,7 +72,6 @@ personalRobotics::Tcp::~Tcp()
 		socketCountMutex.unlock();
 	}
 }
-
 void personalRobotics::Tcp::write(int length, char* bufferPtr)
 {
 	int returnCode = send(dataSocket, bufferPtr, length, 0);
@@ -79,7 +80,6 @@ void personalRobotics::Tcp::write(int length, char* bufferPtr)
 		throw SocketException("Error sending data over the socket");
 	}
 }
-
 void personalRobotics::Tcp::read(int length, char* bufferPtr)
 {
 	int returnCode = recv(dataSocket, bufferPtr, length, 0);
@@ -104,7 +104,6 @@ void personalRobotics::Tcp::read(int length, char* bufferPtr)
 		throw SocketException("Error in reading data from connection");
 	}
 }
-
 void personalRobotics::Tcp::asyncSend(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock, bool unlock)
 {
 	if (lock)
@@ -113,7 +112,6 @@ void personalRobotics::Tcp::asyncSend(int length, char* bufferPtr, std::mutex *b
 	if (unlock)
 		bufferMutex->unlock();
 }
-
 void personalRobotics::Tcp::asyncRead(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock, bool unlock)
 {
 	if (lock)
@@ -122,12 +120,10 @@ void personalRobotics::Tcp::asyncRead(int length, char* bufferPtr, std::mutex *b
 	if (unlock)
 		bufferMutex->unlock();
 }
-
 bool personalRobotics::Tcp::connected()
 {
 	return isConnected;
 }
-
 void personalRobotics::Tcp::disconnect()
 {
 	// Close the send channel
@@ -198,6 +194,7 @@ void personalRobotics::Tcp::disconnect()
 	gracefulShutdownMutex.unlock();
 }
 
+
 personalRobotics::TcpServer::TcpServer(int portNumber, int addressFamily, int socketType, int protocol, int flags)
 {
 	// Cleaning
@@ -249,7 +246,6 @@ personalRobotics::TcpServer::TcpServer(int portNumber, int addressFamily, int so
 		}
 	}
 }
-
 personalRobotics::TcpServer::TcpServer(std::string portNumber, int addressFamily, int socketType, int protocol, int flags)
 {
 	// Cleaning
@@ -299,7 +295,6 @@ personalRobotics::TcpServer::TcpServer(std::string portNumber, int addressFamily
 		}
 	}
 }
-
 personalRobotics::TcpServer::~TcpServer()
 {
 	// stop the listener thread
@@ -308,7 +303,6 @@ personalRobotics::TcpServer::~TcpServer()
 	// Close the listener socket
 	closesocket(listener);
 }
-
 void personalRobotics::TcpServer::start()
 {
 	listenerStoppedMutex.lock();
@@ -323,7 +317,6 @@ void personalRobotics::TcpServer::start()
 		listenerStoppedMutex.unlock();
 	}
 }
-
 void personalRobotics::TcpServer::stop()
 {
 	listenerStoppedMutex.lock();
@@ -339,7 +332,6 @@ void personalRobotics::TcpServer::stop()
 		listenerStoppedMutex.unlock();
 	}
 }
-
 void personalRobotics::TcpServer::listenRoutine()
 {
 	while (!listenerStopped)
