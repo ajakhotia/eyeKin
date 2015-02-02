@@ -19,7 +19,6 @@ personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 	tablePlaneFound.unset();
 	homographyFound.unset();
 	isCalibrating.set();
-	serializableListGenerated.unset();
 
 	// Counters
 	epoch = 0;
@@ -67,25 +66,18 @@ void personalRobotics::EyeKin::calibrate()
 }
 
 // Routines
-void personalRobotics::EyeKin::generateSerializableList()
+void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &serializableList)
 {
 	if (segmentor.newListGenerated.get())
 	{
 		// Lock the lists
 		segmentor.lockList();
-		lockSerializableList();
 
 		// Set the non-serializable list to be old
 		segmentor.newListGenerated.unset();
 
-		// Set the serializable list as new
-		serializableListGenerated.set();
-
 		// Get access to entityList
 		std::vector<personalRobotics::Entity> *listPtr = segmentor.getEntityList();
-
-		// Clear the serializableList
-		serializableList.Clear();
 
 		// Copy information from the entity list
 		serializableList.set_frameid(++epoch);
@@ -133,7 +125,6 @@ void personalRobotics::EyeKin::generateSerializableList()
 
 		// Unlock the lists
 		segmentor.unlockList();
-		unlockSerializableList();
 	}
 }
 
@@ -141,18 +132,4 @@ void personalRobotics::EyeKin::generateSerializableList()
 personalRobotics::TcpServer* personalRobotics::EyeKin::getServer()
 {
 	return &tcpServer;
-}
-procamPRL::EntityList* personalRobotics::EyeKin::getSerializableList()
-{
-	return &serializableList;
-}
-
-// Thread safety methods
-void personalRobotics::EyeKin::lockSerializableList()
-{
-	serializableListMutex.lock();
-}
-void personalRobotics::EyeKin::unlockSerializableList()
-{
-	serializableListMutex.unlock();
 }

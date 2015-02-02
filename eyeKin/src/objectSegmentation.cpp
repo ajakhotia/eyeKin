@@ -56,9 +56,7 @@ void personalRobotics::ObjectSegmentor::unlockPcl()
 // Accessors
 std::vector<personalRobotics::Entity>* personalRobotics::ObjectSegmentor::getEntityList()
 {
-	lockList();
 	return &entityList;
-	unlockList();
 }
 
 // Setters
@@ -176,7 +174,6 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		}
 
 		// Generate patch and geometric data for each of the entity
-		std::cout << "List size = " << entityList.size() << std::endl;
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
 		{
 			entityPtr->generateData(homography, rgbImageCopy);

@@ -18,6 +18,7 @@
 #include <exception>
 #include <vector>
 #include <mutex>
+#include "utilities.h"
 
 #define ADDRESS_FAMILY AF_INET		// Refer https://msdn.microsoft.com/en-us/library/windows/desktop/ms737530(v=vs.85).aspx
 #define SOCKET_TYPE SOCK_STREAM		// Refer https://msdn.microsoft.com/en-us/library/windows/desktop/ms737530(v=vs.85).aspx
@@ -54,14 +55,11 @@ namespace personalRobotics
 		struct addrinfo *result;			// Used to store a singly linked list which results from the getaddrinfo function. First item on the list is generally most relevant one to use.
 		struct addrinfo *ptr;				// A pointer to move through the result linked list
 		SOCKET dataSocket;					// A vector of handlers to the actual socket
-		bool isConnected;					// Signals if the data socket is connected
-		bool remoteTerminatedConnection;	// Signals if remote socket terminated the connection
-		bool gracefulShutdown;
+		MutexBool isConnected;					// Signals if the data socket is connected
+		MutexBool remoteTerminatedConnection;	// Signals if remote socket terminated the connection
+		MutexBool gracefulShutdown;
 		std::thread sendThread;				// Sender thread
 		std::thread recvThread;				// Recevier thread
-		std::mutex rmtTermConnMutex;		// Mutex for remoteTerminatedConnection flag
-		std::mutex gracefulShutdownMutex;	// Mutex for the graceful socket shutdown flag
-		std::mutex isConnectedMutex;		// Mutex for socket connection flag
 		std::mutex socketCountMutex;		// Mutex for socket counts
 		static size_t socketCount;			// Used to figure out when to unload the dll by calling WSACleanup().
 	public:
@@ -69,8 +67,8 @@ namespace personalRobotics
 		virtual ~Tcp();
 		void write(int length, char* bufferPtr);
 		void read(int length, char* bufferPtr);
-		void asyncSend(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock = false, bool unlock = true);
-		void asyncRead(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock = false, bool unlock = true);
+		void asyncSend(int length, char* bufferPtr, std::mutex &bufferMutex, bool lock = false, bool unlock = true);
+		void asyncRead(int length, char* bufferPtr, std::mutex &bufferMutex, bool lock = false, bool unlock = true);
 		bool connected();
 		void disconnect();
 	};

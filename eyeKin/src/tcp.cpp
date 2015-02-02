@@ -77,7 +77,14 @@ void personalRobotics::Tcp::write(int length, char* bufferPtr)
 	int returnCode = send(dataSocket, bufferPtr, length, 0);
 	if (returnCode == SOCKET_ERROR)
 	{
-		throw SocketException("Error sending data over the socket");
+		std::string s("Error sending data over the socket. Error code: ");
+		int error = WSAGetLastError();
+		s.append(std::to_string(error));
+		if (error == WSAECONNRESET)
+		{
+			disconnect();
+		}
+		//throw SocketException(s);
 	}
 }
 void personalRobotics::Tcp::read(int length, char* bufferPtr)
@@ -104,21 +111,21 @@ void personalRobotics::Tcp::read(int length, char* bufferPtr)
 		throw SocketException("Error in reading data from connection");
 	}
 }
-void personalRobotics::Tcp::asyncSend(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock, bool unlock)
+void personalRobotics::Tcp::asyncSend(int length, char* bufferPtr, std::mutex &bufferMutex, bool lock, bool unlock)
 {
 	if (lock)
-		bufferMutex->lock();
+		bufferMutex.lock();
 	sendThread = std::thread(&personalRobotics::TcpServer::write, this, length, bufferPtr);
 	if (unlock)
-		bufferMutex->unlock();
+		bufferMutex.unlock();
 }
-void personalRobotics::Tcp::asyncRead(int length, char* bufferPtr, std::mutex *bufferMutex, bool lock, bool unlock)
+void personalRobotics::Tcp::asyncRead(int length, char* bufferPtr, std::mutex &bufferMutex, bool lock, bool unlock)
 {
 	if (lock)
-		bufferMutex->lock();
+		bufferMutex.lock();
 	recvThread = std::thread(&personalRobotics::TcpServer::read, this, length, bufferPtr);
 	if (unlock)
-		bufferMutex->unlock();
+		bufferMutex.unlock();
 }
 bool personalRobotics::Tcp::connected()
 {
@@ -250,7 +257,7 @@ personalRobotics::TcpServer::TcpServer(std::string portNumber, int addressFamily
 {
 	// Cleaning
 	listener = INVALID_SOCKET;
-	
+
 	// Setup
 	hints.ai_family = addressFamily;
 	hints.ai_socktype = socketType;
@@ -263,13 +270,14 @@ personalRobotics::TcpServer::TcpServer(std::string portNumber, int addressFamily
 	listenerStoppedMutex.unlock();
 
 	// Get address information of the host to bind a listener socket to
-	int returnCode = getaddrinfo(NULL,portNumber.c_str(), &hints, &result);
+	int returnCode = getaddrinfo(NULL, portNumber.c_str(), &hints, &result);
 	if (returnCode != 0)
 	{
+		freeaddrinfo(result);
 		throw SocketException("Failed to get address information");
 	}
 
-	// Start listening for incoming connection
+	// Configure listener socket
 	listener = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	if (listener == INVALID_SOCKET)
 	{
@@ -292,6 +300,7 @@ personalRobotics::TcpServer::TcpServer(std::string portNumber, int addressFamily
 				closesocket(listener);
 				throw SocketException("Unable to bind the listner socket");
 			}
+			break;
 		}
 	}
 }
@@ -345,7 +354,7 @@ void personalRobotics::TcpServer::listenRoutine()
 		if (!isConnected)
 		{
 			dataSocket = accept(listener, NULL, NULL);
-			if (dataSocket = INVALID_SOCKET)
+			if (dataSocket == INVALID_SOCKET)
 			{
 				throw SocketException("Unable to accept incoming connection");
 			}

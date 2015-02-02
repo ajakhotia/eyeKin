@@ -31,9 +31,6 @@
     <ProjectReference Include="..\pcl\pcl\pcl.vcxproj">
       <Project>{c68745cb-6058-42c1-ba33-527e1b2c76f1}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\protobuf-2.6.1\vsprojects\protoc.vcxproj">
-      <Project>{1738d5f6-ed1e-47e0-b2f0-456864b93c1e}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\entity.h" />
@@ -172,6 +169,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>

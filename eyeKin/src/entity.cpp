@@ -67,7 +67,6 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 		}
 
 	}
-	std::cout << "Idx: "<< largestContourIdx << std::endl;
 	if (contours.size() != 0)
 	{
 		cv::approxPolyDP(contours[largestContourIdx], contour, 5, true);

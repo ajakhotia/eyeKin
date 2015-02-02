@@ -15,7 +15,6 @@ namespace personalRobotics
 		// Interface
 		ObjectSegmentor segmentor;
 		TcpServer tcpServer;
-		procamPRL::EntityList serializableList;
 
 		// Calibration
 		cv::Mat checkerboard;
@@ -30,10 +29,7 @@ namespace personalRobotics
 		MutexBool tablePlaneFound;
 		MutexBool homographyFound;
 		MutexBool isCalibrating;
-
-		// Locks
-		std::mutex serializableListMutex;
-		
+	
 		// Configurations
 		int screenWidth;
 		int screenHeight;
@@ -48,18 +44,10 @@ namespace personalRobotics
 		void calibrate();
 
 		// Routines
-		void generateSerializableList();
-
-		// Control flags
-		MutexBool serializableListGenerated;
+		void generateSerializableList(procamPRL::EntityList &serializableList);
 
 		// Accessors
 		TcpServer* getServer();
-		procamPRL::EntityList* getSerializableList();
-
-		// Thread safety methods
-		void lockSerializableList();
-		void unlockSerializableList();
 	};
 }
 
