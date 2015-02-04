@@ -18,6 +18,7 @@ void main(int argC, char **argV)
 			// Allocate space for list
 			procamPRL::EntityList serializableList;
 			serializableList.set_frameid(7);
+			std::cout << "List size is: " << eyeKin.getSegmentor()->getEntityList()->size() << std::endl;
 			// Generate serializable list
 			//eyeKin.generateSerializableList(serializableList);
 			//procamPRL::Entity *ent = serializableList.add_entitylist();
@@ -31,7 +32,6 @@ void main(int argC, char **argV)
 			//bufferMutex.lock();
 			serializableList.SerializeToString(&outString);
 			int dataLenght = outString.length();
-			std::cout << dataLenght << std::endl;
 			if (dataLenght > 0)
 			{
 				try

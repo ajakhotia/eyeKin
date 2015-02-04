@@ -133,3 +133,7 @@ personalRobotics::TcpServer* personalRobotics::EyeKin::getServer()
 {
 	return &tcpServer;
 }
+personalRobotics::ObjectSegmentor* personalRobotics::EyeKin::getSegmentor()
+{
+	return &segmentor;
+}

@@ -221,6 +221,9 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	planePtr->values[2] = planePtr->values[2] * signOfD;
 	planePtr->values[3] = planePtr->values[3] * signOfD;
 
+	// Find pixel size
+
+
 	// Return
 	return true;
 }

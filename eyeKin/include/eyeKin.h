@@ -48,6 +48,7 @@ namespace personalRobotics
 
 		// Accessors
 		TcpServer* getServer();
+		ObjectSegmentor* getSegmentor();
 	};
 }
 
