@@ -3,20 +3,14 @@
 personalRobotics::Tcp::Tcp()
 {
 	// Initialize the winsock framework only once when the fisrt socket is created
-	socketCountMutex.lock();
-	if (socketCount == 0)
+	if (socketCount.get() == 0)
 	{
-		socketCountMutex.unlock();
 		WSAData wsaData;
 		int returnCode = WSAStartup(MAKEWORD(2, 2), &wsaData);
 		if (returnCode != 0)
 		{
 			throw SocketException("Unable to load dlls for sockets. WSAStartup failed");
 		}
-	}
-	else
-	{
-		socketCountMutex.unlock();
 	}
 
 	// Clean up the varibles
@@ -26,89 +20,101 @@ personalRobotics::Tcp::Tcp()
 	dataSocket = INVALID_SOCKET;
 
 	// Setup flags
-	isConnectedMutex.lock();
-	isConnected = false;
-	isConnectedMutex.unlock();
-	rmtTermConnMutex.lock();
-	remoteTerminatedConnection = false;
-	rmtTermConnMutex.unlock();
-	gracefulShutdownMutex.lock();
-	gracefulShutdown = true;
-	gracefulShutdownMutex.unlock();
+	isConnected.set(false);
+	sendChannelOpen.set(false);
+	recvChannelOpen.set(false);
+	remoteTerminatedConnection.set(false);
 
 	// Update the number of sockets initialized
-	socketCountMutex.lock();
 	socketCount++;
-	socketCountMutex.unlock();
 }
 personalRobotics::Tcp::~Tcp()
 {
-	// Disconnect any active connections
-	disconnect();
-
 	// Wait for threads to join
 	if (sendThread.joinable())
 		sendThread.join();
 	if (recvThread.joinable())
 		recvThread.join();
 
+	// Disconnect any active connections
+	disconnect();
+
 	// Close the socket
 	closesocket(dataSocket);
 
 	// Decrement the number of live sockets
-	socketCountMutex.lock();
 	socketCount--;
-	socketCountMutex.unlock();
 
 	// Unload the dlls if all sockets are dead
-	socketCountMutex.lock();
-	if (socketCount == 0)
+	if (socketCount.get() == 0)
 	{
-		socketCountMutex.unlock();
 		WSACleanup();
-	}
-	else
-	{
-		socketCountMutex.unlock();
 	}
 }
 void personalRobotics::Tcp::write(int length, char* bufferPtr)
 {
-	int returnCode = send(dataSocket, bufferPtr, length, 0);
-	if (returnCode == SOCKET_ERROR)
+	if (sendChannelOpen.get())
 	{
-		std::string s("Error sending data over the socket. Error code: ");
-		int error = WSAGetLastError();
-		s.append(std::to_string(error));
-		if (error == WSAECONNRESET)
+		int returnCode = send(dataSocket, bufferPtr, length, 0);
+		if (returnCode == SOCKET_ERROR)
 		{
-			disconnect();
+			// Gather error data
+			std::cout << "Error sending data over the socket. Attempting to shutdown send stream. Error code: " << WSAGetLastError();
+
+			// Shutdown the socket's send stream stream if its not already being closed else simply exit.
+			if (sendChannelOpen.get())
+			{
+				int returnCode = shutdown(dataSocket, SD_SEND);
+				if (returnCode == SOCKET_ERROR)
+				{
+					// Set the flags to crash the entire socket
+					sendChannelOpen.set(false);
+					recvChannelOpen.set(false);
+					std::cout << "Error in closing socket. Error code: " << WSAGetLastError() << std::endl;
+					reset();
+					return;
+				}
+				else
+				{
+					sendChannelOpen.set(false);
+					remoteTerminatedConnection.set(true);
+					cleanup();
+					return;
+				}
+			}
 		}
-		//throw SocketException(s);
 	}
 }
 void personalRobotics::Tcp::read(int length, char* bufferPtr)
 {
-	int returnCode = recv(dataSocket, bufferPtr, length, 0);
-	if (returnCode == 0)
+	if (recvChannelOpen.get())
 	{
-		rmtTermConnMutex.lock();
-		remoteTerminatedConnection |= true;
-		rmtTermConnMutex.unlock();
-		gracefulShutdownMutex.lock();
-		gracefulShutdown &= true;
-		gracefulShutdownMutex.unlock();
-		disconnect();
-	}
-	else if (returnCode == SOCKET_ERROR)
-	{
-		rmtTermConnMutex.lock();
-		remoteTerminatedConnection |= true;
-		rmtTermConnMutex.unlock();
-		gracefulShutdownMutex.lock();
-		gracefulShutdown &= false;
-		gracefulShutdownMutex.unlock();
-		throw SocketException("Error in reading data from connection");
+		int returnCode = recv(dataSocket, bufferPtr, length, 0);
+		if (returnCode == 0)
+		{
+			// Shutdown the socket's receive stream if not already being shutdown
+			if (recvChannelOpen.get())
+			{
+				recvChannelOpen.set(false);
+				remoteTerminatedConnection.set(true);
+				shutdown(dataSocket, SD_RECEIVE);
+				cleanup();
+				return;
+			}
+			return;
+		}
+		else if (returnCode == SOCKET_ERROR)
+		{
+			// Set the flags to crash the entire socket
+			recvChannelOpen.set(false);
+			sendChannelOpen.set(false);
+			remoteTerminatedConnection.set(true);
+			// Gather error data
+			std::cout << "Error in reading data from the socket. Error code: " << WSAGetLastError() << std::endl;		
+			// Reset the soceket
+			reset();
+			return;
+		}
 	}
 }
 void personalRobotics::Tcp::asyncSend(int length, char* bufferPtr, std::mutex &bufferMutex, bool lock, bool unlock)
@@ -127,78 +133,107 @@ void personalRobotics::Tcp::asyncRead(int length, char* bufferPtr, std::mutex &b
 	if (unlock)
 		bufferMutex.unlock();
 }
-bool personalRobotics::Tcp::connected()
+void personalRobotics::Tcp::cleanup()
 {
-	return isConnected;
+	if (sendChannelOpen.get() && !recvChannelOpen.get())
+	{
+		// Implies receive channel stopped cleanly and awaits to stop write channel
+		// Set the flags to close send channel
+		sendChannelOpen.set(false);
+		
+		// Close the send stream
+		int returnCode = shutdown(dataSocket, SD_SEND);
+		if (returnCode == SOCKET_ERROR)
+		{
+			std::cout << "Error in closing socket. Error code: " << WSAGetLastError() << std::endl;
+			reset();
+			return;
+		}
+	}
+
+	if (!sendChannelOpen.get() && recvChannelOpen.get())
+	{
+		// Implies send channel closed cleanly and awaits receive channel to close
+		// Set flags to close receive channel
+		recvChannelOpen.set(false);
+		
+		// Flush the buffer
+		int returnCode = 1;
+		char dumpBuffer[DUMP_BUFFER_LENGTH];
+		while (returnCode != 0)
+		{
+			returnCode = recv(dataSocket, dumpBuffer, DUMP_BUFFER_LENGTH, 0);
+			if (returnCode == 0)
+			{
+				shutdown(dataSocket, SD_RECEIVE);
+			}
+			else if (returnCode == SOCKET_ERROR)
+			{
+				std::cout << "Error in closing socket. Error code: " << WSAGetLastError() << std::endl;
+				reset();
+				return;
+			}
+		}
+	}
+
+	if (!sendChannelOpen.get() && !recvChannelOpen.get())
+	{
+		// Implies both the channels have been shutdown. Reset the socket
+		reset();
+	}
 }
 void personalRobotics::Tcp::disconnect()
 {
-	// Close the send channel
+	// Close the send channel if not already closed
+	if (sendChannelOpen.get())
 	{
+		// Shutdown the socket's send stream
+		sendChannelOpen.set(false);
+		remoteTerminatedConnection.set(false);
 		int returnCode = shutdown(dataSocket, SD_SEND);
-		if (returnCode == 0)
-		{
-			gracefulShutdownMutex.lock();
-			gracefulShutdown &= true;
-			gracefulShutdownMutex.unlock();
-			rmtTermConnMutex.lock();
-			remoteTerminatedConnection |= false;
-			rmtTermConnMutex.unlock();
-		}
 		if (returnCode == SOCKET_ERROR)
 		{
-			gracefulShutdownMutex.lock();
-			gracefulShutdown &= false;
-			gracefulShutdownMutex.unlock();
-			rmtTermConnMutex.lock();
-			remoteTerminatedConnection |= false;
-			rmtTermConnMutex.unlock();
-			throw SocketException("Error trying to shutdown socket");
+			// Signal closing of all channels before crashing the socket. sendChannel is already signaled as closed.
+			recvChannelOpen.set(false);
+			std::cout << "Error in closing socket. Error code: " << WSAGetLastError() << std::endl;
+			reset();
+			return;
 		}
 	}
 
 	// Flush the read buffer and close the receive channel
+	if (recvChannelOpen.get())
 	{
-		rmtTermConnMutex.lock();
-		if (!remoteTerminatedConnection)
+		remoteTerminatedConnection.set(false);
+		recvChannelOpen.set(false);
+		int returnCode = 1;
+		char dumpBuffer[DUMP_BUFFER_LENGTH];
+		while (returnCode != 0)
 		{
-			rmtTermConnMutex.unlock();
-			int returnCode = 1;
-			char dumpBuffer[DUMP_BUFFER_LENGTH];
-			while (returnCode != 0)
+			returnCode = recv(dataSocket, dumpBuffer, DUMP_BUFFER_LENGTH, 0);
+			if (returnCode == 0)
 			{
-				returnCode = recv(dataSocket, dumpBuffer, DUMP_BUFFER_LENGTH, 0);
-				if (returnCode == 0)
-				{
-					gracefulShutdown &= true;
-					remoteTerminatedConnection |= true;
-				}
-				else if (returnCode == SOCKET_ERROR)
-				{
-					gracefulShutdown &= false;
-					remoteTerminatedConnection |= true;
-					throw SocketException("Error in reading data from connection");
-				}
+				shutdown(dataSocket, SD_RECEIVE);
+			}
+			else if (returnCode == SOCKET_ERROR)
+			{
+				std::cout << "Error in closing socket. Error code: " << WSAGetLastError() << std::endl;
+				reset();
+				return;
 			}
 		}
-		else
-		{
-			rmtTermConnMutex.unlock();
-		}
 	}
-
+	reset();
+}
+void personalRobotics::Tcp::reset()
+{
 	// Close the socket to free any occupied resources and reset the flags to constructor set values
+	sendChannelOpen.set(false);
+	recvChannelOpen.set(false);
+	isConnected.set(false);
+	remoteTerminatedConnection.set(false);
 	closesocket(dataSocket);
 	dataSocket = INVALID_SOCKET;
-	isConnectedMutex.lock();
-	isConnected = false;
-	isConnectedMutex.unlock();
-	rmtTermConnMutex.lock();
-	remoteTerminatedConnection = false;
-	rmtTermConnMutex.unlock();
-	gracefulShutdownMutex.lock();
-	gracefulShutdown = true;
-	gracefulShutdownMutex.unlock();
 }
 
 
@@ -214,9 +249,7 @@ personalRobotics::TcpServer::TcpServer(int portNumber, int addressFamily, int so
 	hints.ai_flags = flags;
 
 	// Set flags
-	listenerStoppedMutex.lock();
-	listenerStopped = true;
-	listenerStoppedMutex.unlock();
+	listenerStopped.set(true);
 
 	// Get address information of the host to bind a listener socket to
 	int returnCode = getaddrinfo(NULL, std::to_string(portNumber).c_str(), &hints, &result);
@@ -265,9 +298,7 @@ personalRobotics::TcpServer::TcpServer(std::string portNumber, int addressFamily
 	hints.ai_flags = flags;
 
 	// Set flags
-	listenerStoppedMutex.lock();
-	listenerStopped = true;
-	listenerStoppedMutex.unlock();
+	listenerStopped.set(true);
 
 	// Get address information of the host to bind a listener socket to
 	int returnCode = getaddrinfo(NULL, portNumber.c_str(), &hints, &result);
@@ -314,44 +345,31 @@ personalRobotics::TcpServer::~TcpServer()
 }
 void personalRobotics::TcpServer::start()
 {
-	listenerStoppedMutex.lock();
-	if (listenerStopped)
+	if (listenerStopped.get())
 	{
-		listenerStopped = false;
-		listenerStoppedMutex.unlock();
+		listenerStopped.set(false);
 		listenerThread = std::thread(&TcpServer::listenRoutine, this);
-	}
-	else
-	{
-		listenerStoppedMutex.unlock();
 	}
 }
 void personalRobotics::TcpServer::stop()
 {
-	listenerStoppedMutex.lock();
-	if (!listenerStopped)
+	if (!listenerStopped.get())
 	{
-		listenerStopped = true;
-		listenerStoppedMutex.unlock();
+		listenerStopped.set(true);
 		if (listenerThread.joinable())
 			listenerThread.join();
-	}
-	else
-	{
-		listenerStoppedMutex.unlock();
 	}
 }
 void personalRobotics::TcpServer::listenRoutine()
 {
-	while (!listenerStopped)
+	while (!listenerStopped.get())
 	{
 		int returnCode = listen(listener, SOMAXCONN);
 		if (returnCode == SOCKET_ERROR)
 		{
 			throw SocketException("Unable listen for connections");
 		}
-		isConnectedMutex.lock();
-		if (!isConnected)
+		if (!isConnected.get())
 		{
 			dataSocket = accept(listener, NULL, NULL);
 			if (dataSocket == INVALID_SOCKET)
@@ -360,9 +378,10 @@ void personalRobotics::TcpServer::listenRoutine()
 			}
 			else
 			{
-				isConnected = true;
+				isConnected.set(true);
+				sendChannelOpen.set(true);
+				recvChannelOpen.set(true);
 			}
 		}
-		isConnectedMutex.unlock();
 	}
 }

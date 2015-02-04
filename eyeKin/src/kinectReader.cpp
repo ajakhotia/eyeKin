@@ -7,11 +7,11 @@ personalRobotics::KinectReader::KinectReader() :	kinectPtr(NULL),
 													pointCloudPtr(NULL)
 {
 	// Unset all flags
-	stopKinectFlag.set();
-	newFrameArrived.unset();
-	isColorAllocated.unset();
-	isDepthAllocated.unset();
-	isIRallocated.unset();
+	stopKinectFlag.set(true);
+	newFrameArrived.set(false);
+	isColorAllocated.set(false);
+	isDepthAllocated.set(false);
+	isIRallocated.set(false);
 
 	// Load a dummy image
 	dummy = cv::imread("../data/dummy.jpg", CV_LOAD_IMAGE_COLOR);
@@ -113,7 +113,7 @@ void personalRobotics::KinectReader::pollFrames()
 					rgbaImage.create(rgbHeight, rgbWidth, CV_8UC4);
 					rgbaMutex.unlock();
 					rgbMutex.unlock();
-					isColorAllocated.set();
+					isColorAllocated.set(true);
 					safeRelease(colorFrameDescPtr);
 				}
 			}
@@ -144,7 +144,7 @@ void personalRobotics::KinectReader::pollFrames()
 					pointCloudMutex.lock();
 					pointCloudPtr = new CameraSpacePoint[depthWidth*depthHeight];
 					pointCloudMutex.unlock();
-					isDepthAllocated.set();
+					isDepthAllocated.set(true);
 					safeRelease(depthFrameDescription);
 				}
 			}
@@ -171,7 +171,7 @@ void personalRobotics::KinectReader::pollFrames()
 					irMutex.lock();
 					irImage.create(depthHeight, depthWidth, CV_16UC1);
 					irMutex.unlock();
-					isIRallocated.set();
+					isIRallocated.set(true);
 					safeRelease(infraredFrameDescription);
 				}
 			}
@@ -182,7 +182,7 @@ void personalRobotics::KinectReader::pollFrames()
 		}
 
 		// Report arrival of new frames
-		newFrameArrived.set();
+		newFrameArrived.set(true);
 
 		//Release the reference to MultiSourceFrameptr
 		safeRelease(multiSourceFramePtr);
@@ -197,12 +197,12 @@ void personalRobotics::KinectReader::kinectThreadRoutine()
 }
 void personalRobotics::KinectReader::startKinect()
 {
-	stopKinectFlag.unset();
+	stopKinectFlag.set(false);
 	readerThread = std::thread(&personalRobotics::KinectReader::kinectThreadRoutine, this);
 }
 void personalRobotics::KinectReader::stopKinect()
 {
-	stopKinectFlag.set();
+	stopKinectFlag.set(true);
 	if (readerThread.joinable())
 		readerThread.join();
 }

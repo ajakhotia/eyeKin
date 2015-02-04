@@ -55,13 +55,9 @@ namespace personalRobotics
 		struct addrinfo *result;			// Used to store a singly linked list which results from the getaddrinfo function. First item on the list is generally most relevant one to use.
 		struct addrinfo *ptr;				// A pointer to move through the result linked list
 		SOCKET dataSocket;					// A vector of handlers to the actual socket
-		MutexBool isConnected;					// Signals if the data socket is connected
-		MutexBool remoteTerminatedConnection;	// Signals if remote socket terminated the connection
-		MutexBool gracefulShutdown;
 		std::thread sendThread;				// Sender thread
 		std::thread recvThread;				// Recevier thread
-		std::mutex socketCountMutex;		// Mutex for socket counts
-		static size_t socketCount;			// Used to figure out when to unload the dll by calling WSACleanup().
+		static MutexType<int> socketCount;			// Used to figure out when to unload the dll by calling WSACleanup().
 	public:
 		Tcp();
 		virtual ~Tcp();
@@ -69,16 +65,21 @@ namespace personalRobotics
 		void read(int length, char* bufferPtr);
 		void asyncSend(int length, char* bufferPtr, std::mutex &bufferMutex, bool lock = false, bool unlock = true);
 		void asyncRead(int length, char* bufferPtr, std::mutex &bufferMutex, bool lock = false, bool unlock = true);
-		bool connected();
+		void cleanup();
 		void disconnect();
+		void reset();
+		MutexBool isConnected;					// Signals if the data socket is connected
+		MutexBool sendChannelOpen;
+		MutexBool recvChannelOpen;
+		MutexBool remoteTerminatedConnection;	// Signals if remote socket terminated the connection
 	};
 
+	// Server class
 	class TcpServer : public Tcp
 	{
 	protected:
 		SOCKET listener;
-		bool listenerStopped;
-		std::mutex listenerStoppedMutex;
+		MutexBool listenerStopped;
 		std::thread listenerThread;
 		void listenRoutine();
 	public:
@@ -88,16 +89,15 @@ namespace personalRobotics
 		void start();
 		void stop();
 	};
-	/*
-	class TcpClient : public Tcp
+
+	// Client class
+	/*class TcpClient : public Tcp
 	{
 	protected:
 
 	public:
 		TcpClient();
 		~TcpClient();
-	};
-	*/
-	
+	};*/
 }
 #endif

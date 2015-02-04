@@ -16,9 +16,9 @@ personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 	personalRobotics::createCheckerboard(checkerboard, screenWidth, screenHeight, numCheckerPtsX, numCheckerPtsY);
 
 	//Flags
-	tablePlaneFound.unset();
-	homographyFound.unset();
-	isCalibrating.set();
+	tablePlaneFound.set(false);
+	homographyFound.set(false);
+	isCalibrating.set(true);
 
 	// Counters
 	epoch = 0;
@@ -31,7 +31,7 @@ personalRobotics::EyeKin::~EyeKin()
 void personalRobotics::EyeKin::findTable()
 {
 	if(segmentor.findTablePlane())
-		tablePlaneFound.set();
+		tablePlaneFound.set(true);
 }
 void personalRobotics::EyeKin::findHomography()
 {
@@ -46,7 +46,7 @@ void personalRobotics::EyeKin::findHomography()
 		homographyFound = true;
 	}*/
 	homography = (cv::Mat_<double>(3, 3) <<1.7456, 0.0337, -837.4711, -0.0143, -1.7469, 1411.6242, -3.04089, 0.0000, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
-	homographyFound.set();
+	homographyFound.set(true);
 }
 void personalRobotics::EyeKin::calibrate()
 {
@@ -58,7 +58,7 @@ void personalRobotics::EyeKin::calibrate()
 			findHomography();
 		if (tablePlaneFound.get() && homographyFound.get())
 		{
-			isCalibrating.unset();
+			isCalibrating.set(false);
 			segmentor.setHomography(homography);
 			segmentor.startSegmentor();
 		}
@@ -74,7 +74,7 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 		segmentor.lockList();
 
 		// Set the non-serializable list to be old
-		segmentor.newListGenerated.unset();
+		segmentor.newListGenerated.set(false);
 
 		// Get access to entityList
 		std::vector<personalRobotics::Entity> *listPtr = segmentor.getEntityList();

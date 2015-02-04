@@ -15,7 +15,7 @@ personalRobotics::ObjectSegmentor::ObjectSegmentor()
 	maxClusterSize = DEFAULT_MAXIMUM_CLUSTER_SIZE;
 
 	// Set initial state of flags
-	stopSegmentorFlag.set();
+	stopSegmentorFlag.set(true);
 
 	// Initialize pcl containers
 	lockPcl();
@@ -63,7 +63,7 @@ std::vector<personalRobotics::Entity>* personalRobotics::ObjectSegmentor::getEnt
 void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
 {
 	homography = inHomography.clone();
-	homographySetFlag.set();
+	homographySetFlag.set(true);
 }
 
 // Routines
@@ -72,7 +72,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 	if (newFrameArrived.get())
 	{
 		// Unset the flag
-		newFrameArrived.unset();
+		newFrameArrived.set(false);
 
 		// Empty the containers
 		size_t numPoints = depthHeight*depthWidth;
@@ -146,7 +146,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		// Extract cloud for each object
 		lockList();
 		entityList.clear();
-		newListGenerated.set();
+		newListGenerated.set(true);
 		for (std::vector<pcl::PointIndices>::const_iterator it = clusterIndices.begin(); it != clusterIndices.end(); ++it)
 		{
 			CameraSpacePoint *cameraSpacePoints = new CameraSpacePoint[it->indices.size()];
@@ -226,7 +226,7 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 }
 void personalRobotics::ObjectSegmentor::startSegmentor()
 {
-	stopSegmentorFlag.unset();
+	stopSegmentorFlag.set(false);
 	segementorThread = std::thread(&personalRobotics::ObjectSegmentor::segmentorThreadRoutine, this);
 }
 void personalRobotics::ObjectSegmentor::segmentorThreadRoutine()
@@ -238,7 +238,7 @@ void personalRobotics::ObjectSegmentor::segmentorThreadRoutine()
 }
 void personalRobotics::ObjectSegmentor::stopSegmentor()
 {
-	stopSegmentorFlag.set();
+	stopSegmentorFlag.set(true);
 	if (segementorThread.joinable())
 		segementorThread.join();
 }

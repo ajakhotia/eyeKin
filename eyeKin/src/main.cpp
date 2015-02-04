@@ -1,6 +1,7 @@
 #include "eyeKin.h"
 #include <Windows.h>
-size_t personalRobotics::Tcp::socketCount = 0;
+
+personalRobotics::MutexType<int> personalRobotics::Tcp::socketCount = 0;
 
 void main(int argC, char **argV)
 {
@@ -12,7 +13,7 @@ void main(int argC, char **argV)
 	// Loop to begin sending data
 	while (true)
 	{
-		if (eyeKin.getServer()->connected())
+		if (eyeKin.getServer()->isConnected.get())
 		{
 			// Allocate space for list
 			procamPRL::EntityList serializableList;
