@@ -28,6 +28,7 @@ namespace personalRobotics
 		pcl::ModelCoefficients::Ptr planePtr;
 		std::vector<personalRobotics::Entity> entityList;
 		cv::Mat homography;
+		cv::Point2f pixelSize;
 
 		// Container locks
 		std::mutex pclPtrLock;

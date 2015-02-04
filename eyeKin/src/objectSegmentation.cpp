@@ -244,7 +244,17 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	planePtr->values[3] = planePtr->values[3] * signOfD;
 
 	// Find pixel size
-
+	CameraSpacePoint keyPoints[3];
+	ColorSpacePoint projectedKeyPoints[3];
+	keyPoints[0] = { 0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0) / planePtr->values[2]) };	//(0  , 0   ,z1)
+	keyPoints[1] = { 0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0.1 + planePtr->values[1] * 0) / planePtr->values[2]) };	//(0.1, 0   ,z2)
+	keyPoints[2] = { 0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0.1) / planePtr->values[2]) };	//(0  , 0.1 ,z3)
+	coordinateMapperPtr->MapCameraPointsToColorSpace(3, keyPoints, 3, projectedKeyPoints);
+	double delX = sqrt((projectedKeyPoints[1].X - projectedKeyPoints[0].X)*(projectedKeyPoints[1].X - projectedKeyPoints[0].X) + (projectedKeyPoints[1].Y - projectedKeyPoints[0].Y)*(projectedKeyPoints[1].Y - projectedKeyPoints[0].Y));
+	double delY = sqrt((projectedKeyPoints[2].X - projectedKeyPoints[0].X)*(projectedKeyPoints[2].X - projectedKeyPoints[0].X) + (projectedKeyPoints[2].Y - projectedKeyPoints[0].Y)*(projectedKeyPoints[2].Y - projectedKeyPoints[0].Y));
+	pixelSize.x = 0.1 / delX;
+	pixelSize.y - 0.1 / delY;
+	std::cout << "sizeX: " << pixelSize.x << ", " << "SizeY: " << pixelSize.y << std::endl;
 
 	// Return
 	return true;
