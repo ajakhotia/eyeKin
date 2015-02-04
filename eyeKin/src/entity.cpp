@@ -17,7 +17,7 @@ personalRobotics::Entity::~Entity()
 }
 
 // Routines
-void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbImage)
+void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbImage, cv::Mat& IRmask)
 {
 	//Debug
 	#ifdef DEBUG_PROFILER

@@ -28,7 +28,7 @@ namespace personalRobotics
 		Entity();
 		Entity(cv::Point2f centroid, float angle, float xLenght, float yLenght);
 		~Entity();
-		void generateData(cv::Mat& homography, cv::Mat& rgbImage);
+		void generateData(cv::Mat& homography, cv::Mat& rgbImage, cv::Mat& IRmask);
 	};
 }
 #endif

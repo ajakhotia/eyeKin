@@ -83,6 +83,10 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		// Obtain the plane semented pointcloud
 		size_t dstPoint = 0;
 		pointCloudMutex.lock();
+		cv::Mat IRmask(rgbHeight, rgbWidth, CV_8UC1,cv::Scalar(255));
+		irMutex.lock();
+		cv::Mat irImageCopy = irImage.clone();
+		irMutex.unlock();
 		rgbMutex.lock();
 		cv::Mat rgbImageCopy = rgbImage.clone();
 		rgbMutex.unlock();
@@ -160,7 +164,25 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			// Map the points to RGB space
 			cv::Mat points(pointNum, 2, CV_32F);
 			coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)points.data);
+
+			//Map the points to depth and IR Space
+			cv::Mat dpoints(pointNum, 2, CV_32F);				//Added by Kevin
+			coordinateMapperPtr->MapCameraPointsToDepthSpace(pointNum, cameraSpacePoints, pointNum, (DepthSpacePoint*)dpoints.data);		//Added by Kevin
 			delete[] cameraSpacePoints;
+			cv::Rect boundRect = cv::boundingRect(dpoints);
+
+			//finds the contours using the ir image
+			boundRect += cv::Size(4, 4);
+			int depthPointNum = boundRect.area();
+			cv::Mat croppedImage = irImageCopy(boundRect);
+			std::vector<std::vector<cv::Point>> ncontours;
+			std::vector<std::vector<cv::Point>> npoints;
+			cv::Mat cannyOut;
+			cv::Canny(croppedImage, cannyOut, DEFAULT_IRCANNY_LOW_THRESHOLD, DEFAULT_IRCANNY_HIGH_THRESHOLD, DEFAULT_IRCANNY_KERNEL_SIZE, false);
+			cv::findContours(cannyOut, npoints, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+			int numpoints = npoints.size();
+			coordinateMapperPtr->MapDepthPointsToColorSpace(numpoints, (DepthSpacePoint*)npoints.data, 0, 0, numpoints, (ColorSpacePoint*)ncontours.data);
+			cv::drawContours(IRmask, ncontours, 0, cv::Scalar(0), CV_FILLED);
 
 			//Find mean and covariance
 			cv::Mat cvCentroid, cvCovar;
@@ -176,7 +198,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		// Generate patch and geometric data for each of the entity
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
 		{
-			entityPtr->generateData(homography, rgbImageCopy);
+			entityPtr->generateData(homography, rgbImageCopy, IRmask);
 		}
 		unlockList();
 	}
