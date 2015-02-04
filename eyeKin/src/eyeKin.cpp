@@ -89,23 +89,23 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 			procamPRL::Entity* serializableEntityPtr = serializableList.add_entitylist();
 			
 			// Set pose
-			personalRobotics::Pose2D *pose = new personalRobotics::Pose2D();
-			personalRobotics::Point2D *position = new personalRobotics::Point2D();
-			position->set_x(entityPtr->pose2Dproj.position.x);
-			position->set_y(entityPtr->pose2Dproj.position.y);
-			pose->set_angle(entityPtr->pose2Dproj.angle);
-			serializableEntityPtr->set_allocated_pose(pose);
+			personalRobotics::Pose2D pose;
+			personalRobotics::Point2D position;
+			position.set_x(entityPtr->pose2Dproj.position.x);
+			position.set_y(entityPtr->pose2Dproj.position.y);
+			pose.set_angle(entityPtr->pose2Dproj.angle);
+			serializableEntityPtr->set_allocated_pose(&pose);
 
 			// Set bounding size
-			personalRobotics::Point2D *boundingSize = new personalRobotics::Point2D();
-			boundingSize->set_x(entityPtr->boundingSize.width);
-			boundingSize->set_y(entityPtr->boundingSize.height);
-			serializableEntityPtr->set_allocated_boundingsize(boundingSize);
+			personalRobotics::Point2D boundingSize;
+			boundingSize.set_x(entityPtr->boundingSize.width);
+			boundingSize.set_y(entityPtr->boundingSize.height);
+			serializableEntityPtr->set_allocated_boundingsize(&boundingSize);
 
 			// Set pixel size
-			personalRobotics::Point2D *pixelSize = new personalRobotics::Point2D();
-			pixelSize->set_x(1);
-			pixelSize->set_y(1);
+			personalRobotics::Point2D pixelSize;
+			pixelSize.set_x(1);
+			pixelSize.set_y(1);
 
 			// Set contours
 			for (std::vector<cv::Point>::iterator contourPointPtr = entityPtr->contour.begin(); contourPointPtr != entityPtr->contour.end(); contourPointPtr++)
@@ -116,11 +116,11 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 			}
 
 			// Set Image
-			procamPRL::Entity::Image *imagePtr = new procamPRL::Entity::Image();
-			imagePtr->set_height(entityPtr->patch.rows);
-			imagePtr->set_width(entityPtr->patch.cols);
-			imagePtr->set_data((void*)entityPtr->patch.data, entityPtr->patch.channels() * entityPtr->patch.rows * entityPtr->patch.cols);
-			serializableEntityPtr->set_allocated_image(imagePtr);
+			procamPRL::Entity::Image image;
+			image.set_height(entityPtr->patch.rows);
+			image.set_width(entityPtr->patch.cols);
+			image.set_data((void*)entityPtr->patch.data, entityPtr->patch.channels() * entityPtr->patch.rows * entityPtr->patch.cols);
+			serializableEntityPtr->set_allocated_image(&image);
 		}
 
 		// Unlock the lists

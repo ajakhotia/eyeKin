@@ -17,9 +17,9 @@ void main(int argC, char **argV)
 		{
 			// Allocate space for list
 			procamPRL::EntityList serializableList;
-			//serializableList.set_frameid(7);
+			serializableList.set_frameid(7);
 			// Generate serializable list
-			eyeKin.generateSerializableList(serializableList);
+			//eyeKin.generateSerializableList(serializableList);
 			//procamPRL::Entity *ent = serializableList.add_entitylist();
 			//personalRobotics::Point2D point;
 			//point.set_x(5);

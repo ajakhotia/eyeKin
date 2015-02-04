@@ -59,7 +59,7 @@ void personalRobotics::Tcp::write(int length, char* bufferPtr)
 		if (returnCode == SOCKET_ERROR)
 		{
 			// Gather error data
-			std::cout << "Error sending data over the socket. Attempting to shutdown send stream. Error code: " << WSAGetLastError();
+			std::cout << "Error sending data over the socket. Attempting to shutdown send stream. Error code: " << WSAGetLastError() << std::endl;
 
 			// Shutdown the socket's send stream stream if its not already being closed else simply exit.
 			if (sendChannelOpen.get())
