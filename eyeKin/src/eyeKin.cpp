@@ -45,7 +45,7 @@ void personalRobotics::EyeKin::findHomography()
 		homography = homographyCorrection*invertedHomography;
 		homographyFound = true;
 	}*/
-	homography = (cv::Mat_<double>(3, 3) <<1.7456, 0.0337, -837.4711, -0.0143, -1.7469, 1411.6242, -3.04089, 0.0000, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
+	homography = (cv::Mat_<double>(3, 3) <<1.7456, 0.0337, -837.4711, -0.0143, -1.7469, 1411.6242, -0.0000, 0.0000, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
 	homographyFound.set(true);
 }
 void personalRobotics::EyeKin::calibrate()
@@ -60,6 +60,19 @@ void personalRobotics::EyeKin::calibrate()
 		{
 			isCalibrating.set(false);
 			segmentor.setHomography(homography);
+
+			// Map size of rgb and projector pixels
+			std::vector<cv::Point2f> rgbKeyPoints;
+			std::vector<cv::Point2f> projKeyPoints;
+			rgbKeyPoints.push_back(cv::Point2f(0, 0));
+			rgbKeyPoints.push_back(cv::Point2f(10, 0));
+			rgbKeyPoints.push_back(cv::Point2f(0, 10));
+			cv::perspectiveTransform(rgbKeyPoints, projKeyPoints, homography);
+			float delX = 10.f / cv::norm(projKeyPoints[1] - projKeyPoints[0]);
+			float delY = 10.f / cv::norm(projKeyPoints[2] - projKeyPoints[0]);
+			colorPixelSize = *(segmentor.getRGBpixelSize());
+			projPixelSize.x = colorPixelSize.x * delX;
+			projPixelSize.y = colorPixelSize.y * delY;
 			segmentor.startSegmentor();
 		}
 	}

@@ -21,6 +21,8 @@ namespace personalRobotics
 		int numCheckerPtsX;
 		int numCheckerPtsY;
 		cv::Mat homography;
+		cv::Point2f projPixelSize;
+		cv::Point2f colorPixelSize;
 
 		// Counters
 		long epoch;

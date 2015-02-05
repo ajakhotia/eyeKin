@@ -58,6 +58,10 @@ std::vector<personalRobotics::Entity>* personalRobotics::ObjectSegmentor::getEnt
 {
 	return &entityList;
 }
+cv::Point2f* personalRobotics::ObjectSegmentor::getRGBpixelSize()
+{
+	return &pixelSize;
+}
 
 // Setters
 void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
@@ -166,23 +170,23 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)points.data);
 
 			//Map the points to depth and IR Space
-			cv::Mat dpoints(pointNum, 2, CV_32F);				//Added by Kevin
-			coordinateMapperPtr->MapCameraPointsToDepthSpace(pointNum, cameraSpacePoints, pointNum, (DepthSpacePoint*)dpoints.data);		//Added by Kevin
+			//cv::Mat dpoints(pointNum, 2, CV_32F);				//Added by Kevin
+			//coordinateMapperPtr->MapCameraPointsToDepthSpace(pointNum, cameraSpacePoints, pointNum, (DepthSpacePoint*)dpoints.data);		//Added by Kevin
 			delete[] cameraSpacePoints;
-			cv::Rect boundRect = cv::boundingRect(dpoints);
+			//cv::Rect boundRect = cv::boundingRect(dpoints);
 
 			//finds the contours using the ir image
-			boundRect += cv::Size(4, 4);
+			/*boundRect += cv::Size(4, 4);
 			int depthPointNum = boundRect.area();
 			cv::Mat croppedImage = irImageCopy(boundRect);
 			std::vector<std::vector<cv::Point>> ncontours;
-			std::vector<std::vector<cv::Point>> npoints;
+			std::vector<std::vector<cv::Point>> npoints;// Need to allocate space bfore using****
 			cv::Mat cannyOut;
 			cv::Canny(croppedImage, cannyOut, DEFAULT_IRCANNY_LOW_THRESHOLD, DEFAULT_IRCANNY_HIGH_THRESHOLD, DEFAULT_IRCANNY_KERNEL_SIZE, false);
 			cv::findContours(cannyOut, npoints, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 			int numpoints = npoints.size();
 			coordinateMapperPtr->MapDepthPointsToColorSpace(numpoints, (DepthSpacePoint*)npoints.data, 0, 0, numpoints, (ColorSpacePoint*)ncontours.data);
-			cv::drawContours(IRmask, ncontours, 0, cv::Scalar(0), CV_FILLED);
+			cv::drawContours(IRmask, ncontours, 0, cv::Scalar(0), CV_FILLED);*/
 
 			//Find mean and covariance
 			cv::Mat cvCentroid, cvCovar;
@@ -247,14 +251,13 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	CameraSpacePoint keyPoints[3];
 	ColorSpacePoint projectedKeyPoints[3];
 	keyPoints[0] = { 0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0) / planePtr->values[2]) };	//(0  , 0   ,z1)
-	keyPoints[1] = { 0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0.1 + planePtr->values[1] * 0) / planePtr->values[2]) };	//(0.1, 0   ,z2)
-	keyPoints[2] = { 0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0.1) / planePtr->values[2]) };	//(0  , 0.1 ,z3)
+	keyPoints[1] = { 0.1, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0.1 + planePtr->values[1] * 0) / planePtr->values[2]) };	//(0.1, 0   ,z2)
+	keyPoints[2] = { 0, 0.1, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0.1) / planePtr->values[2]) };	//(0  , 0.1 ,z3)
 	coordinateMapperPtr->MapCameraPointsToColorSpace(3, keyPoints, 3, projectedKeyPoints);
 	double delX = sqrt((projectedKeyPoints[1].X - projectedKeyPoints[0].X)*(projectedKeyPoints[1].X - projectedKeyPoints[0].X) + (projectedKeyPoints[1].Y - projectedKeyPoints[0].Y)*(projectedKeyPoints[1].Y - projectedKeyPoints[0].Y));
 	double delY = sqrt((projectedKeyPoints[2].X - projectedKeyPoints[0].X)*(projectedKeyPoints[2].X - projectedKeyPoints[0].X) + (projectedKeyPoints[2].Y - projectedKeyPoints[0].Y)*(projectedKeyPoints[2].Y - projectedKeyPoints[0].Y));
-	pixelSize.x = 0.1 / delX;
-	pixelSize.y - 0.1 / delY;
-	std::cout << "sizeX: " << pixelSize.x << ", " << "SizeY: " << pixelSize.y << std::endl;
+	pixelSize.x = 100 / delX;
+	pixelSize.y = 100 / delY;
 
 	// Return
 	return true;

@@ -57,6 +57,7 @@ namespace personalRobotics
 
 		// Accessors
 		std::vector<personalRobotics::Entity>* getEntityList();
+		cv::Point2f* getRGBpixelSize();
 
 		// Setters
 		void setHomography(cv::Mat &inhomography);
