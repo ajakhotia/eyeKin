@@ -180,7 +180,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			int depthPointNum = boundRect.area();
 			cv::Mat croppedImage = irImageCopy(boundRect);
 			std::vector<std::vector<cv::Point>> ncontours;
-			std::vector<std::vector<cv::Point>> npoints;// Need to allocate space bfore using****
+			std::vector<std::vector<cv::Point>> npoints;
 			cv::Mat cannyOut;
 			cv::Canny(croppedImage, cannyOut, DEFAULT_IRCANNY_LOW_THRESHOLD, DEFAULT_IRCANNY_HIGH_THRESHOLD, DEFAULT_IRCANNY_KERNEL_SIZE, false);
 			cv::findContours(cannyOut, npoints, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
