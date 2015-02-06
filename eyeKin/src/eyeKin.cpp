@@ -74,6 +74,7 @@ void personalRobotics::EyeKin::calibrate()
 			projPixelSize.x = colorPixelSize.x * delX;
 			projPixelSize.y = colorPixelSize.y * delY;
 			segmentor.startSegmentor();
+			std::cout << "Calibration complete" << std::endl;
 		}
 	}
 }

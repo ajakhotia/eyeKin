@@ -24,6 +24,7 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	#ifdef DEBUG_PROFILER
 		Timer timer("generateData()");
 	#endif
+
 	// Obtain pose in projector space
 	cv::Point2f rgbKeyPoint = pose2Drgb.position + cv::Point2f(cos(pose2Drgb.angle), sin(pose2Drgb.angle));
 	std::vector<cv::Point2f> rgbPositionVector, projPositionVector;

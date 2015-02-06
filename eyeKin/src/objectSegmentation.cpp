@@ -95,6 +95,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		cv::Mat rgbImageCopy = rgbImage.clone();
 		rgbMutex.unlock();		
 		cv::Mat irImageCopy = irImage.clone();
+		irImageCopy.convertTo(irImageCopy, CV_8U);
 		irMutex.unlock();
 		ColorSpacePoint* d2cMapping = new ColorSpacePoint[numPoints];
 		std::copy(depth2colorMappingPtr, depth2colorMappingPtr + numPoints, d2cMapping);
@@ -105,7 +106,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			{
 				if ((planePtr->values[0] * pointCloudPtr[point].X + planePtr->values[1] * pointCloudPtr[point].Y + planePtr->values[2] * pointCloudPtr[point].Z + planePtr->values[3]) > distCutoff)
 				{
-					if ((pointCloudPtr[point].X*pointCloudPtr[point].X / pointCloudPtr[point].Z / pointCloudPtr[point].Z + pointCloudPtr[point].Y*pointCloudPtr[point].Y / pointCloudPtr[point].Z / pointCloudPtr[point].Z) < radialThreshold)
+					if ((pointCloudPtr[point].X * pointCloudPtr[point].X / pointCloudPtr[point].Z / pointCloudPtr[point].Z + pointCloudPtr[point].Y * pointCloudPtr[point].Y / pointCloudPtr[point].Z / pointCloudPtr[point].Z) < radialThreshold)
 					{
 						pclPtr->points[dstPoint].x = pointCloudPtr[point].X;
 						pclPtr->points[dstPoint].y = pointCloudPtr[point].Y;
@@ -119,19 +120,20 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		pclPtr->resize(dstPoint);
 
 		// Suppress noise
+		pcl::PointCloud<pcl::PointXYZ>::Ptr sorOutput(new pcl::PointCloud<pcl::PointXYZ>);
 		pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
 		sor.setInputCloud(pclPtr);
-		sor.setMeanK(25);
+		sor.setMeanK(20);
 		sor.setStddevMulThresh(0.5);
-		sor.filter(*pclPtr);
-		
+		sor.filter(*sorOutput);
+		unlockPcl();
+
 		// Down sample using voxel grid
 		pcl::PointCloud<pcl::PointXYZ>::Ptr dsCloud(new pcl::PointCloud<pcl::PointXYZ>);
 		pcl::VoxelGrid<pcl::PointXYZ> voxelGrid;
-		voxelGrid.setInputCloud(pclPtr);
+		voxelGrid.setInputCloud(sorOutput);
 		voxelGrid.setLeafSize(0.012f, 0.012f, 0.012f);
 		voxelGrid.filter(*dsCloud);
-		unlockPcl();
 
 		// Project the points onto table plane
 		pcl::PointCloud<pcl::PointXYZ>::Ptr projDsCloud(new pcl::PointCloud<pcl::PointXYZ>);
@@ -172,20 +174,33 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			cv::Mat irSpacePoints(pointNum, 2, CV_32F);
 			coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)colorSpacePoints.data);
 			coordinateMapperPtr->MapCameraPointsToDepthSpace(pointNum, cameraSpacePoints, pointNum, (DepthSpacePoint*)irSpacePoints.data);
-			
+
 			// Release the memory
 			delete[] cameraSpacePoints;
 
+			std::cout << "Done coordinate mapping" << std::endl;
+
 			// Make a region of interest in IR frame and expand to be able to get edges
-			cv::Rect irBoundingRect = cv::boundingRect(irSpacePoints);
-			irBoundingRect += cv::Size(10, 10);
-					
+			/*std::cout << irSpacePoints << std::endl;
+			std::vector<cv::Point> irHull;
+			std::cout << "yo1" << std::endl;
+			cv::convexHull(irSpacePoints, irHull);
+			std::cout << "yo2" << std::endl;
+			cv::Rect irBoundingRect = cv::boundingRect(irHull);
+			std::cout << "yo1" << std::endl;
+			irBoundingRect += cv::Size(10, 10);*/
+			cv::Rect irBoundingRect(10,20,10,20);
+			
+			std::cout << "Done bounding box" << std::endl;
+
 			// Finds the contours in the irBoundingRect using the ir image
 			cv::Mat croppedIRimage = irImageCopy(irBoundingRect);
 			cv::Mat croppedIRedges;
 			std::vector<std::vector<cv::Point>> irContours;
 			cv::Canny(croppedIRimage, croppedIRedges, DEFAULT_IRCANNY_LOW_THRESHOLD, DEFAULT_IRCANNY_HIGH_THRESHOLD, DEFAULT_IRCANNY_KERNEL_SIZE, false);
 			
+			std::cout << "Done edge detection" << std::endl;
+
 			// Extract contours corresponding to the *full IR image* and find the largest area contour
 			cv::findContours(croppedIRedges, irContours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, cv::Point(irBoundingRect.x, irBoundingRect.y));
 			int largestContourIdx = -1;
@@ -201,13 +216,20 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			}
 			if (largestContourIdx == -1)
 				continue;
+
+			std::cout << "Done contour finding" << std::endl;
+
 			// Transform the edges to the RGB space
 			std::vector<cv::Point> rgbContour;
 			mapInfraredToColor(irContours[largestContourIdx],rgbContour,d2cMapping);
 			
+			std::cout << "Done edge transformations" << std::endl;
+
 			//Find mean and covariance
 			cv::Mat cvCentroid, cvCovar;
 			cv::calcCovarMatrix(colorSpacePoints, cvCovar, cvCentroid, CV_COVAR_NORMAL | CV_COVAR_ROWS, CV_32F);
+
+			std::cout << "Done eigen computations" << std::endl;
 
 			//Find xAxis and yAxis
 			cv::Mat eigenValues, eigenVectors;
@@ -215,6 +237,9 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			if (eigenValues.at<float>(0, 0) > 1 && eigenValues.at<float>(0, 1) > 1)
 				entityList.push_back(personalRobotics::Entity(cv::Point2f(cvCentroid.at<float>(0, 0), cvCentroid.at<float>(0, 1)), atan2(eigenVectors.at<float>(0, 1), eigenVectors.at<float>(0, 0)), sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(0, 1))*6.5f,rgbContour));
 		}
+
+		std::cout << "Done plane segment" << std::endl;
+
 
 		// Generate patch and geometric data for each of the entity
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
