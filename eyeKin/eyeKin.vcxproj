@@ -171,6 +171,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)\bin\$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>

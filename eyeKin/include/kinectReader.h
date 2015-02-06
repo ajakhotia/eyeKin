@@ -26,6 +26,7 @@ namespace personalRobotics
 		std::mutex depthMutex;
 		std::mutex irMutex;
 		std::mutex pointCloudMutex;
+		std::mutex depth2colorMappingMutex;
 
 		// Parameters
 		int rgbWidth;
@@ -40,12 +41,14 @@ namespace personalRobotics
 		cv::Mat irImage;
 		cv::Mat dummy;
 		CameraSpacePoint *pointCloudPtr;
+		ColorSpacePoint *depth2colorMappingPtr;
 	public:
 		// Constructor & Destructor
 		KinectReader();
 		~KinectReader();
 
 		// Routines
+		void mapInfraredToColor(std::vector<cv::Point> &infraredPoints, std::vector<cv::Point> &colorPoints, ColorSpacePoint *mapping);
 		void pollFrames();
 		void kinectThreadRoutine();
 		void startKinect();

@@ -17,35 +17,22 @@ void main(int argC, char **argV)
 		{
 			// Allocate space for list
 			procamPRL::EntityList serializableList;
-			serializableList.set_frameid(7);
-			std::cout << "List size is: " << eyeKin.getSegmentor()->getEntityList()->size() << std::endl;
-			// Generate serializable list
-			//eyeKin.generateSerializableList(serializableList);
-			//procamPRL::Entity *ent = serializableList.add_entitylist();
-			//personalRobotics::Point2D point;
-			//point.set_x(5);
-			//point.set_y(6);
+			//serializableList.set_frameid(7);
+			if (eyeKin.getSegmentor()->getEntityList()->size() == 0)
+				continue;
+			eyeKin.generateSerializableList(serializableList);
 			
 			// Send data over socket
 			std::string outString;
-			//std::mutex bufferMutex;
 			//bufferMutex.lock();
 			serializableList.SerializeToString(&outString);
 			int dataLenght = outString.length();
 			if (dataLenght > 0)
 			{
-				try
-				{
-
-					int networkOrderDataLength = htonl(dataLenght);
-					eyeKin.getServer()->write(4, (char*)&networkOrderDataLength);
-					//eyeKin.getServer()->asyncSend(dataLenght, &outString[0], &bufferMutex,false,true);
-					eyeKin.getServer()->write(dataLenght, (char*)outString.c_str());
-				}
-				catch (personalRobotics::SocketException e)
-				{
-
-				}
+				int networkOrderDataLength = htonl(dataLenght);
+				eyeKin.getServer()->write(4, (char*)&networkOrderDataLength);
+				//eyeKin.getServer()->asyncSend(dataLenght, &outString[0], &bufferMutex,false,true);
+				eyeKin.getServer()->write(dataLenght, (char*)outString.c_str());
 			}
 		}
 	}

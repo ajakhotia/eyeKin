@@ -43,9 +43,23 @@ personalRobotics::KinectReader::~KinectReader()
 	
 	// Clear the heap
 	delete[] pointCloudPtr;
+	delete[] depth2colorMappingPtr;
 }
 
 // Routines
+void personalRobotics::KinectReader::mapInfraredToColor(std::vector<cv::Point> &infraredPoints, std::vector<cv::Point> &colorPoints, ColorSpacePoint *mapping)
+{
+	if (isDepthAllocated.get())
+	{
+		colorPoints.resize(infraredPoints.size());
+		int colorPointCounter = 0;
+		for (std::vector<cv::Point>::iterator irPtr = infraredPoints.begin(); irPtr != infraredPoints.end(); irPtr++)
+		{
+			int indexTL = (int)irPtr->x + depthWidth* ((int)irPtr->y); // Real thing to do is to interpolate bilinearly
+			colorPoints[colorPointCounter++] = cv::Point(mapping[indexTL].X, mapping[indexTL].Y);
+		}
+	}
+}
 void personalRobotics::KinectReader::pollFrames()
 {
 	if (!readerPtr)
@@ -144,6 +158,9 @@ void personalRobotics::KinectReader::pollFrames()
 					pointCloudMutex.lock();
 					pointCloudPtr = new CameraSpacePoint[depthWidth*depthHeight];
 					pointCloudMutex.unlock();
+					depth2colorMappingMutex.lock();
+					depth2colorMappingPtr = new ColorSpacePoint[depthWidth*depthHeight];
+					depth2colorMappingMutex.unlock();
 					isDepthAllocated.set(true);
 					safeRelease(depthFrameDescription);
 				}
@@ -153,6 +170,9 @@ void personalRobotics::KinectReader::pollFrames()
 			pointCloudMutex.lock();
 			coordinateMapperPtr->MapDepthFrameToCameraSpace(depthWidth*depthHeight, (UINT16*)depthImage.data, depthWidth*depthHeight, pointCloudPtr);
 			pointCloudMutex.unlock();
+			depth2colorMappingMutex.lock();
+			coordinateMapperPtr->MapDepthFrameToColorSpace(depthWidth*depthHeight, (UINT16*)depthImage.data, depthWidth*depthHeight, depth2colorMappingPtr);
+			depth2colorMappingMutex.unlock();
 			depthMutex.unlock();
 			safeRelease(depthFramePtr);
 		}

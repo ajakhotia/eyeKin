@@ -9,7 +9,7 @@ personalRobotics::ObjectSegmentor::ObjectSegmentor()
 	maxRansacIters = DEFAULT_MAX_RANSAC_ITERATIONS;
 	ransacMargin = DEFAULT_DEPTH_MARGIN;
 	distCutoff = DEFAULT_DISTANCE_CUTOFF;
-	radialThreshold = DEFAULT_RADIAL_CUTOFF;
+	radialThreshold = (DEFAULT_RADIAL_CUTOFF)*(DEFAULT_RADIAL_CUTOFF);
 	clusterTolerance = DEFAULT_CLUSTER_TOLERANCE;
 	minClusterSize = DEFAULT_MINIMUM_CLUSTER_SIZE;
 	maxClusterSize = DEFAULT_MAXIMUM_CLUSTER_SIZE;
@@ -84,26 +84,28 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		pclPtr->clear();
 		pclPtr->resize(numPoints);
 
-		// Obtain the plane semented pointcloud
+		// Obtain the plane semented pointcloud and the image streams
 		size_t dstPoint = 0;
+
+		// Copy the RGB, IR and IR to RGB mapping
+		rgbMutex.lock();
 		pointCloudMutex.lock();
-		cv::Mat IRmask(rgbHeight, rgbWidth, CV_8UC1,cv::Scalar(255));
+		depth2colorMappingMutex.lock();
 		irMutex.lock();
+		cv::Mat rgbImageCopy = rgbImage.clone();
+		rgbMutex.unlock();		
 		cv::Mat irImageCopy = irImage.clone();
 		irMutex.unlock();
-		rgbMutex.lock();
-		cv::Mat rgbImageCopy = rgbImage.clone();
-		rgbMutex.unlock();
+		ColorSpacePoint* d2cMapping = new ColorSpacePoint[numPoints];
+		std::copy(depth2colorMappingPtr, depth2colorMappingPtr + numPoints, d2cMapping);
+		depth2colorMappingMutex.unlock();
 		for (size_t point = 0; point < numPoints; point++)
 		{
 			if (pointCloudPtr[point].Z > minThreshold && pointCloudPtr[point].Z < maxThreshold)
 			{
-
-				float dist = (planePtr->values[0] * pointCloudPtr[point].X + planePtr->values[1] * pointCloudPtr[point].Y + planePtr->values[2] * pointCloudPtr[point].Z + planePtr->values[3]);
-				if (dist > distCutoff)
+				if ((planePtr->values[0] * pointCloudPtr[point].X + planePtr->values[1] * pointCloudPtr[point].Y + planePtr->values[2] * pointCloudPtr[point].Z + planePtr->values[3]) > distCutoff)
 				{
-					float radius = sqrt(pointCloudPtr[point].X*pointCloudPtr[point].X / pointCloudPtr[point].Z / pointCloudPtr[point].Z + pointCloudPtr[point].Y*pointCloudPtr[point].Y / pointCloudPtr[point].Z / pointCloudPtr[point].Z);
-					if (radius < radialThreshold)
+					if ((pointCloudPtr[point].X*pointCloudPtr[point].X / pointCloudPtr[point].Z / pointCloudPtr[point].Z + pointCloudPtr[point].Y*pointCloudPtr[point].Y / pointCloudPtr[point].Z / pointCloudPtr[point].Z) < radialThreshold)
 					{
 						pclPtr->points[dstPoint].x = pointCloudPtr[point].X;
 						pclPtr->points[dstPoint].y = pointCloudPtr[point].Y;
@@ -165,47 +167,64 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 				pointNum++;
 			}
 
-			// Map the points to RGB space
-			cv::Mat points(pointNum, 2, CV_32F);
-			coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)points.data);
-
-			//Map the points to depth and IR Space
-			//cv::Mat dpoints(pointNum, 2, CV_32F);				//Added by Kevin
-			//coordinateMapperPtr->MapCameraPointsToDepthSpace(pointNum, cameraSpacePoints, pointNum, (DepthSpacePoint*)dpoints.data);		//Added by Kevin
+			// Map the points to RGB space and infrared space
+			cv::Mat colorSpacePoints(pointNum, 2, CV_32F);
+			cv::Mat irSpacePoints(pointNum, 2, CV_32F);
+			coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)colorSpacePoints.data);
+			coordinateMapperPtr->MapCameraPointsToDepthSpace(pointNum, cameraSpacePoints, pointNum, (DepthSpacePoint*)irSpacePoints.data);
+			
+			// Release the memory
 			delete[] cameraSpacePoints;
-			//cv::Rect boundRect = cv::boundingRect(dpoints);
 
-			//finds the contours using the ir image
-			/*boundRect += cv::Size(4, 4);
-			int depthPointNum = boundRect.area();
-			cv::Mat croppedImage = irImageCopy(boundRect);
-			std::vector<std::vector<cv::Point>> ncontours;
-			std::vector<std::vector<cv::Point>> npoints;
-			cv::Mat cannyOut;
-			cv::Canny(croppedImage, cannyOut, DEFAULT_IRCANNY_LOW_THRESHOLD, DEFAULT_IRCANNY_HIGH_THRESHOLD, DEFAULT_IRCANNY_KERNEL_SIZE, false);
-			cv::findContours(cannyOut, npoints, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-			int numpoints = npoints.size();
-			coordinateMapperPtr->MapDepthPointsToColorSpace(numpoints, (DepthSpacePoint*)npoints.data, 0, 0, numpoints, (ColorSpacePoint*)ncontours.data);
-			cv::drawContours(IRmask, ncontours, 0, cv::Scalar(0), CV_FILLED);*/
-
+			// Make a region of interest in IR frame and expand to be able to get edges
+			cv::Rect irBoundingRect = cv::boundingRect(irSpacePoints);
+			irBoundingRect += cv::Size(10, 10);
+					
+			// Finds the contours in the irBoundingRect using the ir image
+			cv::Mat croppedIRimage = irImageCopy(irBoundingRect);
+			cv::Mat croppedIRedges;
+			std::vector<std::vector<cv::Point>> irContours;
+			cv::Canny(croppedIRimage, croppedIRedges, DEFAULT_IRCANNY_LOW_THRESHOLD, DEFAULT_IRCANNY_HIGH_THRESHOLD, DEFAULT_IRCANNY_KERNEL_SIZE, false);
+			
+			// Extract contours corresponding to the *full IR image* and find the largest area contour
+			cv::findContours(croppedIRedges, irContours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, cv::Point(irBoundingRect.x, irBoundingRect.y));
+			int largestContourIdx = -1;
+			double largestArea = 0;
+			for (int i = 0; i < irContours.size(); i++)
+			{
+				double area = cv::contourArea(irContours[i]);
+				if (area > largestArea)
+				{
+					largestArea = area;
+					largestContourIdx = i;
+				}
+			}
+			if (largestContourIdx == -1)
+				continue;
+			// Transform the edges to the RGB space
+			std::vector<cv::Point> rgbContour;
+			mapInfraredToColor(irContours[largestContourIdx],rgbContour,d2cMapping);
+			
 			//Find mean and covariance
 			cv::Mat cvCentroid, cvCovar;
-			cv::calcCovarMatrix(points, cvCovar, cvCentroid, CV_COVAR_NORMAL | CV_COVAR_ROWS, CV_32F);
+			cv::calcCovarMatrix(colorSpacePoints, cvCovar, cvCentroid, CV_COVAR_NORMAL | CV_COVAR_ROWS, CV_32F);
 
 			//Find xAxis and yAxis
 			cv::Mat eigenValues, eigenVectors;
 			cv::eigen(cvCovar / (pointNum - 1), true, eigenValues, eigenVectors);
 			if (eigenValues.at<float>(0, 0) > 1 && eigenValues.at<float>(0, 1) > 1)
-				entityList.push_back(personalRobotics::Entity(cv::Point2f(cvCentroid.at<float>(0, 0), cvCentroid.at<float>(0, 1)), atan2(eigenVectors.at<float>(0, 1), eigenVectors.at<float>(0, 0)), sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(0, 1))*6.5f));
+				entityList.push_back(personalRobotics::Entity(cv::Point2f(cvCentroid.at<float>(0, 0), cvCentroid.at<float>(0, 1)), atan2(eigenVectors.at<float>(0, 1), eigenVectors.at<float>(0, 0)), sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(0, 1))*6.5f,rgbContour));
 		}
 
 		// Generate patch and geometric data for each of the entity
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
 		{
-			entityPtr->generateData(homography, rgbImageCopy, IRmask);
+			entityPtr->generateData(homography, rgbImageCopy);
 		}
 		unlockList();
+		delete[] d2cMapping;
 	}
+	
 }
 bool personalRobotics::ObjectSegmentor::findTablePlane()
 {
