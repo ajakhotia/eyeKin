@@ -51,12 +51,16 @@ void personalRobotics::KinectReader::mapInfraredToColor(std::vector<cv::Point> &
 {
 	if (isDepthAllocated.get())
 	{
-		colorPoints.resize(infraredPoints.size());
+		colorPoints.clear();
 		int colorPointCounter = 0;
 		for (std::vector<cv::Point>::iterator irPtr = infraredPoints.begin(); irPtr != infraredPoints.end(); irPtr++)
 		{
-			int indexTL = (int)irPtr->x + depthWidth* ((int)irPtr->y); // Real thing to do is to interpolate bilinearly
-			colorPoints[colorPointCounter++] = cv::Point(mapping[indexTL].X, mapping[indexTL].Y);
+			if (irPtr->x >= 0 && irPtr->x <= depthWidth && irPtr->y >= 0 && irPtr->y <= depthHeight)
+			{
+				int indexTL = (int)irPtr->x + depthWidth* ((int)irPtr->y); // Real thing to do is to interpolate bilinearly
+				if (mapping[indexTL].X >= 0 && mapping[indexTL].X < rgbWidth && mapping[indexTL].Y >= 0 && mapping[indexTL].Y < rgbHeight)
+					colorPoints.push_back(cv::Point(mapping[indexTL].X, mapping[indexTL].Y));
+			}
 		}
 	}
 }
@@ -197,6 +201,7 @@ void personalRobotics::KinectReader::pollFrames()
 			}
 			irMutex.lock();
 			infraredFramePtr->CopyFrameDataToArray(depthWidth*depthHeight, (UINT16*)irImage.data);
+			irImage = irImage / 32;
 			irMutex.unlock();
 			safeRelease(infraredFramePtr);
 		}
