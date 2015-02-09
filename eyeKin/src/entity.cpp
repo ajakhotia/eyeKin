@@ -48,6 +48,7 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 
 	// Transform the rgbContour to patch coordinates
 	std::vector<cv::Point> intermediateContour;
+	std::cout << "Len: " << contour.size() << std::endl;
 	cv::transform(contour, intermediateContour, rgb2intermediate);
 	cv::Point translation(boundingRect.x + (boundingRect.width - boundingSize.width) / 2, boundingRect.y + (boundingRect.height - boundingSize.height) / 2);
 	contour.clear();

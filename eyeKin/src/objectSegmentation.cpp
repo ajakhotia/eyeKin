@@ -234,10 +234,9 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			//Find xAxis and yAxis
 			cv::Mat eigenValues, eigenVectors;
 			cv::eigen(cvCovar*(1.f / (pointNum - 1)), true, eigenValues, eigenVectors);
-			if (eigenValues.at<float>(0, 0) > 1 && eigenValues.at<float>(1, 0) > 1)
+			if (eigenValues.at<float>(0, 0) > 1 && eigenValues.at<float>(1, 0) > 1 && rgbContour.size() != 0)
 				entityList.push_back(personalRobotics::Entity(cv::Point2f(cvCentroid.at<float>(0, 0), cvCentroid.at<float>(0, 1)), atan2(eigenVectors.at<float>(0, 1), eigenVectors.at<float>(0, 0)), sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(1, 0))*6.5f,rgbContour));
 		}
-		std::cout << "yo5" << std::endl;
 		// Generate patch and geometric data for each of the entity
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
 		{
