@@ -243,14 +243,12 @@ class Entity : public ::google::protobuf::Message {
   inline ::personalRobotics::Point2D* release_boundingsize();
   inline void set_allocated_boundingsize(::personalRobotics::Point2D* boundingsize);
 
-  // optional .personalRobotics.Point2D id = 3;
+  // optional int32 id = 3;
   inline bool has_id() const;
   inline void clear_id();
   static const int kIdFieldNumber = 3;
-  inline const ::personalRobotics::Point2D& id() const;
-  inline ::personalRobotics::Point2D* mutable_id();
-  inline ::personalRobotics::Point2D* release_id();
-  inline void set_allocated_id(::personalRobotics::Point2D* id);
+  inline ::google::protobuf::int32 id() const;
+  inline void set_id(::google::protobuf::int32 value);
 
   // repeated .personalRobotics.Point2D contours = 4;
   inline int contours_size() const;
@@ -290,9 +288,9 @@ class Entity : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::personalRobotics::Pose2D* pose_;
   ::personalRobotics::Point2D* boundingsize_;
-  ::personalRobotics::Point2D* id_;
   ::google::protobuf::RepeatedPtrField< ::personalRobotics::Point2D > contours_;
   ::procamPRL::Entity_Image* image_;
+  ::google::protobuf::int32 id_;
   friend void  protobuf_AddDesc_entity_2eproto();
   friend void protobuf_AssignDesc_entity_2eproto();
   friend void protobuf_ShutdownFile_entity_2eproto();
@@ -682,7 +680,7 @@ inline void Entity::set_allocated_boundingsize(::personalRobotics::Point2D* boun
   // @@protoc_insertion_point(field_set_allocated:procamPRL.Entity.boundingSize)
 }
 
-// optional .personalRobotics.Point2D id = 3;
+// optional int32 id = 3;
 inline bool Entity::has_id() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
@@ -693,34 +691,17 @@ inline void Entity::clear_has_id() {
   _has_bits_[0] &= ~0x00000004u;
 }
 inline void Entity::clear_id() {
-  if (id_ != NULL) id_->::personalRobotics::Point2D::Clear();
+  id_ = 0;
   clear_has_id();
 }
-inline const ::personalRobotics::Point2D& Entity::id() const {
+inline ::google::protobuf::int32 Entity::id() const {
   // @@protoc_insertion_point(field_get:procamPRL.Entity.id)
-  return id_ != NULL ? *id_ : *default_instance_->id_;
-}
-inline ::personalRobotics::Point2D* Entity::mutable_id() {
-  set_has_id();
-  if (id_ == NULL) id_ = new ::personalRobotics::Point2D;
-  // @@protoc_insertion_point(field_mutable:procamPRL.Entity.id)
   return id_;
 }
-inline ::personalRobotics::Point2D* Entity::release_id() {
-  clear_has_id();
-  ::personalRobotics::Point2D* temp = id_;
-  id_ = NULL;
-  return temp;
-}
-inline void Entity::set_allocated_id(::personalRobotics::Point2D* id) {
-  delete id_;
-  id_ = id;
-  if (id) {
-    set_has_id();
-  } else {
-    clear_has_id();
-  }
-  // @@protoc_insertion_point(field_set_allocated:procamPRL.Entity.id)
+inline void Entity::set_id(::google::protobuf::int32 value) {
+  set_has_id();
+  id_ = value;
+  // @@protoc_insertion_point(field_set:procamPRL.Entity.id)
 }
 
 // repeated .personalRobotics.Point2D contours = 4;

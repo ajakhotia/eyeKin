@@ -138,24 +138,23 @@ void protobuf_AddDesc_entity_2eproto() {
   ::personalRobotics::protobuf_AddDesc_point2D_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\014entity.proto\022\tprocamPRL\032\014pose2D.proto\032"
-    "\rpoint2D.proto\"\223\002\n\006Entity\022&\n\004pose\030\001 \001(\0132"
+    "\rpoint2D.proto\"\370\001\n\006Entity\022&\n\004pose\030\001 \001(\0132"
     "\030.personalRobotics.Pose2D\022/\n\014boundingSiz"
-    "e\030\002 \001(\0132\031.personalRobotics.Point2D\022%\n\002id"
-    "\030\003 \001(\0132\031.personalRobotics.Point2D\022+\n\010con"
-    "tours\030\004 \003(\0132\031.personalRobotics.Point2D\022&"
-    "\n\005image\030\005 \001(\0132\027.procamPRL.Entity.Image\0324"
-    "\n\005Image\022\r\n\005width\030\001 \001(\005\022\016\n\006height\030\002 \001(\005\022\014"
-    "\n\004data\030\003 \001(\014\"\210\003\n\nEntityList\022\021\n\ttimestamp"
-    "\030\001 \001(\001\022\017\n\007frameId\030\002 \001(\005\022/\n\014rgbPixelSize\030"
-    "\003 \001(\0132\031.personalRobotics.Point2D\0220\n\rproj"
-    "PixelSize\030\004 \001(\0132\031.personalRobotics.Point"
-    "2D\0224\n\007command\030\005 \001(\0162\035.procamPRL.EntityLi"
-    "st.Command:\004NONE\022%\n\nentityList\030\006 \003(\0132\021.p"
-    "rocamPRL.Entity\"\225\001\n\007Command\022\010\n\004NONE\020\001\022\034\n"
-    "\030SEND_DISPLAY_INFO_PACKET\020\002\022\025\n\021START_CAL"
-    "IBRATION\020\003\022\030\n\024CALIBRATION_COMPLETE\020\004\022\020\n\014"
-    "START_STREAM\020\005\022\017\n\013STOP_STREAM\020\006\022\016\n\nDISCO"
-    "NNECT\020\007", 727);
+    "e\030\002 \001(\0132\031.personalRobotics.Point2D\022\n\n\002id"
+    "\030\003 \001(\005\022+\n\010contours\030\004 \003(\0132\031.personalRobot"
+    "ics.Point2D\022&\n\005image\030\005 \001(\0132\027.procamPRL.E"
+    "ntity.Image\0324\n\005Image\022\r\n\005width\030\001 \001(\005\022\016\n\006h"
+    "eight\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\210\003\n\nEntityList"
+    "\022\021\n\ttimestamp\030\001 \001(\001\022\017\n\007frameId\030\002 \001(\005\022/\n\014"
+    "rgbPixelSize\030\003 \001(\0132\031.personalRobotics.Po"
+    "int2D\0220\n\rprojPixelSize\030\004 \001(\0132\031.personalR"
+    "obotics.Point2D\0224\n\007command\030\005 \001(\0162\035.proca"
+    "mPRL.EntityList.Command:\004NONE\022%\n\nentityL"
+    "ist\030\006 \003(\0132\021.procamPRL.Entity\"\225\001\n\007Command"
+    "\022\010\n\004NONE\020\001\022\034\n\030SEND_DISPLAY_INFO_PACKET\020\002"
+    "\022\025\n\021START_CALIBRATION\020\003\022\030\n\024CALIBRATION_C"
+    "OMPLETE\020\004\022\020\n\014START_STREAM\020\005\022\017\n\013STOP_STRE"
+    "AM\020\006\022\016\n\nDISCONNECT\020\007", 700);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "entity.proto", &protobuf_RegisterTypes);
   Entity::default_instance_ = new Entity();
@@ -517,7 +516,6 @@ Entity::Entity()
 void Entity::InitAsDefaultInstance() {
   pose_ = const_cast< ::personalRobotics::Pose2D*>(&::personalRobotics::Pose2D::default_instance());
   boundingsize_ = const_cast< ::personalRobotics::Point2D*>(&::personalRobotics::Point2D::default_instance());
-  id_ = const_cast< ::personalRobotics::Point2D*>(&::personalRobotics::Point2D::default_instance());
   image_ = const_cast< ::procamPRL::Entity_Image*>(&::procamPRL::Entity_Image::default_instance());
 }
 
@@ -532,7 +530,7 @@ void Entity::SharedCtor() {
   _cached_size_ = 0;
   pose_ = NULL;
   boundingsize_ = NULL;
-  id_ = NULL;
+  id_ = 0;
   image_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -546,7 +544,6 @@ void Entity::SharedDtor() {
   if (this != default_instance_) {
     delete pose_;
     delete boundingsize_;
-    delete id_;
     delete image_;
   }
 }
@@ -580,9 +577,7 @@ void Entity::Clear() {
     if (has_boundingsize()) {
       if (boundingsize_ != NULL) boundingsize_->::personalRobotics::Point2D::Clear();
     }
-    if (has_id()) {
-      if (id_ != NULL) id_->::personalRobotics::Point2D::Clear();
-    }
+    id_ = 0;
     if (has_image()) {
       if (image_ != NULL) image_->::procamPRL::Entity_Image::Clear();
     }
@@ -623,16 +618,18 @@ bool Entity::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(26)) goto parse_id;
+        if (input->ExpectTag(24)) goto parse_id;
         break;
       }
 
-      // optional .personalRobotics.Point2D id = 3;
+      // optional int32 id = 3;
       case 3: {
-        if (tag == 26) {
+        if (tag == 24) {
          parse_id:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_id()));
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &id_)));
+          set_has_id();
         } else {
           goto handle_unusual;
         }
@@ -704,10 +701,9 @@ void Entity::SerializeWithCachedSizes(
       2, this->boundingsize(), output);
   }
 
-  // optional .personalRobotics.Point2D id = 3;
+  // optional int32 id = 3;
   if (has_id()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->id(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->id(), output);
   }
 
   // repeated .personalRobotics.Point2D contours = 4;
@@ -746,11 +742,9 @@ void Entity::SerializeWithCachedSizes(
         2, this->boundingsize(), target);
   }
 
-  // optional .personalRobotics.Point2D id = 3;
+  // optional int32 id = 3;
   if (has_id()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        3, this->id(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->id(), target);
   }
 
   // repeated .personalRobotics.Point2D contours = 4;
@@ -793,10 +787,10 @@ int Entity::ByteSize() const {
           this->boundingsize());
     }
 
-    // optional .personalRobotics.Point2D id = 3;
+    // optional int32 id = 3;
     if (has_id()) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->id());
     }
 
@@ -850,7 +844,7 @@ void Entity::MergeFrom(const Entity& from) {
       mutable_boundingsize()->::personalRobotics::Point2D::MergeFrom(from.boundingsize());
     }
     if (from.has_id()) {
-      mutable_id()->::personalRobotics::Point2D::MergeFrom(from.id());
+      set_id(from.id());
     }
     if (from.has_image()) {
       mutable_image()->::procamPRL::Entity_Image::MergeFrom(from.image());
@@ -878,9 +872,6 @@ bool Entity::IsInitialized() const {
   }
   if (has_boundingsize()) {
     if (!this->boundingsize().IsInitialized()) return false;
-  }
-  if (has_id()) {
-    if (!this->id().IsInitialized()) return false;
   }
   if (!::google::protobuf::internal::AllAreInitialized(this->contours())) return false;
   return true;
