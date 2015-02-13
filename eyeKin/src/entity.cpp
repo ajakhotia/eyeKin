@@ -11,6 +11,7 @@ personalRobotics::Entity::Entity(cv::Point2f centroid, float angle, float xLengt
 	pose2Drgb.angle = angle;
 	boundingSize = cv::Size2f(xLength, yLenght);
 	contour = rgbContour;
+	id = 0;
 }
 personalRobotics::Entity::~Entity()
 {

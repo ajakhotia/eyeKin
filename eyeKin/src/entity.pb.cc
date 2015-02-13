@@ -41,11 +41,12 @@ void protobuf_AssignDesc_entity_2eproto() {
       "entity.proto");
   GOOGLE_CHECK(file != NULL);
   Entity_descriptor_ = file->message_type(0);
-  static const int Entity_offsets_[5] = {
+  static const int Entity_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity, pose_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity, boundingsize_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity, id_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity, contours_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity, projpixelsize_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity, image_),
   };
   Entity_reflection_ =
@@ -60,9 +61,10 @@ void protobuf_AssignDesc_entity_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Entity));
   Entity_Image_descriptor_ = Entity_descriptor_->nested_type(0);
-  static const int Entity_Image_offsets_[3] = {
+  static const int Entity_Image_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity_Image, width_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity_Image, height_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity_Image, rgbpixelsize_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Entity_Image, data_),
   };
   Entity_Image_reflection_ =
@@ -77,11 +79,9 @@ void protobuf_AssignDesc_entity_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Entity_Image));
   EntityList_descriptor_ = file->message_type(1);
-  static const int EntityList_offsets_[6] = {
+  static const int EntityList_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EntityList, timestamp_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EntityList, frameid_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EntityList, rgbpixelsize_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EntityList, projpixelsize_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EntityList, command_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(EntityList, entitylist_),
   };
@@ -138,17 +138,17 @@ void protobuf_AddDesc_entity_2eproto() {
   ::personalRobotics::protobuf_AddDesc_point2D_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\014entity.proto\022\tprocamPRL\032\014pose2D.proto\032"
-    "\rpoint2D.proto\"\370\001\n\006Entity\022&\n\004pose\030\001 \001(\0132"
+    "\rpoint2D.proto\"\333\002\n\006Entity\022&\n\004pose\030\001 \001(\0132"
     "\030.personalRobotics.Pose2D\022/\n\014boundingSiz"
     "e\030\002 \001(\0132\031.personalRobotics.Point2D\022\n\n\002id"
     "\030\003 \001(\005\022+\n\010contours\030\004 \003(\0132\031.personalRobot"
-    "ics.Point2D\022&\n\005image\030\005 \001(\0132\027.procamPRL.E"
-    "ntity.Image\0324\n\005Image\022\r\n\005width\030\001 \001(\005\022\016\n\006h"
-    "eight\030\002 \001(\005\022\014\n\004data\030\003 \001(\014\"\210\003\n\nEntityList"
-    "\022\021\n\ttimestamp\030\001 \001(\001\022\017\n\007frameId\030\002 \001(\005\022/\n\014"
-    "rgbPixelSize\030\003 \001(\0132\031.personalRobotics.Po"
-    "int2D\0220\n\rprojPixelSize\030\004 \001(\0132\031.personalR"
-    "obotics.Point2D\0224\n\007command\030\005 \001(\0162\035.proca"
+    "ics.Point2D\0220\n\rprojPixelSize\030\005 \001(\0132\031.per"
+    "sonalRobotics.Point2D\022&\n\005image\030\006 \001(\0132\027.p"
+    "rocamPRL.Entity.Image\032e\n\005Image\022\r\n\005width\030"
+    "\001 \001(\005\022\016\n\006height\030\002 \001(\005\022/\n\014rgbPixelSize\030\003 "
+    "\001(\0132\031.personalRobotics.Point2D\022\014\n\004data\030\004"
+    " \001(\014\"\245\002\n\nEntityList\022\021\n\ttimestamp\030\001 \001(\001\022\017"
+    "\n\007frameId\030\002 \001(\005\0224\n\007command\030\005 \001(\0162\035.proca"
     "mPRL.EntityList.Command:\004NONE\022%\n\nentityL"
     "ist\030\006 \003(\0132\021.procamPRL.Entity\"\225\001\n\007Command"
     "\022\010\n\004NONE\020\001\022\034\n\030SEND_DISPLAY_INFO_PACKET\020\002"
@@ -178,6 +178,7 @@ struct StaticDescriptorInitializer_entity_2eproto {
 #ifndef _MSC_VER
 const int Entity_Image::kWidthFieldNumber;
 const int Entity_Image::kHeightFieldNumber;
+const int Entity_Image::kRgbPixelSizeFieldNumber;
 const int Entity_Image::kDataFieldNumber;
 #endif  // !_MSC_VER
 
@@ -188,6 +189,7 @@ Entity_Image::Entity_Image()
 }
 
 void Entity_Image::InitAsDefaultInstance() {
+  rgbpixelsize_ = const_cast< ::personalRobotics::Point2D*>(&::personalRobotics::Point2D::default_instance());
 }
 
 Entity_Image::Entity_Image(const Entity_Image& from)
@@ -202,6 +204,7 @@ void Entity_Image::SharedCtor() {
   _cached_size_ = 0;
   width_ = 0;
   height_ = 0;
+  rgbpixelsize_ = NULL;
   data_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -216,6 +219,7 @@ void Entity_Image::SharedDtor() {
     delete data_;
   }
   if (this != default_instance_) {
+    delete rgbpixelsize_;
   }
 }
 
@@ -251,8 +255,11 @@ void Entity_Image::Clear() {
     ::memset(&first, 0, n);                                \
   } while (0)
 
-  if (_has_bits_[0 / 32] & 7) {
+  if (_has_bits_[0 / 32] & 15) {
     ZR_(width_, height_);
+    if (has_rgbpixelsize()) {
+      if (rgbpixelsize_ != NULL) rgbpixelsize_->::personalRobotics::Point2D::Clear();
+    }
     if (has_data()) {
       if (data_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
         data_->clear();
@@ -302,13 +309,26 @@ bool Entity_Image::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(26)) goto parse_data;
+        if (input->ExpectTag(26)) goto parse_rgbPixelSize;
         break;
       }
 
-      // optional bytes data = 3;
+      // optional .personalRobotics.Point2D rgbPixelSize = 3;
       case 3: {
         if (tag == 26) {
+         parse_rgbPixelSize:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_rgbpixelsize()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(34)) goto parse_data;
+        break;
+      }
+
+      // optional bytes data = 4;
+      case 4: {
+        if (tag == 34) {
          parse_data:
           DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->mutable_data()));
@@ -354,10 +374,16 @@ void Entity_Image::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->height(), output);
   }
 
-  // optional bytes data = 3;
+  // optional .personalRobotics.Point2D rgbPixelSize = 3;
+  if (has_rgbpixelsize()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, this->rgbpixelsize(), output);
+  }
+
+  // optional bytes data = 4;
   if (has_data()) {
     ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
-      3, this->data(), output);
+      4, this->data(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -380,11 +406,18 @@ void Entity_Image::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->height(), target);
   }
 
-  // optional bytes data = 3;
+  // optional .personalRobotics.Point2D rgbPixelSize = 3;
+  if (has_rgbpixelsize()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        3, this->rgbpixelsize(), target);
+  }
+
+  // optional bytes data = 4;
   if (has_data()) {
     target =
       ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        3, this->data(), target);
+        4, this->data(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -413,7 +446,14 @@ int Entity_Image::ByteSize() const {
           this->height());
     }
 
-    // optional bytes data = 3;
+    // optional .personalRobotics.Point2D rgbPixelSize = 3;
+    if (has_rgbpixelsize()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->rgbpixelsize());
+    }
+
+    // optional bytes data = 4;
     if (has_data()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::BytesSize(
@@ -453,6 +493,9 @@ void Entity_Image::MergeFrom(const Entity_Image& from) {
     if (from.has_height()) {
       set_height(from.height());
     }
+    if (from.has_rgbpixelsize()) {
+      mutable_rgbpixelsize()->::personalRobotics::Point2D::MergeFrom(from.rgbpixelsize());
+    }
     if (from.has_data()) {
       set_data(from.data());
     }
@@ -474,6 +517,9 @@ void Entity_Image::CopyFrom(const Entity_Image& from) {
 
 bool Entity_Image::IsInitialized() const {
 
+  if (has_rgbpixelsize()) {
+    if (!this->rgbpixelsize().IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -481,6 +527,7 @@ void Entity_Image::Swap(Entity_Image* other) {
   if (other != this) {
     std::swap(width_, other->width_);
     std::swap(height_, other->height_);
+    std::swap(rgbpixelsize_, other->rgbpixelsize_);
     std::swap(data_, other->data_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -504,6 +551,7 @@ const int Entity::kPoseFieldNumber;
 const int Entity::kBoundingSizeFieldNumber;
 const int Entity::kIdFieldNumber;
 const int Entity::kContoursFieldNumber;
+const int Entity::kProjPixelSizeFieldNumber;
 const int Entity::kImageFieldNumber;
 #endif  // !_MSC_VER
 
@@ -516,6 +564,7 @@ Entity::Entity()
 void Entity::InitAsDefaultInstance() {
   pose_ = const_cast< ::personalRobotics::Pose2D*>(&::personalRobotics::Pose2D::default_instance());
   boundingsize_ = const_cast< ::personalRobotics::Point2D*>(&::personalRobotics::Point2D::default_instance());
+  projpixelsize_ = const_cast< ::personalRobotics::Point2D*>(&::personalRobotics::Point2D::default_instance());
   image_ = const_cast< ::procamPRL::Entity_Image*>(&::procamPRL::Entity_Image::default_instance());
 }
 
@@ -531,6 +580,7 @@ void Entity::SharedCtor() {
   pose_ = NULL;
   boundingsize_ = NULL;
   id_ = 0;
+  projpixelsize_ = NULL;
   image_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -544,6 +594,7 @@ void Entity::SharedDtor() {
   if (this != default_instance_) {
     delete pose_;
     delete boundingsize_;
+    delete projpixelsize_;
     delete image_;
   }
 }
@@ -570,7 +621,7 @@ Entity* Entity::New() const {
 }
 
 void Entity::Clear() {
-  if (_has_bits_[0 / 32] & 23) {
+  if (_has_bits_[0 / 32] & 55) {
     if (has_pose()) {
       if (pose_ != NULL) pose_->::personalRobotics::Pose2D::Clear();
     }
@@ -578,6 +629,9 @@ void Entity::Clear() {
       if (boundingsize_ != NULL) boundingsize_->::personalRobotics::Point2D::Clear();
     }
     id_ = 0;
+    if (has_projpixelsize()) {
+      if (projpixelsize_ != NULL) projpixelsize_->::personalRobotics::Point2D::Clear();
+    }
     if (has_image()) {
       if (image_ != NULL) image_->::procamPRL::Entity_Image::Clear();
     }
@@ -647,13 +701,26 @@ bool Entity::MergePartialFromCodedStream(
           goto handle_unusual;
         }
         if (input->ExpectTag(34)) goto parse_contours;
-        if (input->ExpectTag(42)) goto parse_image;
+        if (input->ExpectTag(42)) goto parse_projPixelSize;
         break;
       }
 
-      // optional .procamPRL.Entity.Image image = 5;
+      // optional .personalRobotics.Point2D projPixelSize = 5;
       case 5: {
         if (tag == 42) {
+         parse_projPixelSize:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_projpixelsize()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(50)) goto parse_image;
+        break;
+      }
+
+      // optional .procamPRL.Entity.Image image = 6;
+      case 6: {
+        if (tag == 50) {
          parse_image:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_image()));
@@ -712,10 +779,16 @@ void Entity::SerializeWithCachedSizes(
       4, this->contours(i), output);
   }
 
-  // optional .procamPRL.Entity.Image image = 5;
+  // optional .personalRobotics.Point2D projPixelSize = 5;
+  if (has_projpixelsize()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, this->projpixelsize(), output);
+  }
+
+  // optional .procamPRL.Entity.Image image = 6;
   if (has_image()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, this->image(), output);
+      6, this->image(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -754,11 +827,18 @@ void Entity::SerializeWithCachedSizes(
         4, this->contours(i), target);
   }
 
-  // optional .procamPRL.Entity.Image image = 5;
+  // optional .personalRobotics.Point2D projPixelSize = 5;
+  if (has_projpixelsize()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        5, this->projpixelsize(), target);
+  }
+
+  // optional .procamPRL.Entity.Image image = 6;
   if (has_image()) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        5, this->image(), target);
+        6, this->image(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -794,7 +874,14 @@ int Entity::ByteSize() const {
           this->id());
     }
 
-    // optional .procamPRL.Entity.Image image = 5;
+    // optional .personalRobotics.Point2D projPixelSize = 5;
+    if (has_projpixelsize()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->projpixelsize());
+    }
+
+    // optional .procamPRL.Entity.Image image = 6;
     if (has_image()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
@@ -846,6 +933,9 @@ void Entity::MergeFrom(const Entity& from) {
     if (from.has_id()) {
       set_id(from.id());
     }
+    if (from.has_projpixelsize()) {
+      mutable_projpixelsize()->::personalRobotics::Point2D::MergeFrom(from.projpixelsize());
+    }
     if (from.has_image()) {
       mutable_image()->::procamPRL::Entity_Image::MergeFrom(from.image());
     }
@@ -874,6 +964,12 @@ bool Entity::IsInitialized() const {
     if (!this->boundingsize().IsInitialized()) return false;
   }
   if (!::google::protobuf::internal::AllAreInitialized(this->contours())) return false;
+  if (has_projpixelsize()) {
+    if (!this->projpixelsize().IsInitialized()) return false;
+  }
+  if (has_image()) {
+    if (!this->image().IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -883,6 +979,7 @@ void Entity::Swap(Entity* other) {
     std::swap(boundingsize_, other->boundingsize_);
     std::swap(id_, other->id_);
     contours_.Swap(&other->contours_);
+    std::swap(projpixelsize_, other->projpixelsize_);
     std::swap(image_, other->image_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -935,8 +1032,6 @@ const int EntityList::Command_ARRAYSIZE;
 #ifndef _MSC_VER
 const int EntityList::kTimestampFieldNumber;
 const int EntityList::kFrameIdFieldNumber;
-const int EntityList::kRgbPixelSizeFieldNumber;
-const int EntityList::kProjPixelSizeFieldNumber;
 const int EntityList::kCommandFieldNumber;
 const int EntityList::kEntityListFieldNumber;
 #endif  // !_MSC_VER
@@ -948,8 +1043,6 @@ EntityList::EntityList()
 }
 
 void EntityList::InitAsDefaultInstance() {
-  rgbpixelsize_ = const_cast< ::personalRobotics::Point2D*>(&::personalRobotics::Point2D::default_instance());
-  projpixelsize_ = const_cast< ::personalRobotics::Point2D*>(&::personalRobotics::Point2D::default_instance());
 }
 
 EntityList::EntityList(const EntityList& from)
@@ -963,8 +1056,6 @@ void EntityList::SharedCtor() {
   _cached_size_ = 0;
   timestamp_ = 0;
   frameid_ = 0;
-  rgbpixelsize_ = NULL;
-  projpixelsize_ = NULL;
   command_ = 1;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -976,8 +1067,6 @@ EntityList::~EntityList() {
 
 void EntityList::SharedDtor() {
   if (this != default_instance_) {
-    delete rgbpixelsize_;
-    delete projpixelsize_;
   }
 }
 
@@ -1003,17 +1092,24 @@ EntityList* EntityList::New() const {
 }
 
 void EntityList::Clear() {
-  if (_has_bits_[0 / 32] & 31) {
-    timestamp_ = 0;
-    frameid_ = 0;
-    if (has_rgbpixelsize()) {
-      if (rgbpixelsize_ != NULL) rgbpixelsize_->::personalRobotics::Point2D::Clear();
-    }
-    if (has_projpixelsize()) {
-      if (projpixelsize_ != NULL) projpixelsize_->::personalRobotics::Point2D::Clear();
-    }
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<EntityList*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  if (_has_bits_[0 / 32] & 7) {
+    ZR_(timestamp_, frameid_);
     command_ = 1;
   }
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
   entitylist_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1051,32 +1147,6 @@ bool EntityList::MergePartialFromCodedStream(
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &frameid_)));
           set_has_frameid();
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(26)) goto parse_rgbPixelSize;
-        break;
-      }
-
-      // optional .personalRobotics.Point2D rgbPixelSize = 3;
-      case 3: {
-        if (tag == 26) {
-         parse_rgbPixelSize:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_rgbpixelsize()));
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(34)) goto parse_projPixelSize;
-        break;
-      }
-
-      // optional .personalRobotics.Point2D projPixelSize = 4;
-      case 4: {
-        if (tag == 34) {
-         parse_projPixelSize:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-               input, mutable_projpixelsize()));
         } else {
           goto handle_unusual;
         }
@@ -1153,18 +1223,6 @@ void EntityList::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->frameid(), output);
   }
 
-  // optional .personalRobotics.Point2D rgbPixelSize = 3;
-  if (has_rgbpixelsize()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->rgbpixelsize(), output);
-  }
-
-  // optional .personalRobotics.Point2D projPixelSize = 4;
-  if (has_projpixelsize()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, this->projpixelsize(), output);
-  }
-
   // optional .procamPRL.EntityList.Command command = 5 [default = NONE];
   if (has_command()) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
@@ -1195,20 +1253,6 @@ void EntityList::SerializeWithCachedSizes(
   // optional int32 frameId = 2;
   if (has_frameid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->frameid(), target);
-  }
-
-  // optional .personalRobotics.Point2D rgbPixelSize = 3;
-  if (has_rgbpixelsize()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        3, this->rgbpixelsize(), target);
-  }
-
-  // optional .personalRobotics.Point2D projPixelSize = 4;
-  if (has_projpixelsize()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        4, this->projpixelsize(), target);
   }
 
   // optional .procamPRL.EntityList.Command command = 5 [default = NONE];
@@ -1246,20 +1290,6 @@ int EntityList::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->frameid());
-    }
-
-    // optional .personalRobotics.Point2D rgbPixelSize = 3;
-    if (has_rgbpixelsize()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->rgbpixelsize());
-    }
-
-    // optional .personalRobotics.Point2D projPixelSize = 4;
-    if (has_projpixelsize()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->projpixelsize());
     }
 
     // optional .procamPRL.EntityList.Command command = 5 [default = NONE];
@@ -1310,12 +1340,6 @@ void EntityList::MergeFrom(const EntityList& from) {
     if (from.has_frameid()) {
       set_frameid(from.frameid());
     }
-    if (from.has_rgbpixelsize()) {
-      mutable_rgbpixelsize()->::personalRobotics::Point2D::MergeFrom(from.rgbpixelsize());
-    }
-    if (from.has_projpixelsize()) {
-      mutable_projpixelsize()->::personalRobotics::Point2D::MergeFrom(from.projpixelsize());
-    }
     if (from.has_command()) {
       set_command(from.command());
     }
@@ -1337,12 +1361,6 @@ void EntityList::CopyFrom(const EntityList& from) {
 
 bool EntityList::IsInitialized() const {
 
-  if (has_rgbpixelsize()) {
-    if (!this->rgbpixelsize().IsInitialized()) return false;
-  }
-  if (has_projpixelsize()) {
-    if (!this->projpixelsize().IsInitialized()) return false;
-  }
   if (!::google::protobuf::internal::AllAreInitialized(this->entitylist())) return false;
   return true;
 }
@@ -1351,8 +1369,6 @@ void EntityList::Swap(EntityList* other) {
   if (other != this) {
     std::swap(timestamp_, other->timestamp_);
     std::swap(frameid_, other->frameid_);
-    std::swap(rgbpixelsize_, other->rgbpixelsize_);
-    std::swap(projpixelsize_, other->projpixelsize_);
     std::swap(command_, other->command_);
     entitylist_.Swap(&other->entitylist_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);

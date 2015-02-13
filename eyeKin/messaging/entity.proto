@@ -103,13 +103,16 @@ message Entity
 	optional personalRobotics.Point2D boundingSize = 2;
 	optional int32 id = 3;
 	repeated personalRobotics.Point2D contours = 4;
+	optional personalRobotics.Point2D projPixelSize = 5;
+
 	message Image
 	{
 		optional int32 width = 1;
 		optional int32 height = 2;
-		optional bytes data = 3;
+		optional personalRobotics.Point2D rgbPixelSize = 3;
+		optional bytes data = 4;
 	}
-	optional Image image = 5;
+	optional Image image = 6;
 }
 
 // This is the message that will be actually sent over the socket
@@ -117,8 +120,6 @@ message EntityList
 {
 	optional double timestamp = 1;
 	optional int32 frameId = 2;
-	optional personalRobotics.Point2D rgbPixelSize = 3;
-	optional personalRobotics.Point2D projPixelSize = 4;
 	enum Command
 	{
 		NONE = 1;

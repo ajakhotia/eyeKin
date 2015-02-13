@@ -133,10 +133,19 @@ class Entity_Image : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 height() const;
   inline void set_height(::google::protobuf::int32 value);
 
-  // optional bytes data = 3;
+  // optional .personalRobotics.Point2D rgbPixelSize = 3;
+  inline bool has_rgbpixelsize() const;
+  inline void clear_rgbpixelsize();
+  static const int kRgbPixelSizeFieldNumber = 3;
+  inline const ::personalRobotics::Point2D& rgbpixelsize() const;
+  inline ::personalRobotics::Point2D* mutable_rgbpixelsize();
+  inline ::personalRobotics::Point2D* release_rgbpixelsize();
+  inline void set_allocated_rgbpixelsize(::personalRobotics::Point2D* rgbpixelsize);
+
+  // optional bytes data = 4;
   inline bool has_data() const;
   inline void clear_data();
-  static const int kDataFieldNumber = 3;
+  static const int kDataFieldNumber = 4;
   inline const ::std::string& data() const;
   inline void set_data(const ::std::string& value);
   inline void set_data(const char* value);
@@ -151,6 +160,8 @@ class Entity_Image : public ::google::protobuf::Message {
   inline void clear_has_width();
   inline void set_has_height();
   inline void clear_has_height();
+  inline void set_has_rgbpixelsize();
+  inline void clear_has_rgbpixelsize();
   inline void set_has_data();
   inline void clear_has_data();
 
@@ -160,6 +171,7 @@ class Entity_Image : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::google::protobuf::int32 width_;
   ::google::protobuf::int32 height_;
+  ::personalRobotics::Point2D* rgbpixelsize_;
   ::std::string* data_;
   friend void  protobuf_AddDesc_entity_2eproto();
   friend void protobuf_AssignDesc_entity_2eproto();
@@ -262,10 +274,19 @@ class Entity : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::personalRobotics::Point2D >*
       mutable_contours();
 
-  // optional .procamPRL.Entity.Image image = 5;
+  // optional .personalRobotics.Point2D projPixelSize = 5;
+  inline bool has_projpixelsize() const;
+  inline void clear_projpixelsize();
+  static const int kProjPixelSizeFieldNumber = 5;
+  inline const ::personalRobotics::Point2D& projpixelsize() const;
+  inline ::personalRobotics::Point2D* mutable_projpixelsize();
+  inline ::personalRobotics::Point2D* release_projpixelsize();
+  inline void set_allocated_projpixelsize(::personalRobotics::Point2D* projpixelsize);
+
+  // optional .procamPRL.Entity.Image image = 6;
   inline bool has_image() const;
   inline void clear_image();
-  static const int kImageFieldNumber = 5;
+  static const int kImageFieldNumber = 6;
   inline const ::procamPRL::Entity_Image& image() const;
   inline ::procamPRL::Entity_Image* mutable_image();
   inline ::procamPRL::Entity_Image* release_image();
@@ -279,6 +300,8 @@ class Entity : public ::google::protobuf::Message {
   inline void clear_has_boundingsize();
   inline void set_has_id();
   inline void clear_has_id();
+  inline void set_has_projpixelsize();
+  inline void clear_has_projpixelsize();
   inline void set_has_image();
   inline void clear_has_image();
 
@@ -289,6 +312,7 @@ class Entity : public ::google::protobuf::Message {
   ::personalRobotics::Pose2D* pose_;
   ::personalRobotics::Point2D* boundingsize_;
   ::google::protobuf::RepeatedPtrField< ::personalRobotics::Point2D > contours_;
+  ::personalRobotics::Point2D* projpixelsize_;
   ::procamPRL::Entity_Image* image_;
   ::google::protobuf::int32 id_;
   friend void  protobuf_AddDesc_entity_2eproto();
@@ -396,24 +420,6 @@ class EntityList : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 frameid() const;
   inline void set_frameid(::google::protobuf::int32 value);
 
-  // optional .personalRobotics.Point2D rgbPixelSize = 3;
-  inline bool has_rgbpixelsize() const;
-  inline void clear_rgbpixelsize();
-  static const int kRgbPixelSizeFieldNumber = 3;
-  inline const ::personalRobotics::Point2D& rgbpixelsize() const;
-  inline ::personalRobotics::Point2D* mutable_rgbpixelsize();
-  inline ::personalRobotics::Point2D* release_rgbpixelsize();
-  inline void set_allocated_rgbpixelsize(::personalRobotics::Point2D* rgbpixelsize);
-
-  // optional .personalRobotics.Point2D projPixelSize = 4;
-  inline bool has_projpixelsize() const;
-  inline void clear_projpixelsize();
-  static const int kProjPixelSizeFieldNumber = 4;
-  inline const ::personalRobotics::Point2D& projpixelsize() const;
-  inline ::personalRobotics::Point2D* mutable_projpixelsize();
-  inline ::personalRobotics::Point2D* release_projpixelsize();
-  inline void set_allocated_projpixelsize(::personalRobotics::Point2D* projpixelsize);
-
   // optional .procamPRL.EntityList.Command command = 5 [default = NONE];
   inline bool has_command() const;
   inline void clear_command();
@@ -439,10 +445,6 @@ class EntityList : public ::google::protobuf::Message {
   inline void clear_has_timestamp();
   inline void set_has_frameid();
   inline void clear_has_frameid();
-  inline void set_has_rgbpixelsize();
-  inline void clear_has_rgbpixelsize();
-  inline void set_has_projpixelsize();
-  inline void clear_has_projpixelsize();
   inline void set_has_command();
   inline void clear_has_command();
 
@@ -451,10 +453,8 @@ class EntityList : public ::google::protobuf::Message {
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   double timestamp_;
-  ::personalRobotics::Point2D* rgbpixelsize_;
   ::google::protobuf::int32 frameid_;
   int command_;
-  ::personalRobotics::Point2D* projpixelsize_;
   ::google::protobuf::RepeatedPtrField< ::procamPRL::Entity > entitylist_;
   friend void  protobuf_AddDesc_entity_2eproto();
   friend void protobuf_AssignDesc_entity_2eproto();
@@ -518,15 +518,56 @@ inline void Entity_Image::set_height(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:procamPRL.Entity.Image.height)
 }
 
-// optional bytes data = 3;
-inline bool Entity_Image::has_data() const {
+// optional .personalRobotics.Point2D rgbPixelSize = 3;
+inline bool Entity_Image::has_rgbpixelsize() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void Entity_Image::set_has_data() {
+inline void Entity_Image::set_has_rgbpixelsize() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void Entity_Image::clear_has_data() {
+inline void Entity_Image::clear_has_rgbpixelsize() {
   _has_bits_[0] &= ~0x00000004u;
+}
+inline void Entity_Image::clear_rgbpixelsize() {
+  if (rgbpixelsize_ != NULL) rgbpixelsize_->::personalRobotics::Point2D::Clear();
+  clear_has_rgbpixelsize();
+}
+inline const ::personalRobotics::Point2D& Entity_Image::rgbpixelsize() const {
+  // @@protoc_insertion_point(field_get:procamPRL.Entity.Image.rgbPixelSize)
+  return rgbpixelsize_ != NULL ? *rgbpixelsize_ : *default_instance_->rgbpixelsize_;
+}
+inline ::personalRobotics::Point2D* Entity_Image::mutable_rgbpixelsize() {
+  set_has_rgbpixelsize();
+  if (rgbpixelsize_ == NULL) rgbpixelsize_ = new ::personalRobotics::Point2D;
+  // @@protoc_insertion_point(field_mutable:procamPRL.Entity.Image.rgbPixelSize)
+  return rgbpixelsize_;
+}
+inline ::personalRobotics::Point2D* Entity_Image::release_rgbpixelsize() {
+  clear_has_rgbpixelsize();
+  ::personalRobotics::Point2D* temp = rgbpixelsize_;
+  rgbpixelsize_ = NULL;
+  return temp;
+}
+inline void Entity_Image::set_allocated_rgbpixelsize(::personalRobotics::Point2D* rgbpixelsize) {
+  delete rgbpixelsize_;
+  rgbpixelsize_ = rgbpixelsize;
+  if (rgbpixelsize) {
+    set_has_rgbpixelsize();
+  } else {
+    clear_has_rgbpixelsize();
+  }
+  // @@protoc_insertion_point(field_set_allocated:procamPRL.Entity.Image.rgbPixelSize)
+}
+
+// optional bytes data = 4;
+inline bool Entity_Image::has_data() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Entity_Image::set_has_data() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Entity_Image::clear_has_data() {
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void Entity_Image::clear_data() {
   if (data_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
@@ -734,15 +775,56 @@ Entity::mutable_contours() {
   return &contours_;
 }
 
-// optional .procamPRL.Entity.Image image = 5;
-inline bool Entity::has_image() const {
+// optional .personalRobotics.Point2D projPixelSize = 5;
+inline bool Entity::has_projpixelsize() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void Entity::set_has_image() {
+inline void Entity::set_has_projpixelsize() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void Entity::clear_has_image() {
+inline void Entity::clear_has_projpixelsize() {
   _has_bits_[0] &= ~0x00000010u;
+}
+inline void Entity::clear_projpixelsize() {
+  if (projpixelsize_ != NULL) projpixelsize_->::personalRobotics::Point2D::Clear();
+  clear_has_projpixelsize();
+}
+inline const ::personalRobotics::Point2D& Entity::projpixelsize() const {
+  // @@protoc_insertion_point(field_get:procamPRL.Entity.projPixelSize)
+  return projpixelsize_ != NULL ? *projpixelsize_ : *default_instance_->projpixelsize_;
+}
+inline ::personalRobotics::Point2D* Entity::mutable_projpixelsize() {
+  set_has_projpixelsize();
+  if (projpixelsize_ == NULL) projpixelsize_ = new ::personalRobotics::Point2D;
+  // @@protoc_insertion_point(field_mutable:procamPRL.Entity.projPixelSize)
+  return projpixelsize_;
+}
+inline ::personalRobotics::Point2D* Entity::release_projpixelsize() {
+  clear_has_projpixelsize();
+  ::personalRobotics::Point2D* temp = projpixelsize_;
+  projpixelsize_ = NULL;
+  return temp;
+}
+inline void Entity::set_allocated_projpixelsize(::personalRobotics::Point2D* projpixelsize) {
+  delete projpixelsize_;
+  projpixelsize_ = projpixelsize;
+  if (projpixelsize) {
+    set_has_projpixelsize();
+  } else {
+    clear_has_projpixelsize();
+  }
+  // @@protoc_insertion_point(field_set_allocated:procamPRL.Entity.projPixelSize)
+}
+
+// optional .procamPRL.Entity.Image image = 6;
+inline bool Entity::has_image() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void Entity::set_has_image() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void Entity::clear_has_image() {
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void Entity::clear_image() {
   if (image_ != NULL) image_->::procamPRL::Entity_Image::Clear();
@@ -827,97 +909,15 @@ inline void EntityList::set_frameid(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:procamPRL.EntityList.frameId)
 }
 
-// optional .personalRobotics.Point2D rgbPixelSize = 3;
-inline bool EntityList::has_rgbpixelsize() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void EntityList::set_has_rgbpixelsize() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void EntityList::clear_has_rgbpixelsize() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void EntityList::clear_rgbpixelsize() {
-  if (rgbpixelsize_ != NULL) rgbpixelsize_->::personalRobotics::Point2D::Clear();
-  clear_has_rgbpixelsize();
-}
-inline const ::personalRobotics::Point2D& EntityList::rgbpixelsize() const {
-  // @@protoc_insertion_point(field_get:procamPRL.EntityList.rgbPixelSize)
-  return rgbpixelsize_ != NULL ? *rgbpixelsize_ : *default_instance_->rgbpixelsize_;
-}
-inline ::personalRobotics::Point2D* EntityList::mutable_rgbpixelsize() {
-  set_has_rgbpixelsize();
-  if (rgbpixelsize_ == NULL) rgbpixelsize_ = new ::personalRobotics::Point2D;
-  // @@protoc_insertion_point(field_mutable:procamPRL.EntityList.rgbPixelSize)
-  return rgbpixelsize_;
-}
-inline ::personalRobotics::Point2D* EntityList::release_rgbpixelsize() {
-  clear_has_rgbpixelsize();
-  ::personalRobotics::Point2D* temp = rgbpixelsize_;
-  rgbpixelsize_ = NULL;
-  return temp;
-}
-inline void EntityList::set_allocated_rgbpixelsize(::personalRobotics::Point2D* rgbpixelsize) {
-  delete rgbpixelsize_;
-  rgbpixelsize_ = rgbpixelsize;
-  if (rgbpixelsize) {
-    set_has_rgbpixelsize();
-  } else {
-    clear_has_rgbpixelsize();
-  }
-  // @@protoc_insertion_point(field_set_allocated:procamPRL.EntityList.rgbPixelSize)
-}
-
-// optional .personalRobotics.Point2D projPixelSize = 4;
-inline bool EntityList::has_projpixelsize() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void EntityList::set_has_projpixelsize() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void EntityList::clear_has_projpixelsize() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void EntityList::clear_projpixelsize() {
-  if (projpixelsize_ != NULL) projpixelsize_->::personalRobotics::Point2D::Clear();
-  clear_has_projpixelsize();
-}
-inline const ::personalRobotics::Point2D& EntityList::projpixelsize() const {
-  // @@protoc_insertion_point(field_get:procamPRL.EntityList.projPixelSize)
-  return projpixelsize_ != NULL ? *projpixelsize_ : *default_instance_->projpixelsize_;
-}
-inline ::personalRobotics::Point2D* EntityList::mutable_projpixelsize() {
-  set_has_projpixelsize();
-  if (projpixelsize_ == NULL) projpixelsize_ = new ::personalRobotics::Point2D;
-  // @@protoc_insertion_point(field_mutable:procamPRL.EntityList.projPixelSize)
-  return projpixelsize_;
-}
-inline ::personalRobotics::Point2D* EntityList::release_projpixelsize() {
-  clear_has_projpixelsize();
-  ::personalRobotics::Point2D* temp = projpixelsize_;
-  projpixelsize_ = NULL;
-  return temp;
-}
-inline void EntityList::set_allocated_projpixelsize(::personalRobotics::Point2D* projpixelsize) {
-  delete projpixelsize_;
-  projpixelsize_ = projpixelsize;
-  if (projpixelsize) {
-    set_has_projpixelsize();
-  } else {
-    clear_has_projpixelsize();
-  }
-  // @@protoc_insertion_point(field_set_allocated:procamPRL.EntityList.projPixelSize)
-}
-
 // optional .procamPRL.EntityList.Command command = 5 [default = NONE];
 inline bool EntityList::has_command() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void EntityList::set_has_command() {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000004u;
 }
 inline void EntityList::clear_has_command() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void EntityList::clear_command() {
   command_ = 1;

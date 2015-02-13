@@ -96,14 +96,7 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 		// Set frame ids, time stamp and the pixel sizes
 		serializableList.set_frameid(++epoch);
 		serializableList.set_timestamp(0);
-		personalRobotics::Point2D *rgbPixelSizeSerializable = new personalRobotics::Point2D();
-		personalRobotics::Point2D *projPixelSizeSerializable = new personalRobotics::Point2D();
-		rgbPixelSizeSerializable->set_x(colorPixelSize.x);
-		rgbPixelSizeSerializable->set_y(colorPixelSize.y);
-		projPixelSizeSerializable->set_x(projPixelSize.x);
-		projPixelSizeSerializable->set_y(projPixelSize.y);
-		serializableList.set_allocated_rgbpixelsize(rgbPixelSizeSerializable);
-		serializableList.set_allocated_projpixelsize(projPixelSizeSerializable);
+		
 		
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = listPtr->begin(); entityPtr != listPtr->end(); entityPtr++)
 		{
@@ -126,6 +119,7 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 			serializableEntityPtr->set_allocated_boundingsize(boundingSize);
 
 			// Set ID
+			serializableEntityPtr->set_id(entityPtr->id);
 
 			// Set contours
 			for (std::vector<cv::Point>::iterator contourPointPtr = entityPtr->contour.begin(); contourPointPtr != entityPtr->contour.end(); contourPointPtr++)
@@ -135,10 +129,20 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 				serializableContourPtr->set_y(contourPointPtr->y);
 			}
 
+			// Set pixel size
+			personalRobotics::Point2D *rgbPixelSizeSerializable = new personalRobotics::Point2D();
+			personalRobotics::Point2D *projPixelSizeSerializable = new personalRobotics::Point2D();
+			rgbPixelSizeSerializable->set_x(colorPixelSize.x);
+			rgbPixelSizeSerializable->set_y(colorPixelSize.y);
+			projPixelSizeSerializable->set_x(projPixelSize.x);
+			projPixelSizeSerializable->set_y(projPixelSize.y);
+			serializableEntityPtr->set_allocated_projpixelsize(projPixelSizeSerializable);
+
 			// Set Image
 			procamPRL::Entity::Image *image = new procamPRL::Entity::Image();
 			image->set_height(entityPtr->patch.rows);
 			image->set_width(entityPtr->patch.cols);
+			image->set_allocated_rgbpixelsize(rgbPixelSizeSerializable);
 			image->set_data((void*)entityPtr->patch.data, entityPtr->patch.channels() * entityPtr->patch.rows * entityPtr->patch.cols);
 			serializableEntityPtr->set_allocated_image(image);
 		}
