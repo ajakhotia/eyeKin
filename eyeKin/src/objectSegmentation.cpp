@@ -96,6 +96,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		rgbMutex.unlock();
 		cv::Mat irImageCopy;
 		irImage.convertTo(irImageCopy, CV_8UC1);
+		cv::imwrite("ir.png", irImageCopy);
 		irMutex.unlock();
 		ColorSpacePoint* d2cMapping = new ColorSpacePoint[numPoints];
 		std::copy(depth2colorMappingPtr, depth2colorMappingPtr + numPoints, d2cMapping);
@@ -196,8 +197,13 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			cv::getRectSubPix(irImageCopy, irBoundingRect.size(), cv::Point(irBoundingRect.x + (irBoundingRect.width)/2,irBoundingRect.y+(irBoundingRect.height)/2),croppedIRimage);
 			cv::Mat croppedBlurImage;
 			cv::Mat croppedIRedges;
+			cv::Mat croppedThreshold;
 			cv::blur(croppedIRimage, croppedBlurImage, cv::Size(3, 3));
-			cv::Canny(croppedBlurImage, croppedIRedges, 20, 50, DEFAULT_IRCANNY_KERNEL_SIZE, false);
+			cv::Canny(croppedBlurImage, croppedIRedges, 10, 40, DEFAULT_IRCANNY_KERNEL_SIZE, false);
+			cv::inRange(croppedBlurImage, 50, 100, croppedThreshold);
+			cv::imshow("disp", croppedIRedges);
+			cv::imshow("disp2", croppedThreshold);
+			cv::waitKey(20);
 
 			// Extract contours corresponding to the *full IR image* and find the largest area contour
 			std::vector<std::vector<cv::Point>> irContours;

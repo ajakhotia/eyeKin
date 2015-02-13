@@ -48,7 +48,6 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 
 	// Transform the rgbContour to patch coordinates
 	std::vector<cv::Point> intermediateContour;
-	std::cout << "Len: " << contour.size() << std::endl;
 	cv::transform(contour, intermediateContour, rgb2intermediate);
 	cv::Point translation(boundingRect.x + (boundingRect.width - boundingSize.width) / 2, boundingRect.y + (boundingRect.height - boundingSize.height) / 2);
 	contour.clear();
@@ -67,16 +66,12 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	// Make a mask
 	cv::Mat maskChannel = cv::Mat::zeros(rgbPatch.rows, rgbPatch.cols,CV_8UC1);
 	cv::drawContours(maskChannel, std::vector<std::vector<cv::Point>>(1, contour), 0, cv::Scalar(255), CV_FILLED);
-	/*cv::imshow("disp", maskChannel);
-	cv::imshow("disp2", rgbPatch);
-	cv::waitKey(20);*/
 	patch.create(rgbPatch.rows, rgbPatch.cols, CV_8UC4);
 	int fromTo[] = {0,0, 1,1, 2,2, 3,3};
 	cv::Mat inMatArray[] = { rgbPatch, maskChannel };
 	cv::mixChannels(inMatArray, 2, &patch, 1, fromTo, 4);
-	cv::imshow("disp2", patch);
-	cv::waitKey(20);
-	std::cout << "ping6" << std::endl;
+	//cv::imshow("disp", maskChannel);
+	//cv::waitKey(10);
 
 	#ifdef DEBUG_PROFILER
 		timer.toc();
