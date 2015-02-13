@@ -9,6 +9,12 @@
 
 namespace personalRobotics
 {
+	struct IDLookUp
+	{
+		int id;
+		cv::Size2f boundingSize;
+	};
+
 	class ObjectSegmentor : public KinectReader
 	{
 	protected:
@@ -22,6 +28,7 @@ namespace personalRobotics
 		int maxClusterSize;
 		float minThreshold;
 		float maxThreshold;
+		float objectDifferenceThreshold;
 
 		// Containers
 		pcl::PointCloud<pcl::PointXYZ>::Ptr pclPtr;
@@ -29,6 +36,8 @@ namespace personalRobotics
 		std::vector<personalRobotics::Entity> entityList;
 		cv::Mat homography;
 		cv::Point2f pixelSize;
+		std::vector<IDLookUp> previousIDList;
+		std::vector<IDLookUp> currentIDList;
 
 		// Container locks
 		std::mutex pclPtrLock;
@@ -40,6 +49,9 @@ namespace personalRobotics
 
 		// Runner threads
 		std::thread segementorThread;
+
+		//Counters
+		int objectCount;
 
 		// Routines
 		void planeSegment();
@@ -58,6 +70,7 @@ namespace personalRobotics
 		// Accessors
 		std::vector<personalRobotics::Entity>* getEntityList();
 		cv::Point2f* getRGBpixelSize();
+		std::vector<IDLookUp>* getIDList();
 
 		// Setters
 		void setHomography(cv::Mat &inhomography);
@@ -67,6 +80,7 @@ namespace personalRobotics
 		void startSegmentor();
 		void segmentorThreadRoutine();
 		void stopSegmentor();
+		float calculateEntityDifferences(cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize);
 	};
 
 	void createCheckerboard(cv::Mat& checkerboard, int width, int height, int& numBlocksX, int& numBlocksY);

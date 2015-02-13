@@ -5,13 +5,13 @@ personalRobotics::Entity::Entity()
 {
 
 }
-personalRobotics::Entity::Entity(cv::Point2f centroid, float angle, float xLength, float yLenght, std::vector<cv::Point> rgbContour)
+personalRobotics::Entity::Entity(cv::Point2f centroid, float angle, float xLength, float yLenght, std::vector<cv::Point> rgbContour, int inID)
 {
 	pose2Drgb.position = centroid;
 	pose2Drgb.angle = angle;
 	boundingSize = cv::Size2f(xLength, yLenght);
 	contour = rgbContour;
-	id = 0;
+	id = inID;
 }
 personalRobotics::Entity::~Entity()
 {

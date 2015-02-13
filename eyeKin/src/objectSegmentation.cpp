@@ -13,6 +13,7 @@ personalRobotics::ObjectSegmentor::ObjectSegmentor()
 	clusterTolerance = DEFAULT_CLUSTER_TOLERANCE;
 	minClusterSize = DEFAULT_MINIMUM_CLUSTER_SIZE;
 	maxClusterSize = DEFAULT_MAXIMUM_CLUSTER_SIZE;
+	objectDifferenceThreshold = OBJECT_DIFFERENCE_THRESHOLD;
 
 	// Set initial state of flags
 	stopSegmentorFlag.set(true);
@@ -22,6 +23,8 @@ personalRobotics::ObjectSegmentor::ObjectSegmentor()
 	pclPtr = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
 	unlockPcl();
 	planePtr = pcl::ModelCoefficients::Ptr(new pcl::ModelCoefficients);
+
+	objectCount = 0;
 
 	// Start the kinect thread
 	startKinect();
@@ -62,6 +65,11 @@ cv::Point2f* personalRobotics::ObjectSegmentor::getRGBpixelSize()
 {
 	return &pixelSize;
 }
+std::vector<personalRobotics::IDLookUp>* personalRobotics::ObjectSegmentor::getIDList()
+{
+	return &previousIDList;
+}
+
 
 // Setters
 void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
@@ -162,6 +170,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		newListGenerated.set(true);
 		for (std::vector<pcl::PointIndices>::const_iterator it = clusterIndices.begin(); it != clusterIndices.end(); ++it)
 		{
+			int id;
 			CameraSpacePoint *cameraSpacePoints = new CameraSpacePoint[it->indices.size()];
 			int pointNum = 0;
 			for (std::vector<int>::const_iterator pit = it->indices.begin(); pit != it->indices.end(); pit++)
@@ -234,14 +243,41 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			cv::Mat eigenValues, eigenVectors;
 			cv::eigen(cvCovar*(1.f / (pointNum - 1)), true, eigenValues, eigenVectors);
 			if (eigenValues.at<float>(0, 0) > 1 && eigenValues.at<float>(1, 0) > 1 && rgbContour.size() != 0)
-				entityList.push_back(personalRobotics::Entity(cv::Point2f(cvCentroid.at<float>(0, 0), cvCentroid.at<float>(0, 1)), atan2(eigenVectors.at<float>(0, 1), eigenVectors.at<float>(0, 0)), sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(1, 0))*6.5f,rgbContour));
+			{
+				bool match = false;
+				float minScore = objectDifferenceThreshold;
+
+				for (std::vector<IDLookUp>::iterator idPtr = previousIDList.begin(); idPtr != previousIDList.end(); idPtr++)
+				{
+					float currentScore = calculateEntityDifferences(idPtr->boundingSize, cv::Size2f(sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(1, 0))*6.5f));
+					if (currentScore < objectDifferenceThreshold && currentScore < minScore)
+					{
+						id = idPtr->id;
+						minScore = currentScore;
+						bool match = true;
+					}
+				}
+				IDLookUp iLU;
+				iLU.boundingSize = cv::Size2f(sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(1, 0))*6.5f);
+				if (match){
+					iLU.id = id;
+				}
+				else {
+					objectCount++;
+					iLU.id = objectCount;
+				}
+				currentIDList.push_back(iLU);
+				entityList.push_back(personalRobotics::Entity(cv::Point2f(cvCentroid.at<float>(0, 0), cvCentroid.at<float>(0, 1)), atan2(eigenVectors.at<float>(0, 1), eigenVectors.at<float>(0, 0)), sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(1, 0))*6.5f, rgbContour, id));
+			}
 		}
 		// Generate patch and geometric data for each of the entity
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
 		{
 			entityPtr->generateData(homography, rgbImageCopy);
 		}
+		previousIDList = currentIDList;
 		unlockList();
+		currentIDList.clear();
 		delete[] d2cMapping;
 	}
 }
@@ -322,6 +358,10 @@ void personalRobotics::ObjectSegmentor::stopSegmentor()
 		segementorThread.join();
 }
 
+float personalRobotics::ObjectSegmentor::calculateEntityDifferences(cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize)
+{
+	return sqrt(pow((IDBoundingSize.width - objectBoundingSize.width), 2) + pow((IDBoundingSize.height - objectBoundingSize.height), 2));
+}
 
 void personalRobotics::createCheckerboard(cv::Mat& checkerboard, int width, int height, int& numBlocksX, int& numBlocksY)
 {

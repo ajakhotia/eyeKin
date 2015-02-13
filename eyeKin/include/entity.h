@@ -27,7 +27,7 @@ namespace personalRobotics
 		cv::Mat patch;
 	public:
 		Entity();
-		Entity(cv::Point2f centroid, float angle, float xLenght, float yLenght, std::vector<cv::Point> rgbContour);
+		Entity(cv::Point2f centroid, float angle, float xLenght, float yLenght, std::vector<cv::Point> rgbContour, int inID);
 		~Entity();
 		void generateData(cv::Mat& homography, cv::Mat& rgbImage);
 	};
