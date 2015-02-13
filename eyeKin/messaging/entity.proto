@@ -101,7 +101,7 @@ message Entity
 {
 	optional personalRobotics.Pose2D pose = 1;
 	optional personalRobotics.Point2D boundingSize = 2;
-	optional personalRobotics.Point2D id = 3;
+	optional int32 id = 3;
 	repeated personalRobotics.Point2D contours = 4;
 	message Image
 	{
