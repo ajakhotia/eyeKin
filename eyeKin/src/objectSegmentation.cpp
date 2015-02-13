@@ -196,18 +196,18 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			cv::Mat croppedIRimage;
 			cv::getRectSubPix(irImageCopy, irBoundingRect.size(), cv::Point(irBoundingRect.x + (irBoundingRect.width)/2,irBoundingRect.y+(irBoundingRect.height)/2),croppedIRimage);
 			cv::Mat croppedBlurImage;
-			cv::Mat croppedIRedges;
+			//cv::Mat croppedIRedges;
 			cv::Mat croppedThreshold;
 			cv::blur(croppedIRimage, croppedBlurImage, cv::Size(3, 3));
-			cv::Canny(croppedBlurImage, croppedIRedges, 10, 40, DEFAULT_IRCANNY_KERNEL_SIZE, false);
+			//cv::Canny(croppedBlurImage, croppedIRedges, 10, 40, DEFAULT_IRCANNY_KERNEL_SIZE, false);
 			cv::inRange(croppedBlurImage, 50, 100, croppedThreshold);
-			cv::imshow("disp", croppedIRedges);
-			cv::imshow("disp2", croppedThreshold);
+			//cv::imshow("disp", croppedIRedges);
+			cv::imshow("disp", croppedThreshold);
 			cv::waitKey(20);
 
 			// Extract contours corresponding to the *full IR image* and find the largest area contour
 			std::vector<std::vector<cv::Point>> irContours;
-			cv::findContours(croppedIRedges, irContours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, cv::Point(irBoundingRect.x, irBoundingRect.y));
+			cv::findContours(croppedThreshold, irContours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, cv::Point(irBoundingRect.x, irBoundingRect.y));
 			int largestContourIdx = -1;
 			double largestArea = 0;
 			for (int i = 0; i < irContours.size(); i++)
