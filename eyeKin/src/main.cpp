@@ -17,7 +17,6 @@ void main(int argC, char **argV)
 		{
 			// Allocate space for list
 			procamPRL::EntityList serializableList;
-			//serializableList.set_frameid(7);
 			if (eyeKin.getSegmentor()->getEntityList()->size() == 0)
 				continue;
 			eyeKin.generateSerializableList(serializableList);

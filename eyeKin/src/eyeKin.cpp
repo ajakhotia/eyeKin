@@ -93,9 +93,17 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 		// Get access to entityList
 		std::vector<personalRobotics::Entity> *listPtr = segmentor.getEntityList();
 
-		// Copy information from the entity list
+		// Set frame ids, time stamp and the pixel sizes
 		serializableList.set_frameid(++epoch);
 		serializableList.set_timestamp(0);
+		personalRobotics::Point2D *rgbPixelSizeSerializable = new personalRobotics::Point2D();
+		personalRobotics::Point2D *projPixelSizeSerializable = new personalRobotics::Point2D();
+		rgbPixelSizeSerializable->set_x(colorPixelSize.x);
+		rgbPixelSizeSerializable->set_y(colorPixelSize.y);
+		projPixelSizeSerializable->set_x(projPixelSize.x);
+		projPixelSizeSerializable->set_y(projPixelSize.y);
+		serializableList.set_allocated_rgbpixelsize(rgbPixelSizeSerializable);
+		serializableList.set_allocated_projpixelsize(projPixelSizeSerializable);
 		
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = listPtr->begin(); entityPtr != listPtr->end(); entityPtr++)
 		{
@@ -117,10 +125,7 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 			boundingSize->set_y(entityPtr->boundingSize.height);
 			serializableEntityPtr->set_allocated_boundingsize(boundingSize);
 
-			// Set pixel size
-			personalRobotics::Point2D pixelSize;
-			pixelSize.set_x(colorPixelSize.x);
-			pixelSize.set_y(colorPixelSize.y);
+			// Set ID
 
 			// Set contours
 			for (std::vector<cv::Point>::iterator contourPointPtr = entityPtr->contour.begin(); contourPointPtr != entityPtr->contour.end(); contourPointPtr++)

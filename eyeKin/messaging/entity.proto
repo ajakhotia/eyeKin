@@ -71,9 +71,15 @@ package procamPRL;
 //					boundingSize is same as the size of image. The bounds are not
 //					tight.
 //	
-//	pixelSize:		A tuple denoting the size of the pixels when projected on the
-//					table. A tuple is used because the size of pixels may along the
-//					x and y directions of the projector space. The units are mm/pixel.
+//	rgbPixelSize:	Represents the size of the the rgb image pixel when projected onto
+//					the table. The pixels are assumed to be non square. x component
+//					along the largest dimension and y along the next largest 
+//					component. Size is represented in mm/pixels.
+//
+//	projPixelSize:	Represents the size of the the projector pixel when projected onto
+//					the table. The pixels are assumed to be non square. x component
+//					along the largest dimension and y along the next largest 
+//					component. Size is represented in mm/pixels.
 //	
 //	contours:		A list of floating point tuples containing the contour information
 //					of the object in the imagePatch. The tuples represent the edge
@@ -95,7 +101,7 @@ message Entity
 {
 	optional personalRobotics.Pose2D pose = 1;
 	optional personalRobotics.Point2D boundingSize = 2;
-	optional personalRobotics.Point2D pixelSize = 3;
+	optional personalRobotics.Point2D id = 3;
 	repeated personalRobotics.Point2D contours = 4;
 	message Image
 	{
@@ -111,6 +117,8 @@ message EntityList
 {
 	optional double timestamp = 1;
 	optional int32 frameId = 2;
+	optional personalRobotics.Point2D rgbPixelSize = 3;
+	optional personalRobotics.Point2D projPixelSize = 4;
 	enum Command
 	{
 		NONE = 1;
@@ -121,6 +129,6 @@ message EntityList
 		STOP_STREAM = 6;
 		DISCONNECT = 7;
 	}
-	optional Command command = 3 [default = NONE];
-	repeated Entity entityList = 4;
+	optional Command command = 5 [default = NONE];
+	repeated Entity entityList = 6;
 }

@@ -220,13 +220,6 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			std::vector<cv::Point> rgbContour;
 			mapInfraredToColor(irContours[largestContourIdx],rgbContour,d2cMapping);
 
-			// Debug
-			/*cv::Mat rgbMask = cv::Mat::zeros(1080, 1920, CV_8UC1);
-			cv::drawContours(rgbMask, std::vector<std::vector<cv::Point>>(1, rgbContour), 0, cv::Scalar(255), CV_FILLED);
-			imshow("disp", rgbMask);
-			cv::imshow("disp2", rgbImageCopy);
-			cv::waitKey(20);*/
-
 			//Find mean and covariance
 			cv::Mat cvCentroid, cvCovar;
 			cv::calcCovarMatrix(colorSpacePoints, cvCovar, cvCentroid, CV_COVAR_NORMAL | CV_COVAR_ROWS, CV_32F);
