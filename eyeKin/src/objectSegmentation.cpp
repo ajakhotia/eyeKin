@@ -69,6 +69,11 @@ std::vector<personalRobotics::IDLookUp>* personalRobotics::ObjectSegmentor::getI
 {
 	return &previousIDList;
 }
+bool personalRobotics::ObjectSegmentor::getStatic()
+{
+	return frameStatic;
+}
+
 
 
 // Setters
@@ -177,7 +182,6 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		newListGenerated.set(true);
 		for (std::vector<pcl::PointIndices>::const_iterator it = clusterIndices.begin(); it != clusterIndices.end(); ++it)
 		{
-			int id;
 			CameraSpacePoint *cameraSpacePoints = new CameraSpacePoint[it->indices.size()];
 			int pointNum = 0;
 			for (std::vector<int>::const_iterator pit = it->indices.begin(); pit != it->indices.end(); pit++)
@@ -257,30 +261,29 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 				cv::Point2f objectCentroid = cv::Point2f(cvCentroid.at<float>(0, 0), cvCentroid.at<float>(0, 1));
 				float objectAngle = atan2(eigenVectors.at<float>(0, 1), eigenVectors.at<float>(0, 0));
 				cv::Size2f objectBoundingSize = cv::Size2f(sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(1, 0))*6.5f);
+				IDLookUp iLU;
 
 				for (std::vector<IDLookUp>::iterator idPtr = previousIDList.begin(); idPtr != previousIDList.end(); idPtr++)
 				{
 					float currentScore = calculateEntityDifferences(idPtr->centroid, objectCentroid, idPtr->angle, objectAngle, idPtr->boundingSize, objectBoundingSize);
 					if (currentScore < objectDifferenceThreshold && currentScore < minScore)
 					{
-						id = idPtr->id;
+						iLU.id = idPtr->id;
+						iLU.numFramesSame = idPtr->numFramesSame + 1;
 						minScore = currentScore;
 						bool match = true;
 					}
 				}
-				IDLookUp iLU;
 				iLU.centroid = objectCentroid;
 				iLU.angle = objectAngle;
 				iLU.boundingSize = objectBoundingSize;
-				if (match){
-					iLU.id = id;
-				}
-				else {
+				if (!match){
 					objectCount++;
 					iLU.id = objectCount;
+					iLU.numFramesSame = 1;
 				}
 				currentIDList.push_back(iLU);
-				entityList.push_back(personalRobotics::Entity(objectCentroid, objectAngle, objectBoundingSize, rgbContour, id));
+				entityList.push_back(personalRobotics::Entity(objectCentroid, objectAngle, objectBoundingSize, rgbContour, iLU.id));
 			}
 		}
 		// Generate patch and geometric data for each of the entity
@@ -288,7 +291,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		{
 			entityPtr->generateData(homography, rgbImageCopy);
 		}
-		calculateOverallChangeInFrames(previousIDList, currentIDList);
+		frameStatic = calculateOverallChangeInFrames(previousIDList, currentIDList);
 		previousIDList = currentIDList;
 		unlockList();
 		currentIDList.clear();
@@ -377,9 +380,16 @@ float personalRobotics::ObjectSegmentor::calculateEntityDifferences(cv::Point2f 
 	return sqrt(pow((IDcentroid.x - objectCentroid.x), 2) + pow((IDcentroid.y - objectCentroid.y), 2) + pow((IDangle - objectAngle), 2) + pow((IDBoundingSize.width - objectBoundingSize.width), 2) + pow((IDBoundingSize.height - objectBoundingSize.height), 2));
 }
 
-void personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vector<personalRobotics::IDLookUp> pIDList, std::vector<personalRobotics::IDLookUp> cIDList)
+bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vector<personalRobotics::IDLookUp> pIDList, std::vector<personalRobotics::IDLookUp> cIDList)
 {
-
+	for (std::vector<IDLookUp>::iterator cIDPtr = cIDList.begin(); cIDPtr != cIDList.end(); cIDPtr++)
+	{
+		if (cIDPtr->numFramesSame < 10)
+		{ 
+			return false;
+		}
+	}
+	return true;
 }
 
 void personalRobotics::createCheckerboard(cv::Mat& checkerboard, int width, int height, int& numBlocksX, int& numBlocksY)

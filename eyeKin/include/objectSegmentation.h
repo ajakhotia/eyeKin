@@ -15,6 +15,7 @@ namespace personalRobotics
 		cv::Point2f centroid;
 		float angle;
 		cv::Size2f boundingSize;
+		int numFramesSame;
 	};
 
 	class ObjectSegmentor : public KinectReader
@@ -53,6 +54,7 @@ namespace personalRobotics
 		std::thread segementorThread;
 
 		//Counters
+		bool frameStatic;
 		int objectCount;
 
 		// Routines
@@ -73,6 +75,7 @@ namespace personalRobotics
 		std::vector<personalRobotics::Entity>* getEntityList();
 		cv::Point2f* getRGBpixelSize();
 		std::vector<IDLookUp>* getIDList();
+		bool getStatic();
 
 		// Setters
 		void setHomography(cv::Mat &inhomography);
@@ -82,7 +85,7 @@ namespace personalRobotics
 		void startSegmentor();
 		void segmentorThreadRoutine();
 		void stopSegmentor();
-		void calculateOverallChangeInFrames(std::vector<IDLookUp> pIDList, std::vector<IDLookUp> cIDList);
+		bool calculateOverallChangeInFrames(std::vector<IDLookUp> pIDList, std::vector<IDLookUp> cIDList);
 		float calculateEntityDifferences(cv::Point2f IDcentroid, cv::Point2f objectCentroid, float IDangle, float objectAngle, cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize);
 	};
 
