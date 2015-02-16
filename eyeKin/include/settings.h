@@ -37,6 +37,6 @@
 #define DEFAULT_IRCANNY_KERNEL_SIZE 3
 
 //---Object Tracking Settings---//
-#define OBJECT_DIFFERENCE_THRESHOLD 33
+#define OBJECT_DIFFERENCE_THRESHOLD 100
 
 #endif

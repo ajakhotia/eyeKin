@@ -271,7 +271,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 						iLU.id = idPtr->id;
 						iLU.numFramesSame = idPtr->numFramesSame + 1;
 						minScore = currentScore;
-						bool match = true;
+						match = true;
 					}
 				}
 				iLU.centroid = objectCentroid;
@@ -377,14 +377,14 @@ void personalRobotics::ObjectSegmentor::stopSegmentor()
 
 float personalRobotics::ObjectSegmentor::calculateEntityDifferences(cv::Point2f IDcentroid, cv::Point2f objectCentroid, float IDangle, float objectAngle, cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize)
 {
-	return sqrt(pow((IDcentroid.x - objectCentroid.x), 2) + pow((IDcentroid.y - objectCentroid.y), 2) + pow((IDangle - objectAngle), 2) + pow((IDBoundingSize.width - objectBoundingSize.width), 2) + pow((IDBoundingSize.height - objectBoundingSize.height), 2));
+	return sqrt(pow((IDcentroid.x - objectCentroid.x), 2) + pow((IDcentroid.y - objectCentroid.y), 2) + pow((IDangle - objectAngle), 2) + 10*(pow((IDBoundingSize.width - objectBoundingSize.width), 2) + pow((IDBoundingSize.height - objectBoundingSize.height), 2)));
 }
 
 bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vector<personalRobotics::IDLookUp> pIDList, std::vector<personalRobotics::IDLookUp> cIDList)
 {
 	for (std::vector<IDLookUp>::iterator cIDPtr = cIDList.begin(); cIDPtr != cIDList.end(); cIDPtr++)
 	{
-		if (cIDPtr->numFramesSame < 10)
+		if (cIDPtr->numFramesSame < 3)
 		{ 
 			return false;
 		}
