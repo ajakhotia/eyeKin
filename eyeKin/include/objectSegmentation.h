@@ -12,6 +12,8 @@ namespace personalRobotics
 	struct IDLookUp
 	{
 		int id;
+		cv::Point2f centroid;
+		float angle;
 		cv::Size2f boundingSize;
 	};
 
@@ -80,7 +82,8 @@ namespace personalRobotics
 		void startSegmentor();
 		void segmentorThreadRoutine();
 		void stopSegmentor();
-		float calculateEntityDifferences(cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize);
+		void calculateOverallChangeInFrames(std::vector<IDLookUp> pIDList, std::vector<IDLookUp> cIDList);
+		float calculateEntityDifferences(cv::Point2f IDcentroid, cv::Point2f objectCentroid, float IDangle, float objectAngle, cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize);
 	};
 
 	void createCheckerboard(cv::Mat& checkerboard, int width, int height, int& numBlocksX, int& numBlocksY);
