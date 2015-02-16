@@ -66,10 +66,10 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 
 	// Make a mask
 	//cv::Mat maskChannel = cv::Mat::zeros(rgbPatch.rows, rgbPatch.cols,CV_8UC1);
-	cv::Mat maskChannel, fgdModel, bgdModel, maskCopy;
-	std::cout << "yo1" <<std::endl;
-	cv::Rect yoRect(cv::Point(rect.size.width*0.11, rect.size.height*0.11), cv::Size2f(rect.size.width*0.78, rect.size.height*0.78));
-	cv::grabCut(rgbPatch, maskChannel, yoRect, bgdModel, fgdModel, 3, cv::GC_INIT_WITH_RECT);
+	cv::Mat maskChannel, fgdModel, bgdModel, maskCopy, blurPatch;
+	cv::Rect yoRect(cv::Point(rect.size.width*0.1, rect.size.height*0.1), cv::Size2f(rect.size.width*0.8, rect.size.height*0.8));
+	cv::blur(rgbPatch, blurPatch, cv::Size(5, 5));
+	cv::grabCut(blurPatch, maskChannel, yoRect, bgdModel, fgdModel, 5, cv::GC_INIT_WITH_RECT);
 	for (int i = 0; i < maskChannel.rows*maskChannel.cols; i++)
 	{
 		if (maskChannel.data[i] == cv::GC_BGD || maskChannel.data[i] == cv::GC_PR_BGD)
@@ -92,6 +92,8 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 		}
 	}
 	contour = vectorOfContours[largestContourIdx];
+	maskChannel = cv::Mat::zeros(maskChannel.size(),CV_8UC1);
+	cv::drawContours(maskChannel, vectorOfContours, largestContourIdx, cv::Scalar(255), CV_FILLED);
 	cv::imshow("disp", maskChannel);
 	cv::rectangle(rgbPatch, yoRect, cv::Scalar(255,0,0,0));
 	cv::imshow("disp2", rgbPatch);

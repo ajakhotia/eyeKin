@@ -128,8 +128,9 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		pointCloudMutex.unlock();
 		pclPtr->resize(dstPoint);
 
-		if (dstPoint > 20000)
+		if (dstPoint > 40000)
 		{
+			std::cout << "rejecting frame, too many points: " << dstPoint << std::endl;
 			unlockPcl();
 			return;
 		}
@@ -144,19 +145,19 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		unlockPcl();
 
 		// Down sample using voxel grid
-		pcl::PointCloud<pcl::PointXYZ>::Ptr dsCloud(new pcl::PointCloud<pcl::PointXYZ>);
+		pcl::PointCloud<pcl::PointXYZ>::Ptr projDsCloud(new pcl::PointCloud<pcl::PointXYZ>);
 		pcl::VoxelGrid<pcl::PointXYZ> voxelGrid;
 		voxelGrid.setInputCloud(sorOutput);
 		voxelGrid.setLeafSize(0.012f, 0.012f, 0.012f);
-		voxelGrid.filter(*dsCloud);
+		voxelGrid.filter(*projDsCloud);
 
 		// Project the points onto table plane
-		pcl::PointCloud<pcl::PointXYZ>::Ptr projDsCloud(new pcl::PointCloud<pcl::PointXYZ>);
+		/*pcl::PointCloud<pcl::PointXYZ>::Ptr projDsCloud(new pcl::PointCloud<pcl::PointXYZ>);
 		pcl::ProjectInliers<pcl::PointXYZ> orthProjection;
 		orthProjection.setModelType(pcl::SACMODEL_PLANE);
 		orthProjection.setInputCloud(dsCloud);
 		orthProjection.setModelCoefficients(planePtr);
-		orthProjection.filter(*projDsCloud);
+		orthProjection.filter(*projDsCloud);*/
 
 		// Clustering
 		pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
