@@ -73,13 +73,14 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	for (int i = 0; i < maskChannel.rows*maskChannel.cols; i++)
 	{
 		if (maskChannel.data[i] == cv::GC_BGD || maskChannel.data[i] == cv::GC_PR_BGD)
-			maskChannel.data[i] = 255;
-		else
 			maskChannel.data[i] = 0;
+		else
+			maskChannel.data[i] = 255;
 	}
 	maskCopy = maskChannel.clone();
 	std::vector<std::vector<cv::Point>> vectorOfContours;
-	cv::findContours(maskCopy, vectorOfContours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+	cv::vector<cv::Vec4i> hierarchy;
+	cv::findContours(maskCopy, vectorOfContours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 	int largestContourIdx = -1;
 	double largestArea = 0;
 	for (int i = 0; i < vectorOfContours.size(); i++)
@@ -91,17 +92,18 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 			largestContourIdx = i;
 		}
 	}
-	contour = vectorOfContours[largestContourIdx];
-	maskChannel = cv::Mat::zeros(maskChannel.size(),CV_8UC1);
-	cv::drawContours(maskChannel, vectorOfContours, largestContourIdx, cv::Scalar(255), CV_FILLED);
-	cv::imshow("disp", maskChannel);
+	if (largestContourIdx!= -1)
+		cv::approxPolyDP(vectorOfContours[largestContourIdx],contour,5,true);
+	cv::Mat mask2 = cv::Mat::zeros(maskChannel.size(),CV_8UC1);
+	cv::drawContours(mask2, vectorOfContours, largestContourIdx, cv::Scalar(255), CV_FILLED);
+	cv::imshow("disp", mask2);
 	cv::rectangle(rgbPatch, yoRect, cv::Scalar(255,0,0,0));
 	cv::imshow("disp2", rgbPatch);
 	cv::waitKey(20);
 	//cv::drawContours(maskChannel, std::vector<std::vector<cv::Point>>(1, contour), 0, cv::Scalar(255), CV_FILLED);
 	patch.create(rgbPatch.rows, rgbPatch.cols, CV_8UC4);
 	int fromTo[] = {0,0, 1,1, 2,2, 3,3};
-	cv::Mat inMatArray[] = { rgbPatch, maskChannel };
+	cv::Mat inMatArray[] = { rgbPatch, mask2 };
 	cv::mixChannels(inMatArray, 2, &patch, 1, fromTo, 4);
 	//cv::imshow("disp", maskChannel);
 	//cv::waitKey(10);
