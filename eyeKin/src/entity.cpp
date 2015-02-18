@@ -5,12 +5,11 @@ personalRobotics::Entity::Entity()
 {
 
 }
-personalRobotics::Entity::Entity(cv::Point2f objectCentroid, float objectAngle, cv::Size2f objectBoundingSize, std::vector<cv::Point> rgbContour, int inID)
+personalRobotics::Entity::Entity(cv::Point2f objectCentroid, float objectAngle, cv::Size2f objectBoundingSize, int inID)
 {
 	pose2Drgb.position = objectCentroid;
 	pose2Drgb.angle = objectAngle;
 	boundingSize = objectBoundingSize;
-	contour = rgbContour;
 	id = inID;
 }
 personalRobotics::Entity::~Entity()
@@ -45,7 +44,7 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	cv::getRectSubPix(rgbPatch, boundingSize, cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), rgbPatch);
 
 	// Construct the transformation matrix for mapping the contours
-	cv::Mat rgb2intermediate = cv::getRotationMatrix2D(rect.center, rect.angle, 1);
+	/*cv::Mat rgb2intermediate = cv::getRotationMatrix2D(rect.center, rect.angle, 1);
 
 	// Transform the rgbContour to patch coordinates
 	std::vector<cv::Point> intermediateContour;
@@ -61,7 +60,7 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	cv::Point2f points[4];
 	rect.points(points);
 	boundingCornersRgb = std::vector<cv::Point2f>(points, points + sizeof(points) / sizeof(cv::Point2f));
-	cv::perspectiveTransform(boundingCornersRgb, boundingCornersProj, homography);
+	cv::perspectiveTransform(boundingCornersRgb, boundingCornersProj, homography);*/
 	
 
 	// Make a mask

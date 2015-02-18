@@ -201,7 +201,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			delete[] cameraSpacePoints;
 
 			// Make a region of interest in IR frame and expand to be able to get edges
-			std::vector<cv::Point> irSpaceIntegerPoints(pointNum);
+			/*std::vector<cv::Point> irSpaceIntegerPoints(pointNum);
 			for (int i = 0; i < pointNum; i++)
 			{
 				irSpaceIntegerPoints[i] = cv::Point(round(irSpacePoints.at<float>(i, 0)), round(irSpacePoints.at<float>(i, 1)));
@@ -216,11 +216,11 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			// Finds the contours in the irBoundingRect using the ir image
 			cv::Mat croppedIRimage;
 			cv::getRectSubPix(irImageCopy, irBoundingRect.size(), cv::Point(irBoundingRect.x + (irBoundingRect.width)/2,irBoundingRect.y+(irBoundingRect.height)/2),croppedIRimage);
-			cv::Mat croppedBlurImage;
-			cv::Mat croppedIRedges;
+			cv::Mat croppedBlurImage; */
+			//cv::Mat croppedIRedges;
 			//cv::Mat croppedThreshold;
-			cv::blur(croppedIRimage, croppedBlurImage, cv::Size(5, 5));
-			cv::Canny(croppedBlurImage, croppedIRedges, 10, 40, DEFAULT_IRCANNY_KERNEL_SIZE, false);
+			//cv::blur(croppedIRimage, croppedBlurImage, cv::Size(5, 5));
+			//cv::Canny(croppedBlurImage, croppedIRedges, 10, 40, DEFAULT_IRCANNY_KERNEL_SIZE, false);
 			//cv::inRange(croppedBlurImage, 60, 95, croppedThreshold);
 			//cv::imshow("disp", croppedIRedges);
 			//cv::imshow("disp", croppedThreshold);
@@ -228,7 +228,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			//cv::waitKey(20);
 
 			// Extract contours corresponding to the *full IR image* and find the largest area contour
-			std::vector<std::vector<cv::Point>> irContours;
+			/*std::vector<std::vector<cv::Point>> irContours;
 			cv::findContours(croppedIRedges, irContours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, cv::Point(irBoundingRect.x, irBoundingRect.y));
 			int largestContourIdx = -1;
 			double largestArea = 0;
@@ -246,7 +246,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 
 			// Transform the edges to the RGB space
 			std::vector<cv::Point> rgbContour;
-			mapInfraredToColor(irContours[largestContourIdx],rgbContour,d2cMapping);
+			mapInfraredToColor(irContours[largestContourIdx],rgbContour,d2cMapping);*/
 
 			//Find mean and covariance
 			cv::Mat cvCentroid, cvCovar;
@@ -255,7 +255,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			//Find xAxis and yAxis
 			cv::Mat eigenValues, eigenVectors;
 			cv::eigen(cvCovar*(1.f / (pointNum - 1)), true, eigenValues, eigenVectors);
-			if (eigenValues.at<float>(0, 0) > 1 && eigenValues.at<float>(1, 0) > 1 && rgbContour.size() != 0)
+			if (eigenValues.at<float>(0, 0) > 1 && eigenValues.at<float>(1, 0) > 1)
 			{
 				bool match = false;
 				float minScore = objectDifferenceThreshold;
@@ -284,7 +284,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					iLU.numFramesSame = 1;
 				}
 				currentIDList.push_back(iLU);
-				entityList.push_back(personalRobotics::Entity(objectCentroid, objectAngle, objectBoundingSize, rgbContour, iLU.id));
+				entityList.push_back(personalRobotics::Entity(objectCentroid, objectAngle, objectBoundingSize, iLU.id));
 			}
 		}
 		// Generate patch and geometric data for each of the entity
