@@ -176,6 +176,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		ec.setInputCloud(projDsCloud);
 		ec.extract(clusterIndices);
 
+
 		// Extract cloud for each object
 		lockList();
 		entityList.clear();
@@ -206,7 +207,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 				irSpaceIntegerPoints[i] = cv::Point(round(irSpacePoints.at<float>(i, 0)), round(irSpacePoints.at<float>(i, 1)));
 			}
 			cv::Rect irBoundingRect = cv::boundingRect(irSpaceIntegerPoints);
-			if (irBoundingRect.width <= 20 || irBoundingRect.height <= 20)
+			if (irBoundingRect.width <= 10 || irBoundingRect.height <= 10)
 				continue;
 			int margin = 20;
 			irBoundingRect += cv::Size(margin, margin);
@@ -291,7 +292,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		{
 			entityPtr->generateData(homography, rgbImageCopy);
 		}
-		frameStatic = calculateOverallChangeInFrames(previousIDList, currentIDList);
+		frameStatic = calculateOverallChangeInFrames(currentIDList);
 		previousIDList = currentIDList;
 		unlockList();
 		currentIDList.clear();
@@ -380,11 +381,11 @@ float personalRobotics::ObjectSegmentor::calculateEntityDifferences(cv::Point2f 
 	return sqrt(pow((IDcentroid.x - objectCentroid.x), 2) + pow((IDcentroid.y - objectCentroid.y), 2) + pow((IDangle - objectAngle), 2) + 10*(pow((IDBoundingSize.width - objectBoundingSize.width), 2) + pow((IDBoundingSize.height - objectBoundingSize.height), 2)));
 }
 
-bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vector<personalRobotics::IDLookUp> pIDList, std::vector<personalRobotics::IDLookUp> cIDList)
+bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vector<personalRobotics::IDLookUp> cIDList)
 {
 	for (std::vector<IDLookUp>::iterator cIDPtr = cIDList.begin(); cIDPtr != cIDList.end(); cIDPtr++)
 	{
-		if (cIDPtr->numFramesSame < 3)
+		if (cIDPtr->numFramesSame < 2)
 		{ 
 			return false;
 		}
