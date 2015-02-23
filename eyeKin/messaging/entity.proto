@@ -36,10 +36,8 @@ package procamPRL;
 //					direction.
 //	
 // Variable description:
-//	timestamps:		The wall-clock time of the frame, encoded as seconds and
-//					nanoseconds in the UNIX Epoch. timestamp_secs are the number of
-//					lapsed seconds and timestamp_nsecs are the number of nanoseconds
-//					lapsed after the last second.
+//	timestamps:		The UTC time in terms of number of seconds since epoch(00:00, 
+//					Jan 1970). The resolution is 1 micro second.
 //
 //	frameID:		The index of the given frame within the current run. With each
 //					start of the server, the ID counts will reset to zero.

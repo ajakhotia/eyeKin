@@ -95,7 +95,7 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 
 		// Set frame ids, time stamp and the pixel sizes
 		serializableList.set_frameid(++epoch);
-		serializableList.set_timestamp(0);
+		serializableList.set_timestamp(((double)std::chrono::system_clock::now().time_since_epoch().count())/1000000.f);
 		
 		
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = listPtr->begin(); entityPtr != listPtr->end(); entityPtr++)

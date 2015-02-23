@@ -2,6 +2,7 @@
 #define __EYEKIN_H__
 
 #include "tcp.h"
+#include <chrono>
 #include "entity.pb.h"
 #include "objectSegmentation.h"
 
