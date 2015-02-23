@@ -60,6 +60,7 @@ namespace personalRobotics
 
 		//Counters
 		bool frameStatic;
+		bool prevFrameStatic;
 		int objectCount;
 
 		// Routines

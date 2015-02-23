@@ -42,7 +42,7 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	cv::Mat rotationMatrix = cv::getRotationMatrix2D(cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), rect.angle, 1);
 	cv::warpAffine(rgbPatch, rgbPatch, rotationMatrix, rgbPatch.size(), cv::INTER_CUBIC);
 	cv::getRectSubPix(rgbPatch, boundingSize, cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), rgbPatch);
-	cv::flip(rgbPatch, rgbPatch, 1);
+	cv::flip(rgbPatch, rgbPatch, 0);
 
 	// Make a mask
 	cv::Mat maskChannel, fgdModel, bgdModel, maskCopy, blurPatch;

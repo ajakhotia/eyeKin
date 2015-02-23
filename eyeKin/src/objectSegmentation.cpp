@@ -26,6 +26,8 @@ personalRobotics::ObjectSegmentor::ObjectSegmentor()
 	planePtr = pcl::ModelCoefficients::Ptr(new pcl::ModelCoefficients);
 
 	objectCount = 0;
+	frameStatic = false;
+	prevFrameStatic = false;
 
 	// Start the kinect thread
 	startKinect();
@@ -227,7 +229,9 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 						if (currentScore < objectMovementThreshold)
 							iLU.numFramesSame = idPtr->numFramesSame + 1;
 						else
+						{
 							iLU.numFramesSame = 1;
+						}
 						minScore = currentScore;
 						match = true;
 					}
@@ -247,14 +251,15 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		}
 
 		// See if frames are static
+		prevFrameStatic = frameStatic;
 		frameStatic = calculateOverallChangeInFrames(currentIDList);
-		std::cout << "Static?  = " << frameStatic << std::endl;
+		std::cout << "Static: " << frameStatic << std::endl;
 		previousIDList = currentIDList;
 
 		// Check for static condition here and set new list to true for static frames only
 
 		// Generate patch and geometric data for each of the entity
-		if (frameStatic)
+		if (frameStatic && !prevFrameStatic)
 		{
 			for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
 			{
