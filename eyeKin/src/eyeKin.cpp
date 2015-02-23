@@ -41,7 +41,7 @@ void personalRobotics::EyeKin::findHomography()
 	if (foundCorners)
 	{
 		cv::Mat invertedHomography = cv::findHomography(detectedCorners, checkerboardCorners, CV_RANSAC);
-		cv::Mat homographyCorrection = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, -1, screenHeight, 0, 0, 1);
+		//cv::Mat homographyCorrection = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, -1, screenHeight, 0, 0, 1);
 		homography = homographyCorrection*invertedHomography;
 		homographyFound = true;
 	}*/

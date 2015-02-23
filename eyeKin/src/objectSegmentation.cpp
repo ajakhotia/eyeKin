@@ -14,6 +14,7 @@ personalRobotics::ObjectSegmentor::ObjectSegmentor()
 	minClusterSize = DEFAULT_MINIMUM_CLUSTER_SIZE;
 	maxClusterSize = DEFAULT_MAXIMUM_CLUSTER_SIZE;
 	objectDifferenceThreshold = OBJECT_DIFFERENCE_THRESHOLD;
+	objectMovementThreshold = OBJECT_MOVEMENT_THRESHOLD;
 
 	// Set initial state of flags
 	stopSegmentorFlag.set(true);
@@ -193,7 +194,6 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 				continue;
 			}
 
-			std::cout << pointNum << std::endl;
 			// Map the points to RGB space and infrared space
 			cv::Mat colorSpacePoints(pointNum, 2, CV_32F);
 			coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)colorSpacePoints.data);
@@ -220,19 +220,23 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 				for (std::vector<IDLookUp>::iterator idPtr = previousIDList.begin(); idPtr != previousIDList.end(); idPtr++)
 				{
 					float currentScore = calculateEntityDifferences(idPtr->centroid, objectCentroid, idPtr->angle, objectAngle, idPtr->boundingSize, objectBoundingSize);
+					std::cout << currentScore << std::endl;
 					if (currentScore < objectDifferenceThreshold && currentScore < minScore)
 					{
 						iLU.id = idPtr->id;
-						iLU.numFramesSame = idPtr->numFramesSame + 1;
+						if (currentScore < objectMovementThreshold)
+							iLU.numFramesSame = idPtr->numFramesSame + 1;
+						else
+							iLU.numFramesSame = 1;
 						minScore = currentScore;
-						std::cout << minScore << std::endl;
 						match = true;
 					}
 				}
 				iLU.centroid = objectCentroid;
 				iLU.angle = objectAngle;
 				iLU.boundingSize = objectBoundingSize;
-				if (!match){
+				if (!match)
+				{
 					objectCount++;
 					iLU.id = objectCount;
 					iLU.numFramesSame = 1;
@@ -242,18 +246,22 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			}
 		}
 
-		// Generate patch and geometric data for each of the entity
-		for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
-		{
-			entityPtr->generateData(homography, rgbImageCopy);
-		}
-
+		// See if frames are static
 		frameStatic = calculateOverallChangeInFrames(currentIDList);
 		std::cout << "Static?  = " << frameStatic << std::endl;
 		previousIDList = currentIDList;
 
 		// Check for static condition here and set new list to true for static frames only
-		newListGenerated.set(true);
+
+		// Generate patch and geometric data for each of the entity
+		if (frameStatic)
+		{
+			for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
+			{
+				entityPtr->generateData(homography, rgbImageCopy);
+			}
+			newListGenerated.set(true);
+		}
 		unlockList();
 		currentIDList.clear();
 	}
@@ -338,12 +346,12 @@ void personalRobotics::ObjectSegmentor::stopSegmentor()
 // 
 float personalRobotics::ObjectSegmentor::calculateEntityDifferences(cv::Point2f IDcentroid, cv::Point2f objectCentroid, float IDangle, float objectAngle, cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize)
 {
-	if (abs(IDBoundingSize.width*IDBoundingSize.height - objectBoundingSize.width*objectBoundingSize.height) >= 50)
-		return 10000;
-	else
-	{
-		return sqrt(pow((IDcentroid.x - objectCentroid.x), 2) + pow((IDcentroid.y - objectCentroid.y), 2) + pow((IDangle - objectAngle), 2) + 10 * (pow((IDBoundingSize.width - objectBoundingSize.width), 2) + pow((IDBoundingSize.height - objectBoundingSize.height), 2)));
-	}
+	//if (abs(IDBoundingSize.width*IDBoundingSize.height - objectBoundingSize.width*objectBoundingSize.height) >= 50)
+	//	return 10000;
+	//else
+	//{
+		return sqrt( (pow((IDcentroid.x - objectCentroid.x), 2) + pow((IDcentroid.y - objectCentroid.y), 2)) + 0*(pow((IDangle - objectAngle), 1)) + 0*(pow((IDBoundingSize.width - objectBoundingSize.width), 2) + pow((IDBoundingSize.height - objectBoundingSize.height), 2)));
+	//}
 }
 bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vector<personalRobotics::IDLookUp> cIDList)
 {

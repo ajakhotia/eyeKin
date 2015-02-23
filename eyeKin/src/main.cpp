@@ -13,7 +13,7 @@ void main(int argC, char **argV)
 	// Loop to begin sending data
 	while (true)
 	{
-		if (eyeKin.getServer()->isConnected.get())
+		if (eyeKin.getServer()->isConnected.get() && eyeKin.getSegmentor()->newListGenerated.get())
 		{
 			// Allocate space for list
 			procamPRL::EntityList serializableList;
@@ -34,6 +34,7 @@ void main(int argC, char **argV)
 				eyeKin.getServer()->write(dataLenght, (char*)outString.c_str());
 			}
 		}
+		Sleep(50);
 	}
 	std::cin >> a;
 }

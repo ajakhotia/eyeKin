@@ -32,6 +32,7 @@ namespace personalRobotics
 		float minThreshold;
 		float maxThreshold;
 		float objectDifferenceThreshold;
+		float objectMovementThreshold;
 
 		// Containers
 		pcl::PointCloud<pcl::PointXYZ>::Ptr pclPtr;
