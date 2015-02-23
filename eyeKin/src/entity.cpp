@@ -42,33 +42,13 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	cv::Mat rotationMatrix = cv::getRotationMatrix2D(cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), rect.angle, 1);
 	cv::warpAffine(rgbPatch, rgbPatch, rotationMatrix, rgbPatch.size(), cv::INTER_CUBIC);
 	cv::getRectSubPix(rgbPatch, boundingSize, cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), rgbPatch);
-
-	// Construct the transformation matrix for mapping the contours
-	/*cv::Mat rgb2intermediate = cv::getRotationMatrix2D(rect.center, rect.angle, 1);
-
-	// Transform the rgbContour to patch coordinates
-	std::vector<cv::Point> intermediateContour;
-	cv::transform(contour, intermediateContour, rgb2intermediate);
-	cv::Point translation(boundingRect.x + (boundingRect.width - boundingSize.width) / 2, boundingRect.y + (boundingRect.height - boundingSize.height) / 2);
-	contour.clear();
-	for (std::vector<cv::Point>::iterator iter = intermediateContour.begin(); iter != intermediateContour.end(); iter++)
-	{
-		contour.push_back((*iter) - translation);
-	}
-
-	//Generate bounding points in RGB and projector space
-	cv::Point2f points[4];
-	rect.points(points);
-	boundingCornersRgb = std::vector<cv::Point2f>(points, points + sizeof(points) / sizeof(cv::Point2f));
-	cv::perspectiveTransform(boundingCornersRgb, boundingCornersProj, homography);*/
-	
+	cv::flip(rgbPatch, rgbPatch, 1);
 
 	// Make a mask
-	//cv::Mat maskChannel = cv::Mat::zeros(rgbPatch.rows, rgbPatch.cols,CV_8UC1);
 	cv::Mat maskChannel, fgdModel, bgdModel, maskCopy, blurPatch;
 	cv::Rect yoRect(cv::Point(rect.size.width*0.1, rect.size.height*0.1), cv::Size2f(rect.size.width*0.8, rect.size.height*0.8));
 	cv::blur(rgbPatch, blurPatch, cv::Size(5, 5));
-	cv::grabCut(blurPatch, maskChannel, yoRect, bgdModel, fgdModel, 5, cv::GC_INIT_WITH_RECT);
+	cv::grabCut(blurPatch, maskChannel, yoRect, bgdModel, fgdModel, 2, cv::GC_INIT_WITH_RECT);
 	for (int i = 0; i < maskChannel.rows*maskChannel.cols; i++)
 	{
 		if (maskChannel.data[i] == cv::GC_BGD || maskChannel.data[i] == cv::GC_PR_BGD)
@@ -99,13 +79,10 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	cv::rectangle(rgbPatch, yoRect, cv::Scalar(255,0,0,0));
 	cv::imshow("disp2", rgbPatch);
 	cv::waitKey(20);
-	//cv::drawContours(maskChannel, std::vector<std::vector<cv::Point>>(1, contour), 0, cv::Scalar(255), CV_FILLED);
 	patch.create(rgbPatch.rows, rgbPatch.cols, CV_8UC4);
 	int fromTo[] = {0,0, 1,1, 2,2, 3,3};
 	cv::Mat inMatArray[] = { rgbPatch, mask2 };
 	cv::mixChannels(inMatArray, 2, &patch, 1, fromTo, 4);
-	//cv::imshow("disp", maskChannel);
-	//cv::waitKey(10);
 
 	#ifdef DEBUG_PROFILER
 		timer.toc();

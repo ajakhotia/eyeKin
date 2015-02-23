@@ -63,7 +63,7 @@ std::vector<personalRobotics::Entity>* personalRobotics::ObjectSegmentor::getEnt
 }
 cv::Point2f* personalRobotics::ObjectSegmentor::getRGBpixelSize()
 {
-	return &pixelSize;
+	return &rgbPixelSize;
 }
 std::vector<personalRobotics::IDLookUp>* personalRobotics::ObjectSegmentor::getIDList()
 {
@@ -73,8 +73,6 @@ bool personalRobotics::ObjectSegmentor::getStatic()
 {
 	return frameStatic;
 }
-
-
 
 // Setters
 void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
@@ -96,24 +94,15 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		lockPcl();
 		pclPtr->clear();
 		pclPtr->resize(numPoints);
-
-		// Obtain the plane semented pointcloud and the image streams
 		size_t dstPoint = 0;
 
-		// Copy the RGB, IR and IR to RGB mapping
+		// Copy the RGB image
 		rgbMutex.lock();
 		pointCloudMutex.lock();
-		depth2colorMappingMutex.lock();
-		irMutex.lock();
 		cv::Mat rgbImageCopy = rgbImage.clone();
 		rgbMutex.unlock();
-		cv::Mat irImageCopy;
-		irImage.convertTo(irImageCopy, CV_8UC1);
-		irMutex.unlock();
-		cv::imwrite("ir.png", irImageCopy);
-		ColorSpacePoint* d2cMapping = new ColorSpacePoint[numPoints];
-		std::copy(depth2colorMappingPtr, depth2colorMappingPtr + numPoints, d2cMapping);
-		depth2colorMappingMutex.unlock();
+
+		// Convert points to pointcloud and plane segment as well
 		for (size_t point = 0; point < numPoints; point++)
 		{
 			if (pointCloudPtr[point].Z > minThreshold && pointCloudPtr[point].Z < maxThreshold)
@@ -133,7 +122,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		pointCloudMutex.unlock();
 		pclPtr->resize(dstPoint);
 
-		if (dstPoint > 40000)
+		if (dstPoint > 20000)
 		{
 			std::cout << "rejecting frame, too many points: " << dstPoint << std::endl;
 			unlockPcl();
@@ -144,7 +133,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		pcl::PointCloud<pcl::PointXYZ>::Ptr sorOutput(new pcl::PointCloud<pcl::PointXYZ>);
 		pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
 		sor.setInputCloud(pclPtr);
-		sor.setMeanK(20);
+		sor.setMeanK(10);
 		sor.setStddevMulThresh(0.5);
 		sor.filter(*sorOutput);
 		unlockPcl();
@@ -176,77 +165,41 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		ec.setInputCloud(projDsCloud);
 		ec.extract(clusterIndices);
 
-
 		// Extract cloud for each object
 		lockList();
 		entityList.clear();
-		newListGenerated.set(true);
 		for (std::vector<pcl::PointIndices>::const_iterator it = clusterIndices.begin(); it != clusterIndices.end(); ++it)
 		{
+			// Convert PCL to kinect camera point representation
 			CameraSpacePoint *cameraSpacePoints = new CameraSpacePoint[it->indices.size()];
 			int pointNum = 0;
+			bool validCluster = true;
 			for (std::vector<int>::const_iterator pit = it->indices.begin(); pit != it->indices.end(); pit++)
 			{
-				cameraSpacePoints[pointNum] = { projDsCloud->points[*pit].x, projDsCloud->points[*pit].y, projDsCloud->points[*pit].z };		// Orthographic projection on table followed by projective transform onto RGB
-				pointNum++;
+				if (!onBoundingEdges(projDsCloud->points[*pit]))
+					cameraSpacePoints[pointNum++] = { projDsCloud->points[*pit].x, projDsCloud->points[*pit].y, projDsCloud->points[*pit].z };
+				else
+				{
+					std::cout << "marking cluster for deletion" << std::endl;
+					validCluster = false;
+					break;
+				}
 			}
 
+			if (!validCluster)
+			{
+				std::cout << "deleting cluster" << std::endl;
+				delete[] cameraSpacePoints;
+				continue;
+			}
+
+			std::cout << pointNum << std::endl;
 			// Map the points to RGB space and infrared space
 			cv::Mat colorSpacePoints(pointNum, 2, CV_32F);
-			cv::Mat irSpacePoints(pointNum, 2, CV_32F);
 			coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)colorSpacePoints.data);
-			coordinateMapperPtr->MapCameraPointsToDepthSpace(pointNum, cameraSpacePoints, pointNum, (DepthSpacePoint*)irSpacePoints.data);
 
 			// Release the memory
 			delete[] cameraSpacePoints;
-
-			// Make a region of interest in IR frame and expand to be able to get edges
-			/*std::vector<cv::Point> irSpaceIntegerPoints(pointNum);
-			for (int i = 0; i < pointNum; i++)
-			{
-				irSpaceIntegerPoints[i] = cv::Point(round(irSpacePoints.at<float>(i, 0)), round(irSpacePoints.at<float>(i, 1)));
-			}
-			cv::Rect irBoundingRect = cv::boundingRect(irSpaceIntegerPoints);
-			if (irBoundingRect.width <= 10 || irBoundingRect.height <= 10)
-				continue;
-			int margin = 20;
-			irBoundingRect += cv::Size(margin, margin);
-			irBoundingRect -= cv::Point(10, 10);
-
-			// Finds the contours in the irBoundingRect using the ir image
-			cv::Mat croppedIRimage;
-			cv::getRectSubPix(irImageCopy, irBoundingRect.size(), cv::Point(irBoundingRect.x + (irBoundingRect.width)/2,irBoundingRect.y+(irBoundingRect.height)/2),croppedIRimage);
-			cv::Mat croppedBlurImage; */
-			//cv::Mat croppedIRedges;
-			//cv::Mat croppedThreshold;
-			//cv::blur(croppedIRimage, croppedBlurImage, cv::Size(5, 5));
-			//cv::Canny(croppedBlurImage, croppedIRedges, 10, 40, DEFAULT_IRCANNY_KERNEL_SIZE, false);
-			//cv::inRange(croppedBlurImage, 60, 95, croppedThreshold);
-			//cv::imshow("disp", croppedIRedges);
-			//cv::imshow("disp", croppedThreshold);
-			//cv::imshow("disp2", irImageCopy);
-			//cv::waitKey(20);
-
-			// Extract contours corresponding to the *full IR image* and find the largest area contour
-			/*std::vector<std::vector<cv::Point>> irContours;
-			cv::findContours(croppedIRedges, irContours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE, cv::Point(irBoundingRect.x, irBoundingRect.y));
-			int largestContourIdx = -1;
-			double largestArea = 0;
-			for (int i = 0; i < irContours.size(); i++)
-			{
-				double area = cv::contourArea(irContours[i]);
-				if (area > largestArea)
-				{
-					largestArea = area;
-					largestContourIdx = i;
-				}
-			}
-			if (largestContourIdx == -1)
-				continue;
-
-			// Transform the edges to the RGB space
-			std::vector<cv::Point> rgbContour;
-			mapInfraredToColor(irContours[largestContourIdx],rgbContour,d2cMapping);*/
 
 			//Find mean and covariance
 			cv::Mat cvCentroid, cvCovar;
@@ -272,6 +225,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 						iLU.id = idPtr->id;
 						iLU.numFramesSame = idPtr->numFramesSame + 1;
 						minScore = currentScore;
+						std::cout << minScore << std::endl;
 						match = true;
 					}
 				}
@@ -287,16 +241,21 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 				entityList.push_back(personalRobotics::Entity(objectCentroid, objectAngle, objectBoundingSize, iLU.id));
 			}
 		}
+
 		// Generate patch and geometric data for each of the entity
 		for (std::vector<personalRobotics::Entity>::iterator entityPtr = entityList.begin(); entityPtr != entityList.end(); entityPtr++)
 		{
 			entityPtr->generateData(homography, rgbImageCopy);
 		}
+
 		frameStatic = calculateOverallChangeInFrames(currentIDList);
+		std::cout << "Static?  = " << frameStatic << std::endl;
 		previousIDList = currentIDList;
+
+		// Check for static condition here and set new list to true for static frames only
+		newListGenerated.set(true);
 		unlockList();
 		currentIDList.clear();
-		delete[] d2cMapping;
 	}
 }
 bool personalRobotics::ObjectSegmentor::findTablePlane()
@@ -348,8 +307,8 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	coordinateMapperPtr->MapCameraPointsToColorSpace(3, keyPoints, 3, projectedKeyPoints);
 	double delX = sqrt((projectedKeyPoints[1].X - projectedKeyPoints[0].X)*(projectedKeyPoints[1].X - projectedKeyPoints[0].X) + (projectedKeyPoints[1].Y - projectedKeyPoints[0].Y)*(projectedKeyPoints[1].Y - projectedKeyPoints[0].Y));
 	double delY = sqrt((projectedKeyPoints[2].X - projectedKeyPoints[0].X)*(projectedKeyPoints[2].X - projectedKeyPoints[0].X) + (projectedKeyPoints[2].Y - projectedKeyPoints[0].Y)*(projectedKeyPoints[2].Y - projectedKeyPoints[0].Y));
-	pixelSize.x = 100 / delX;
-	pixelSize.y = 100 / delY;
+	rgbPixelSize.x = 100 / delX;
+	rgbPixelSize.y = 100 / delY;
 
 	// Return
 	return true;
@@ -376,23 +335,39 @@ void personalRobotics::ObjectSegmentor::stopSegmentor()
 		segementorThread.join();
 }
 
+// 
 float personalRobotics::ObjectSegmentor::calculateEntityDifferences(cv::Point2f IDcentroid, cv::Point2f objectCentroid, float IDangle, float objectAngle, cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize)
 {
-	return sqrt(pow((IDcentroid.x - objectCentroid.x), 2) + pow((IDcentroid.y - objectCentroid.y), 2) + pow((IDangle - objectAngle), 2) + 10*(pow((IDBoundingSize.width - objectBoundingSize.width), 2) + pow((IDBoundingSize.height - objectBoundingSize.height), 2)));
+	if (abs(IDBoundingSize.width*IDBoundingSize.height - objectBoundingSize.width*objectBoundingSize.height) >= 50)
+		return 10000;
+	else
+	{
+		return sqrt(pow((IDcentroid.x - objectCentroid.x), 2) + pow((IDcentroid.y - objectCentroid.y), 2) + pow((IDangle - objectAngle), 2) + 10 * (pow((IDBoundingSize.width - objectBoundingSize.width), 2) + pow((IDBoundingSize.height - objectBoundingSize.height), 2)));
+	}
 }
-
 bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vector<personalRobotics::IDLookUp> cIDList)
 {
 	for (std::vector<IDLookUp>::iterator cIDPtr = cIDList.begin(); cIDPtr != cIDList.end(); cIDPtr++)
 	{
-		if (cIDPtr->numFramesSame < 2)
+		if (cIDPtr->numFramesSame < 3)
 		{ 
 			return false;
 		}
 	}
 	return true;
 }
-
+bool personalRobotics::ObjectSegmentor::onBoundingEdges(pcl::PointXYZ point)
+{
+	if (abs(point.z - minThreshold) < 0.04)	// Its a hack and will not work for general situation. Better way is to actually create a min plane
+	{
+		return true;
+	}
+	else
+	{
+		// check if its the edge of the depth map
+	}
+	return false;
+}
 void personalRobotics::createCheckerboard(cv::Mat& checkerboard, int width, int height, int& numBlocksX, int& numBlocksY)
 {
 	checkerboard.create(height, width, CV_8UC1);

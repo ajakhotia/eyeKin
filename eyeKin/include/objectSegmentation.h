@@ -38,7 +38,11 @@ namespace personalRobotics
 		pcl::ModelCoefficients::Ptr planePtr;
 		std::vector<personalRobotics::Entity> entityList;
 		cv::Mat homography;
-		cv::Point2f pixelSize;
+
+		// Pixel sizes
+		cv::Point2f rgbPixelSize;
+
+		// ID lists
 		std::vector<IDLookUp> previousIDList;
 		std::vector<IDLookUp> currentIDList;
 
@@ -87,6 +91,7 @@ namespace personalRobotics
 		void stopSegmentor();
 		bool calculateOverallChangeInFrames(std::vector<IDLookUp> cIDList);
 		float calculateEntityDifferences(cv::Point2f IDcentroid, cv::Point2f objectCentroid, float IDangle, float objectAngle, cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize);
+		bool onBoundingEdges(pcl::PointXYZ point);
 	};
 
 	void createCheckerboard(cv::Mat& checkerboard, int width, int height, int& numBlocksX, int& numBlocksY);
