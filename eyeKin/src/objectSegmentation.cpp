@@ -100,9 +100,10 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		size_t dstPoint = 0;
 
 		// Copy the RGB image
-		rgbMutex.lock();
 		pointCloudMutex.lock();
-		cv::Mat rgbImageCopy = rgbImage.clone();
+		rgbMutex.lock();
+		cv::Mat rgbImageCopy;
+		rgbImage.copyTo(rgbImageCopy);
 		rgbMutex.unlock();
 
 		// Convert points to pointcloud and plane segment as well
@@ -127,7 +128,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 
 		if (dstPoint > 20000)
 		{
-			std::cout << "rejecting frame, too many points: " << dstPoint << std::endl;
+			//std::cout << "rejecting frame, too many points: " << dstPoint << std::endl;
 			unlockPcl();
 			return;
 		}
@@ -183,7 +184,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					cameraSpacePoints[pointNum++] = { projDsCloud->points[*pit].x, projDsCloud->points[*pit].y, projDsCloud->points[*pit].z };
 				else
 				{
-					std::cout << "marking cluster for deletion" << std::endl;
+					//std::cout << "marking cluster for deletion" << std::endl;
 					validCluster = false;
 					break;
 				}
@@ -191,7 +192,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 
 			if (!validCluster)
 			{
-				std::cout << "deleting cluster" << std::endl;
+				//std::cout << "deleting cluster" << std::endl;
 				delete[] cameraSpacePoints;
 				continue;
 			}
@@ -227,7 +228,9 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					{
 						iLU.id = idPtr->id;
 						if (currentScore < objectMovementThreshold)
+						{
 							iLU.numFramesSame = idPtr->numFramesSame + 1;
+						}
 						else
 						{
 							iLU.numFramesSame = 1;
@@ -236,6 +239,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 						match = true;
 					}
 				}
+				std::cout << "**********" << std::endl;
 				iLU.centroid = objectCentroid;
 				iLU.angle = objectAngle;
 				iLU.boundingSize = objectBoundingSize;
@@ -362,7 +366,7 @@ bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vect
 {
 	for (std::vector<IDLookUp>::iterator cIDPtr = cIDList.begin(); cIDPtr != cIDList.end(); cIDPtr++)
 	{
-		if (cIDPtr->numFramesSame < 3)
+		if (cIDPtr->numFramesSame < 5)
 		{ 
 			return false;
 		}

@@ -136,12 +136,12 @@ void personalRobotics::KinectReader::pollFrames()
 				}
 			}
 			rgbaMutex.lock();
+			rgbMutex.lock();
 			colorFramePtr->CopyConvertedFrameDataToArray(rgbWidth*rgbHeight*sizeof(RGBQUAD), rgbaImage.data, ColorImageFormat_Bgra);
 			int fromTo[] = { 0, 0, 1, 1, 2, 2 };
-			rgbMutex.lock();
 			mixChannels(&rgbaImage, 1, &rgbImage, 1, fromTo, 3);
-			rgbaMutex.unlock();
 			rgbMutex.unlock();
+			rgbaMutex.unlock();
 			safeRelease(colorFramePtr);
 		}
 

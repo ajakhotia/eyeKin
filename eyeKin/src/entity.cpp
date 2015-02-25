@@ -37,12 +37,12 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	//Construct the rectangle and extarct patches
 	cv::RotatedRect rect(pose2Drgb.position, boundingSize, 180*pose2Drgb.angle/CV_PI);
 	cv::Rect boundingRect = rect.boundingRect();
-	cv::Mat rgbPatch;
+	cv::Mat rgbPatch,affinePatch,flipPatch;
 	cv::getRectSubPix(rgbImage, boundingRect.size(), rect.center, rgbPatch);
 	cv::Mat rotationMatrix = cv::getRotationMatrix2D(cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), rect.angle, 1);
-	cv::warpAffine(rgbPatch, rgbPatch, rotationMatrix, rgbPatch.size(), cv::INTER_CUBIC);
-	cv::getRectSubPix(rgbPatch, boundingSize, cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), rgbPatch);
-	cv::flip(rgbPatch, rgbPatch, 0);
+	cv::warpAffine(rgbPatch, affinePatch, rotationMatrix, rgbPatch.size(), cv::INTER_CUBIC);
+	cv::getRectSubPix(affinePatch, boundingSize, cv::Point2f(boundingRect.width / 2.f, boundingRect.height / 2.f), flipPatch);
+	cv::flip(flipPatch, rgbPatch, 0);
 
 	// Make a mask
 	cv::Mat maskChannel, fgdModel, bgdModel, maskCopy, blurPatch;
