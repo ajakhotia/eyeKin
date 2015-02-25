@@ -123,10 +123,14 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 				}
 			}
 		}
+
+		/*std::cout << "maxXbyZ: " << maxXbyZ << std::endl;
+		std::cout << "maxYbyZ: " << maxYbyZ << std::endl;*/
+
 		pointCloudMutex.unlock();
 		pclPtr->resize(dstPoint);
 
-		if (dstPoint > 20000)
+		if (dstPoint > 60000)
 		{
 			//std::cout << "rejecting frame, too many points: " << dstPoint << std::endl;
 			unlockPcl();
@@ -172,6 +176,9 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		// Extract cloud for each object
 		lockList();
 		entityList.clear();
+
+		// Vector to track valid clusters
+
 		for (std::vector<pcl::PointIndices>::const_iterator it = clusterIndices.begin(); it != clusterIndices.end(); ++it)
 		{
 			// Convert PCL to kinect camera point representation
@@ -192,7 +199,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 
 			if (!validCluster)
 			{
-				//std::cout << "deleting cluster" << std::endl;
+				std::cout << "*******************deleting cluster********************" << std::endl;
 				delete[] cameraSpacePoints;
 				continue;
 			}
@@ -211,19 +218,19 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			//Find xAxis and yAxis
 			cv::Mat eigenValues, eigenVectors;
 			cv::eigen(cvCovar*(1.f / (pointNum - 1)), true, eigenValues, eigenVectors);
+
 			if (eigenValues.at<float>(0, 0) > 1 && eigenValues.at<float>(1, 0) > 1)
 			{
 				bool match = false;
 				float minScore = objectDifferenceThreshold;
 				cv::Point2f objectCentroid = cv::Point2f(cvCentroid.at<float>(0, 0), cvCentroid.at<float>(0, 1));
 				float objectAngle = atan2(eigenVectors.at<float>(0, 1), eigenVectors.at<float>(0, 0));
-				cv::Size2f objectBoundingSize = cv::Size2f(sqrtf(eigenValues.at<float>(0, 0))*6.5f, sqrtf(eigenValues.at<float>(1, 0))*6.5f);
+				cv::Size2f objectBoundingSize = cv::Size2f(sqrtf(eigenValues.at<float>(0, 0))*7.5f, sqrtf(eigenValues.at<float>(1, 0))*7.5f);
 				IDLookUp iLU;
 
 				for (std::vector<IDLookUp>::iterator idPtr = previousIDList.begin(); idPtr != previousIDList.end(); idPtr++)
 				{
 					float currentScore = calculateEntityDifferences(idPtr->centroid, objectCentroid, idPtr->angle, objectAngle, idPtr->boundingSize, objectBoundingSize);
-					std::cout << currentScore << std::endl;
 					if (currentScore < objectDifferenceThreshold && currentScore < minScore)
 					{
 						iLU.id = idPtr->id;
@@ -239,7 +246,6 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 						match = true;
 					}
 				}
-				std::cout << "**********" << std::endl;
 				iLU.centroid = objectCentroid;
 				iLU.angle = objectAngle;
 				iLU.boundingSize = objectBoundingSize;
@@ -257,7 +263,6 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		// See if frames are static
 		prevFrameStatic = frameStatic;
 		frameStatic = calculateOverallChangeInFrames(currentIDList);
-		std::cout << "Static: " << frameStatic << std::endl;
 		previousIDList = currentIDList;
 
 		// Check for static condition here and set new list to true for static frames only
@@ -375,13 +380,9 @@ bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vect
 }
 bool personalRobotics::ObjectSegmentor::onBoundingEdges(pcl::PointXYZ point)
 {
-	if (abs(point.z - minThreshold) < 0.04)	// Its a hack and will not work for general situation. Better way is to actually create a min plane
+	if (abs(point.x / point.z - 0.68488375) < 0.05 || abs(point.y / point.z - 0.59607856) < 0.05)
 	{
 		return true;
-	}
-	else
-	{
-		// check if its the edge of the depth map
 	}
 	return false;
 }
