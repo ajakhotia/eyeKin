@@ -3,15 +3,20 @@
 
 personalRobotics::MutexType<int> personalRobotics::Tcp::socketCount = 0;
 
+
+
 void main(int argC, char **argV)
 {
-	int a;
+	int a;							// Dummy variable
+	std::thread socketSendThread;	// Reader thread to get commands from the client
+	bool sendData = true;					// Data control flag
+
 	// Initialize and calibrate the kinect segmentation system. This also
 	// starts a tcp server and listens on port 9000 of the local host.
 	personalRobotics::EyeKin eyeKin;
 	eyeKin.calibrate();
 	// Loop to begin sending data
-	while (true)
+	while (sendData)
 	{
 		if (eyeKin.getServer()->isConnected.get() && eyeKin.getSegmentor()->newListGenerated.get())
 		{
