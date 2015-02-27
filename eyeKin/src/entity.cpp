@@ -48,7 +48,7 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 	cv::Mat maskChannel, fgdModel, bgdModel, maskCopy, blurPatch;
 	cv::Rect yoRect(cv::Point(rect.size.width*0.1, rect.size.height*0.1), cv::Size2f(rect.size.width*0.8, rect.size.height*0.8));
 	cv::blur(rgbPatch, blurPatch, cv::Size(5, 5));
-	cv::grabCut(blurPatch, maskChannel, yoRect, bgdModel, fgdModel, 2, cv::GC_INIT_WITH_RECT);
+	cv::grabCut(blurPatch, maskChannel, yoRect, bgdModel, fgdModel, 3, cv::GC_INIT_WITH_RECT);
 	for (int i = 0; i < maskChannel.rows*maskChannel.cols; i++)
 	{
 		if (maskChannel.data[i] == cv::GC_BGD || maskChannel.data[i] == cv::GC_PR_BGD)

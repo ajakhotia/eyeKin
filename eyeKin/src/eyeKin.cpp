@@ -46,6 +46,7 @@ void personalRobotics::EyeKin::findHomography()
 		homographyFound = true;
 	}*/
 	homography = (cv::Mat_<double>(3, 3) <<1.7456, 0.0337, -837.4711, 0.0143, 1.7469, -331.6242, 0.0, 0.0, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
+	//homography = (cv::Mat_<double>(3, 3) << 1.9949, 0.0490, -1012.0788, 0.0004, 1.9674, -699.7341, 0.0, 0.0, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
 	homographyFound.set(true);
 }
 void personalRobotics::EyeKin::calibrate()

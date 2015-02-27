@@ -106,6 +106,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 		rgbImage.copyTo(rgbImageCopy);
 		rgbMutex.unlock();
 
+		// Add line based rejection
 		// Convert points to pointcloud and plane segment as well
 		for (size_t point = 0; point < numPoints; point++)
 		{
@@ -196,7 +197,6 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					break;
 				}
 			}
-
 			if (!validCluster)
 			{
 				std::cout << "*******************deleting cluster********************" << std::endl;
@@ -332,6 +332,14 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	rgbPixelSize.x = 100 / delX;
 	rgbPixelSize.y = 100 / delY;
 
+	// Project the inliers onto the plane
+
+	// Take a covex hull
+
+	// Pick points within a margin around the convex hull
+
+	// RANSAC fit lines
+
 	// Return
 	return true;
 }
@@ -348,6 +356,7 @@ void personalRobotics::ObjectSegmentor::segmentorThreadRoutine()
 	while (!stopSegmentorFlag.get())
 	{
 		planeSegment();
+		Sleep(25);
 	}
 }
 void personalRobotics::ObjectSegmentor::stopSegmentor()
@@ -380,7 +389,7 @@ bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vect
 }
 bool personalRobotics::ObjectSegmentor::onBoundingEdges(pcl::PointXYZ point)
 {
-	if (abs(point.x / point.z - 0.68488375) < 0.05 || abs(point.y / point.z - 0.59607856) < 0.05)
+	if (abs(point.x / point.z - 0.68488375) < 0.05 || abs(point.y / point.z - 0.59607856) < 0.05) // Add line based consttaints
 	{
 		return true;
 	}

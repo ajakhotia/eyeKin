@@ -218,7 +218,8 @@ void personalRobotics::KinectReader::kinectThreadRoutine()
 	while (!stopKinectFlag.get())
 	{
 		pollFrames();
-	}
+		Sleep(25);
+	};
 }
 void personalRobotics::KinectReader::startKinect()
 {
