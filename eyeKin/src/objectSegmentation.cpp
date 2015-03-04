@@ -332,13 +332,20 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	rgbPixelSize.x = 100 / delX;
 	rgbPixelSize.y = 100 / delY;
 
-	// Project the inliers onto the plane
+	cv::Matx<float, 3, 3> camPoints;
+	cv::Matx<float, 3, 2> rgbPoints;
+	cv::Matx<float, 3, 2> result;
 
-	// Take a covex hull
+	camPoints = (0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0) / planePtr->values[2]),
+				 0.1, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0.1 + planePtr->values[1] * 0) / planePtr->values[2]),
+				 0, 0.1, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0.1) / planePtr->values[2]));
+	rgbPoints = (projectedKeyPoints[0].X, projectedKeyPoints[0].Y, 
+				 projectedKeyPoints[1].X, projectedKeyPoints[1].Y, 
+				 projectedKeyPoints[2].X, projectedKeyPoints[2].Y);
 
-	// Pick points within a margin around the convex hull
+	result = camPoints.inv() * rgbPoints;
 
-	// RANSAC fit lines
+	std::cout << result << std::endl;
 
 	// Return
 	return true;
