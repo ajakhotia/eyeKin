@@ -82,6 +82,80 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
 {
 	homography = inHomography.clone();
 	homographySetFlag.set(true);
+
+	CameraSpacePoint keyPoints[3];
+	ColorSpacePoint projectedKeyPoints[3];
+	keyPoints[0] = { 0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0) / planePtr->values[2]) };	//(0  , 0   ,z1)
+	keyPoints[1] = { 0.1, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0.1 + planePtr->values[1] * 0) / planePtr->values[2]) };	//(0.1, 0   ,z2)
+	keyPoints[2] = { 0, 0.1, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0.1) / planePtr->values[2]) };	//(0  , 0.1 ,z3)
+	coordinateMapperPtr->MapCameraPointsToColorSpace(3, keyPoints, 3, projectedKeyPoints);
+
+	cv::Mat rgbToKeyPoints(2, 2, CV_32FC1);
+	rgbToKeyPoints.at<float>(0, 0) = projectedKeyPoints[1].X - projectedKeyPoints[0].X;
+	rgbToKeyPoints.at<float>(1, 0) = projectedKeyPoints[1].Y - projectedKeyPoints[0].Y;
+	rgbToKeyPoints.at<float>(0, 1) = projectedKeyPoints[2].X - projectedKeyPoints[0].X;
+	rgbToKeyPoints.at<float>(1, 1) = projectedKeyPoints[2].Y - projectedKeyPoints[0].Y;
+
+	std::vector<cv::Point2f> projCornersInProj, projCornersInRGB;
+	projCornersInProj.push_back(cv::Point2f(0, 0));
+	projCornersInProj.push_back(cv::Point2f(1920, 0));
+	projCornersInProj.push_back(cv::Point2f(1920, 1080));
+	projCornersInProj.push_back(cv::Point2f(0, 1080));
+
+	cv::perspectiveTransform(projCornersInProj, projCornersInRGB, homography.inv());
+	std::cout << projCornersInRGB << std::endl;
+	cv::Mat projCornersInRGBMat(2, 4, CV_32FC1);
+	projCornersInRGBMat.at<float>(0, 0) = projCornersInRGB[0].x - projectedKeyPoints[0].X;
+	projCornersInRGBMat.at<float>(1, 0) = projCornersInRGB[0].y - projectedKeyPoints[0].Y;
+	projCornersInRGBMat.at<float>(0, 1) = projCornersInRGB[1].x - projectedKeyPoints[0].X;
+	projCornersInRGBMat.at<float>(1, 1) = projCornersInRGB[1].y - projectedKeyPoints[0].Y;
+	projCornersInRGBMat.at<float>(0, 2) = projCornersInRGB[2].x - projectedKeyPoints[0].X;
+	projCornersInRGBMat.at<float>(1, 2) = projCornersInRGB[2].y - projectedKeyPoints[0].Y;
+	projCornersInRGBMat.at<float>(0, 3) = projCornersInRGB[3].x - projectedKeyPoints[0].X;
+	projCornersInRGBMat.at<float>(1, 3) = projCornersInRGB[3].y - projectedKeyPoints[0].Y;
+
+	cv::Mat weights (2, 4, CV_32FC1);
+	weights = rgbToKeyPoints.inv() * projCornersInRGBMat;
+	cv::Mat keyPointsVectors (3, 2, CV_32FC1);
+
+	keyPointsVectors.at<float>(0, 0) = keyPoints[1].X - keyPoints[0].X;
+	keyPointsVectors.at<float>(1, 0) = keyPoints[1].Y - keyPoints[0].Y;
+	keyPointsVectors.at<float>(2, 0) = keyPoints[1].Z - keyPoints[0].Z;
+	keyPointsVectors.at<float>(0, 1) = keyPoints[2].X - keyPoints[0].X;
+	keyPointsVectors.at<float>(1, 1) = keyPoints[2].Y - keyPoints[0].Y;
+	keyPointsVectors.at<float>(2, 1) = keyPoints[2].Z - keyPoints[0].Z;
+	cv::Mat weightMultVectors(3, 4, CV_32FC1);
+
+	cv::Mat origin(3, 4, CV_32FC1);
+	origin.at<float>(0, 0) = keyPoints[0].X;
+	origin.at<float>(0, 1) = keyPoints[0].X;
+	origin.at<float>(0, 2) = keyPoints[0].X;
+	origin.at<float>(0, 3) = keyPoints[0].X;
+	origin.at<float>(1, 0) = keyPoints[0].Y;
+	origin.at<float>(1, 1) = keyPoints[0].Y;
+	origin.at<float>(1, 2) = keyPoints[0].Y;
+	origin.at<float>(1, 3) = keyPoints[0].Y;
+	origin.at<float>(2, 0) = keyPoints[0].Z;
+	origin.at<float>(2, 1) = keyPoints[0].Z;
+	origin.at<float>(2, 2) = keyPoints[0].Z;
+	origin.at<float>(2, 3) = keyPoints[0].Z;
+	
+	weightMultVectors = keyPointsVectors * weights;
+	std::cout << weightMultVectors << std::endl;
+	cv::Mat projCornersInCam(3, 4, CV_32FC1);
+	cv::add(origin, weightMultVectors, projCornersInCam);
+	std::cout << projCornersInCam << std::endl;
+
+	std::vector <cv::Vec3f> cornerPoints;
+	cornerPoints.push_back(cv::Vec3f(projCornersInCam.at<float>(0, 0), projCornersInCam.at<float>(1, 0), projCornersInCam.at<float>(2, 0)));
+	cornerPoints.push_back(cv::Vec3f( projCornersInCam.at<float>(0, 1), projCornersInCam.at<float>(1, 1), projCornersInCam.at<float>(2, 1) ));
+	cornerPoints.push_back(cv::Vec3f(projCornersInCam.at<float>(0, 2), projCornersInCam.at<float>(1, 2), projCornersInCam.at<float>(2, 2)));
+	cornerPoints.push_back(cv::Vec3f(projCornersInCam.at<float>(0, 3), projCornersInCam.at<float>(1, 3), projCornersInCam.at<float>(2, 3)));
+
+	for (int i = 0; i < 4; i++)
+	{
+		planeNormals.push_back(cornerPoints[i].cross(cornerPoints[(i + 1) % 4]));
+	}
 }
 
 // Routines
@@ -199,7 +273,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			}
 			if (!validCluster)
 			{
-				std::cout << "*******************deleting cluster********************" << std::endl;
+				//std::cout << "*******************deleting cluster********************" << std::endl;
 				delete[] cameraSpacePoints;
 				continue;
 			}
@@ -332,28 +406,6 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	rgbPixelSize.x = 100 / delX;
 	rgbPixelSize.y = 100 / delY;
 
-	cv::Matx<float, 3, 3> camPoints(keyPoints[0].X, keyPoints[0].Y, keyPoints[0].Z,
-									keyPoints[1].X, keyPoints[1].Y, keyPoints[1].Z,
-									keyPoints[2].X, keyPoints[2].Y, keyPoints[2].Z);
-	cv::Matx<float, 3, 2> rgbPoints(projectedKeyPoints[0].X, projectedKeyPoints[0].Y,
-									projectedKeyPoints[1].X, projectedKeyPoints[1].Y,
-									projectedKeyPoints[2].X, projectedKeyPoints[2].Y);
-	cv::Matx<float, 3, 2> result;
-
-	result = camPoints.inv() * rgbPoints;
-
-	std::cout << "keyPoints" << keyPoints[0].X << std::endl;
-
-	std::cout << "keyPoints" << keyPoints[0].Y << std::endl;
-
-	std::cout << "keyPoints" << keyPoints[0].Z << std::endl;
-
-	std::cout << "camPoints" << camPoints << std::endl;
-
-	std::cout << "rgbPoints" << camPoints << std::endl;
-
-	std::cout << result << std::endl;
-
 	// Return
 	return true;
 }
@@ -440,3 +492,4 @@ void personalRobotics::createCheckerboard(cv::Mat& checkerboard, int width, int 
 	numBlocksX -= 3;
 	numBlocksY -= 3;
 }
+
