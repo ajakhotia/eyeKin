@@ -332,18 +332,25 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	rgbPixelSize.x = 100 / delX;
 	rgbPixelSize.y = 100 / delY;
 
-	cv::Matx<float, 3, 3> camPoints;
-	cv::Matx<float, 3, 2> rgbPoints;
+	cv::Matx<float, 3, 3> camPoints(keyPoints[0].X, keyPoints[0].Y, keyPoints[0].Z,
+									keyPoints[1].X, keyPoints[1].Y, keyPoints[1].Z,
+									keyPoints[2].X, keyPoints[2].Y, keyPoints[2].Z);
+	cv::Matx<float, 3, 2> rgbPoints(projectedKeyPoints[0].X, projectedKeyPoints[0].Y,
+									projectedKeyPoints[1].X, projectedKeyPoints[1].Y,
+									projectedKeyPoints[2].X, projectedKeyPoints[2].Y);
 	cv::Matx<float, 3, 2> result;
 
-	camPoints = (0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0) / planePtr->values[2]),
-				 0.1, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0.1 + planePtr->values[1] * 0) / planePtr->values[2]),
-				 0, 0.1, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0.1) / planePtr->values[2]));
-	rgbPoints = (projectedKeyPoints[0].X, projectedKeyPoints[0].Y, 
-				 projectedKeyPoints[1].X, projectedKeyPoints[1].Y, 
-				 projectedKeyPoints[2].X, projectedKeyPoints[2].Y);
-
 	result = camPoints.inv() * rgbPoints;
+
+	std::cout << "keyPoints" << keyPoints[0].X << std::endl;
+
+	std::cout << "keyPoints" << keyPoints[0].Y << std::endl;
+
+	std::cout << "keyPoints" << keyPoints[0].Z << std::endl;
+
+	std::cout << "camPoints" << camPoints << std::endl;
+
+	std::cout << "rgbPoints" << camPoints << std::endl;
 
 	std::cout << result << std::endl;
 
