@@ -39,7 +39,7 @@ namespace personalRobotics
 		pcl::ModelCoefficients::Ptr planePtr;
 		std::vector<personalRobotics::Entity> entityList;
 		cv::Mat homography;
-		std::vector <cv::Vec3f> planeNormals;
+		std::vector <cv::Point3f> planeNormals;
 
 		// Pixel sizes
 		cv::Point2f rgbPixelSize;

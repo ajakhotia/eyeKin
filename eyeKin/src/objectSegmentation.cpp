@@ -146,15 +146,22 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
 	cv::add(origin, weightMultVectors, projCornersInCam);
 	std::cout << projCornersInCam << std::endl;
 
-	std::vector <cv::Vec3f> cornerPoints;
-	cornerPoints.push_back(cv::Vec3f(projCornersInCam.at<float>(0, 0), projCornersInCam.at<float>(1, 0), projCornersInCam.at<float>(2, 0)));
-	cornerPoints.push_back(cv::Vec3f( projCornersInCam.at<float>(0, 1), projCornersInCam.at<float>(1, 1), projCornersInCam.at<float>(2, 1) ));
-	cornerPoints.push_back(cv::Vec3f(projCornersInCam.at<float>(0, 2), projCornersInCam.at<float>(1, 2), projCornersInCam.at<float>(2, 2)));
-	cornerPoints.push_back(cv::Vec3f(projCornersInCam.at<float>(0, 3), projCornersInCam.at<float>(1, 3), projCornersInCam.at<float>(2, 3)));
+	std::vector <cv::Point3f> cornerPoints;
+	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 0), projCornersInCam.at<float>(1, 0), projCornersInCam.at<float>(2, 0)));
+	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 1), projCornersInCam.at<float>(1, 1), projCornersInCam.at<float>(2, 1)));
+	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 2), projCornersInCam.at<float>(1, 2), projCornersInCam.at<float>(2, 2)));
+	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 3), projCornersInCam.at<float>(1, 3), projCornersInCam.at<float>(2, 3)));
 
 	for (int i = 0; i < 4; i++)
 	{
 		planeNormals.push_back(cornerPoints[i].cross(cornerPoints[(i + 1) % 4]));
+	}
+
+	cv::Point3f testPoint(keyPoints[0].X, keyPoints[0].Y, keyPoints[0].Z);
+	for (int i = 0; i < 4; i++)
+	{
+		float a = testPoint.dot(planeNormals[i]);
+		planeNormals[i] *= a / abs(a);
 	}
 }
 
@@ -188,12 +195,21 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			{
 				if ((planePtr->values[0] * pointCloudPtr[point].X + planePtr->values[1] * pointCloudPtr[point].Y + planePtr->values[2] * pointCloudPtr[point].Z + planePtr->values[3]) > distCutoff)
 				{
-					if ((pointCloudPtr[point].X * pointCloudPtr[point].X / pointCloudPtr[point].Z / pointCloudPtr[point].Z + pointCloudPtr[point].Y * pointCloudPtr[point].Y / pointCloudPtr[point].Z / pointCloudPtr[point].Z) < radialThreshold)
+					if ((planeNormals[0].x * pointCloudPtr[point].X + planeNormals[0].y * pointCloudPtr[point].Y + planeNormals[0].z * pointCloudPtr[point].Z) > 0)
 					{
-						pclPtr->points[dstPoint].x = pointCloudPtr[point].X;
-						pclPtr->points[dstPoint].y = pointCloudPtr[point].Y;
-						pclPtr->points[dstPoint].z = pointCloudPtr[point].Z;
-						dstPoint++;
+						if ((planeNormals[1].x * pointCloudPtr[point].X + planeNormals[1].y * pointCloudPtr[point].Y + planeNormals[1].z * pointCloudPtr[point].Z) > 0)
+						{
+							if ((planeNormals[2].x * pointCloudPtr[point].X + planeNormals[2].y * pointCloudPtr[point].Y + planeNormals[2].z * pointCloudPtr[point].Z) > 0)
+							{
+								if ((planeNormals[3].x * pointCloudPtr[point].X + planeNormals[3].y * pointCloudPtr[point].Y + planeNormals[3].z * pointCloudPtr[point].Z) > 0)
+								{
+									pclPtr->points[dstPoint].x = pointCloudPtr[point].X;
+									pclPtr->points[dstPoint].y = pointCloudPtr[point].Y;
+									pclPtr->points[dstPoint].z = pointCloudPtr[point].Z;
+									dstPoint++;
+								}
+							}
+						}
 					}
 				}
 			}
@@ -455,10 +471,15 @@ bool personalRobotics::ObjectSegmentor::calculateOverallChangeInFrames(std::vect
 }
 bool personalRobotics::ObjectSegmentor::onBoundingEdges(pcl::PointXYZ point)
 {
-	if (abs(point.x / point.z - 0.68488375) < 0.05 || abs(point.y / point.z - 0.59607856) < 0.05) // Add line based consttaints
-	{
+	if ((planeNormals[0].x * point.x + planeNormals[0].y * point.y + planeNormals[0].z * point.z) < 0.05)
 		return true;
-	}
+	if ((planeNormals[1].x * point.x + planeNormals[1].y * point.y + planeNormals[1].z * point.z) < 0.05)
+		return true;
+	if ((planeNormals[2].x * point.x + planeNormals[2].y * point.y + planeNormals[2].z * point.z) < 0.05)
+		return true;
+	if ((planeNormals[3].x * point.x + planeNormals[3].y * point.y + planeNormals[3].z * point.z) < 0.05)
+		return true;
+	
 	return false;
 }
 void personalRobotics::createCheckerboard(cv::Mat& checkerboard, int width, int height, int& numBlocksX, int& numBlocksY)
