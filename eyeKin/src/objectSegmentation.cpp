@@ -103,7 +103,6 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
 	projCornersInProj.push_back(cv::Point2f(0, 1080));
 
 	cv::perspectiveTransform(projCornersInProj, projCornersInRGB, homography.inv());
-	std::cout << projCornersInRGB << std::endl;
 	cv::Mat projCornersInRGBMat(2, 4, CV_32FC1);
 	projCornersInRGBMat.at<float>(0, 0) = projCornersInRGB[0].x - projectedKeyPoints[0].X;
 	projCornersInRGBMat.at<float>(1, 0) = projCornersInRGB[0].y - projectedKeyPoints[0].Y;
@@ -141,10 +140,8 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
 	origin.at<float>(2, 3) = keyPoints[0].Z;
 	
 	weightMultVectors = keyPointsVectors * weights;
-	std::cout << weightMultVectors << std::endl;
 	cv::Mat projCornersInCam(3, 4, CV_32FC1);
 	cv::add(origin, weightMultVectors, projCornersInCam);
-	std::cout << projCornersInCam << std::endl;
 
 	std::vector <cv::Point3f> cornerPoints;
 	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 0), projCornersInCam.at<float>(1, 0), projCornersInCam.at<float>(2, 0)));

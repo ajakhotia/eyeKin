@@ -18,28 +18,35 @@ void main(int argC, char **argV)
 	// Loop to begin sending data
 	while (sendData)
 	{
-		if (eyeKin.getServer()->isConnected.get() && eyeKin.getSegmentor()->newListGenerated.get())
+		if (eyeKin.getSegmentor()->newListGenerated.get())
 		{
-			// Allocate space for list
-			procamPRL::EntityList serializableList;
-			if (eyeKin.getSegmentor()->getEntityList()->size() == 0)
-				continue;
-			eyeKin.generateSerializableList(serializableList);
-			
-			// Send data over socket
-			std::string outString;
-			//bufferMutex.lock();
-			serializableList.SerializeToString(&outString);
-			int dataLenght = outString.length();
-			if (dataLenght > 0)
+			if (eyeKin.getServer()->isConnected.get())
 			{
-				int networkOrderDataLength = htonl(dataLenght);
-				eyeKin.getServer()->write(4, (char*)&networkOrderDataLength);
-				//eyeKin.getServer()->asyncSend(dataLenght, &outString[0], &bufferMutex,false,true);
-				eyeKin.getServer()->write(dataLenght, (char*)outString.c_str());
+				// Allocate space for list
+				procamPRL::EntityList serializableList;
+				if (eyeKin.getSegmentor()->getEntityList()->size() == 0)
+					continue;
+				eyeKin.generateSerializableList(serializableList);
+
+				// Send data over socket
+				std::string outString;
+				//bufferMutex.lock();
+				serializableList.SerializeToString(&outString);
+				int dataLenght = outString.length();
+				if (dataLenght > 0)
+				{
+					int networkOrderDataLength = htonl(dataLenght);
+					eyeKin.getServer()->write(4, (char*)&networkOrderDataLength);
+					//eyeKin.getServer()->asyncSend(dataLenght, &outString[0], &bufferMutex,false,true);
+					eyeKin.getServer()->write(dataLenght, (char*)outString.c_str());
+				}
+			}
+			else
+			{
+				eyeKin.getSegmentor()->newListGenerated.set(false);
 			}
 		}
-		Sleep(50);
+		Sleep(25);
 	}
 	std::cin >> a;
 }
