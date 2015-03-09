@@ -510,4 +510,3 @@ void personalRobotics::createCheckerboard(cv::Mat& checkerboard, int width, int 
 	numBlocksX -= 3;
 	numBlocksY -= 3;
 }
-

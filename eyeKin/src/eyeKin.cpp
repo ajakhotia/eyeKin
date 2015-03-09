@@ -33,30 +33,33 @@ void personalRobotics::EyeKin::findTable()
 	if(segmentor.findTablePlane())
 		tablePlaneFound.set(true);
 }
-void personalRobotics::EyeKin::findHomography()
+void personalRobotics::EyeKin::findHomography(bool placeholder)
 {
-	/*std::vector<cv::Point2f> detectedCorners, checkerboardCorners;
-	bool foundCorners = findChessboardCorners(*segmentor.getColorImagePtr(), cv::Size(numCheckerPtsX, numCheckerPtsY), detectedCorners, CV_CALIB_CB_ADAPTIVE_THRESH);
-	bool foundProjectedCorners = findChessboardCorners(checkerboard, cv::Size(numCheckerPtsX, numCheckerPtsY), checkerboardCorners, CV_CALIB_CB_ADAPTIVE_THRESH);
-	if (foundCorners)
+	if (!placeholder)
 	{
-		cv::Mat invertedHomography = cv::findHomography(detectedCorners, checkerboardCorners, CV_RANSAC);
-		//cv::Mat homographyCorrection = (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, -1, screenHeight, 0, 0, 1);
-		homography = homographyCorrection*invertedHomography;
-		homographyFound = true;
-	}*/
-	homography = (cv::Mat_<double>(3, 3) <<1.7456, 0.0337, -837.4711, 0.0143, 1.7469, -331.6242, 0.0, 0.0, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
-	//homography = (cv::Mat_<double>(3, 3) << 1.9949, 0.0490, -1012.0788, 0.0004, 1.9674, -699.7341, 0.0, 0.0, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
-	homographyFound.set(true);
+		std::vector<cv::Point2f> detectedCorners, checkerboardCorners;
+		bool foundCorners = findChessboardCorners(*segmentor.getColorImagePtr(), cv::Size(numCheckerPtsX, numCheckerPtsY), detectedCorners, CV_CALIB_CB_ADAPTIVE_THRESH);
+		bool foundProjectedCorners = findChessboardCorners(checkerboard, cv::Size(numCheckerPtsX, numCheckerPtsY), checkerboardCorners, CV_CALIB_CB_ADAPTIVE_THRESH);
+		if (foundCorners && foundProjectedCorners)
+		{
+			homography = cv::findHomography(detectedCorners, checkerboardCorners, CV_RANSAC);
+			homographyFound.set(true);
+		}
+	}
+	else
+	{
+		homography = (cv::Mat_<double>(3, 3) << 1.7456, 0.0337, -837.4711, 0.0143, 1.7469, -331.6242, 0.0, 0.0, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
+		homographyFound.set(true);
+	}
 }
-void personalRobotics::EyeKin::calibrate()
+void personalRobotics::EyeKin::calibrate(bool placeholder)
 {
 	while (isCalibrating.get())
 	{
 		if (!tablePlaneFound.get() && segmentor.isDepthAllocated.get())
 			findTable();
 		if (!homographyFound.get() && segmentor.isColorAllocated.get())
-			findHomography();
+			findHomography(placeholder);
 		if (tablePlaneFound.get() && homographyFound.get())
 		{
 			isCalibrating.set(false);

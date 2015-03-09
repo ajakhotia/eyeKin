@@ -1,22 +1,32 @@
 #include "eyeKin.h"
 #include <Windows.h>
 
+// Socket counter for managing loading and unloading of resources
 personalRobotics::MutexType<int> personalRobotics::Tcp::socketCount = 0;
 
+// Globals for managing socket streaming and calibration
+std::thread sendRoutineThread;			// SenderThread
+personalRobotics::MutexBool sendData;	// Data control flag
+personalRobotics::EyeKin eyeKin;		// Eyekin object to handle all vision calls
+void sendThreadRoutine();				// Thread for sending data
+void startStreaming();					// Sends data to currently connected client
+void stopStreaming();					// Stops the server and resets the state
 
 
 void main(int argC, char **argV)
 {
-	int a;							// Dummy variable
-	std::thread socketSendThread;	// Reader thread to get commands from the client
-	bool sendData = true;					// Data control flag
+	// Do a placeholdercalibration
+	sendData.set(false);
+	eyeKin.calibrate(true);
 
-	// Initialize and calibrate the kinect segmentation system. This also
-	// starts a tcp server and listens on port 9000 of the local host.
-	personalRobotics::EyeKin eyeKin;
-	eyeKin.calibrate();
-	// Loop to begin sending data
-	while (sendData)
+	// Look for incoming commands and change the state of the machine
+	sendThreadRoutine();
+}
+
+
+void sendThreadRoutine()
+{
+	while (sendData.get())
 	{
 		if (eyeKin.getSegmentor()->newListGenerated.get())
 		{
@@ -37,7 +47,6 @@ void main(int argC, char **argV)
 				{
 					int networkOrderDataLength = htonl(dataLenght);
 					eyeKin.getServer()->write(4, (char*)&networkOrderDataLength);
-					//eyeKin.getServer()->asyncSend(dataLenght, &outString[0], &bufferMutex,false,true);
 					eyeKin.getServer()->write(dataLenght, (char*)outString.c_str());
 				}
 			}
@@ -48,5 +57,4 @@ void main(int argC, char **argV)
 		}
 		Sleep(25);
 	}
-	std::cin >> a;
 }

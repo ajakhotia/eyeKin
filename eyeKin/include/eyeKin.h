@@ -43,8 +43,8 @@ namespace personalRobotics
 
 		// Calibration methods
 		void findTable();
-		void findHomography();
-		void calibrate();
+		void findHomography(bool placeholder);
+		void calibrate(bool placeholder);
 
 		// Routines
 		void generateSerializableList(procamPRL::EntityList &serializableList);
