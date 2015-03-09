@@ -89,31 +89,38 @@ void personalRobotics::Tcp::read(int length, char* bufferPtr)
 {
 	if (recvChannelOpen.get())
 	{
-		int returnCode = recv(dataSocket, bufferPtr, length, 0);
-		if (returnCode == 0)
+		while ()
 		{
-			// Shutdown the socket's receive stream if not already being shutdown
-			if (recvChannelOpen.get())
+			int returnCode = recv(dataSocket, bufferPtr, length, 0);
+			if (returnCode == 0)
 			{
-				recvChannelOpen.set(false);
-				remoteTerminatedConnection.set(true);
-				shutdown(dataSocket, SD_RECEIVE);
-				cleanup();
+				// Shutdown the socket's receive stream if not already being shutdown
+				if (recvChannelOpen.get())
+				{
+					recvChannelOpen.set(false);
+					remoteTerminatedConnection.set(true);
+					shutdown(dataSocket, SD_RECEIVE);
+					cleanup();
+					return;
+				}
 				return;
 			}
-			return;
-		}
-		else if (returnCode == SOCKET_ERROR)
-		{
-			// Set the flags to crash the entire socket
-			recvChannelOpen.set(false);
-			sendChannelOpen.set(false);
-			remoteTerminatedConnection.set(true);
-			// Gather error data
-			std::cout << "Error in reading data from the socket. Error code: " << WSAGetLastError() << std::endl;		
-			// Reset the soceket
-			reset();
-			return;
+			else if (returnCode == SOCKET_ERROR)
+			{
+				// Set the flags to crash the entire socket
+				recvChannelOpen.set(false);
+				sendChannelOpen.set(false);
+				remoteTerminatedConnection.set(true);
+				// Gather error data
+				std::cout << "Error in reading data from the socket. Error code: " << WSAGetLastError() << std::endl;
+				// Reset the soceket
+				reset();
+				return;
+			}
+			else
+			{
+
+			}
 		}
 	}
 }

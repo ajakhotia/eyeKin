@@ -5,7 +5,7 @@
 personalRobotics::MutexType<int> personalRobotics::Tcp::socketCount = 0;
 
 // Globals for managing socket streaming and calibration
-std::thread sendRoutineThread;			// SenderThread
+std::thread sendThread;			// SenderThread
 personalRobotics::MutexBool sendData;	// Data control flag
 personalRobotics::EyeKin eyeKin;		// Eyekin object to handle all vision calls
 void sendThreadRoutine();				// Thread for sending data
@@ -20,7 +20,9 @@ void main(int argC, char **argV)
 	eyeKin.calibrate(true);
 
 	// Look for incoming commands and change the state of the machine
-	sendThreadRoutine();
+	startStreaming();
+
+	
 }
 
 
@@ -53,8 +55,20 @@ void sendThreadRoutine()
 			else
 			{
 				eyeKin.getSegmentor()->newListGenerated.set(false);
+				sendData.set(false);
 			}
 		}
 		Sleep(25);
 	}
+}
+void startStreaming()
+{
+	sendData.set(true);
+	sendThread = std::thread(&sendThreadRoutine);
+}
+void stopStreaming()
+{
+	sendData.set(false);
+	if (sendThread.joinable())
+		sendThread.join();
 }
