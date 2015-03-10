@@ -3,17 +3,8 @@
 // Constructor and Destructor
 personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 {
-	// Configuration
-	screenWidth = DEFAULT_SCREEN_WIDTH;
-	screenHeight = DEFAULT_SCREEN_HEIGHT;
-
 	// Start the server
 	tcpServer.start();
-
-	// Useful Images
-	numCheckerPtsX = 0;
-	numCheckerPtsY = 0;
-	personalRobotics::createCheckerboard(checkerboard, screenWidth, screenHeight, numCheckerPtsX, numCheckerPtsY);
 
 	//Flags
 	tablePlaneFound.set(false);
@@ -26,6 +17,20 @@ personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 personalRobotics::EyeKin::~EyeKin()
 {
 }
+void personalRobotics::EyeKin::reset()
+{
+	// Stop segmentor
+	segmentor.stopSegmentor();
+
+	// Reset the flags
+	tablePlaneFound.set(false);
+	homographyFound.set(false);
+	isCalibrating.set(true);
+
+	// Reset the counter
+	epoch = 0;
+}
+
 
 // Calibration methods
 void personalRobotics::EyeKin::findTable()
@@ -52,8 +57,16 @@ void personalRobotics::EyeKin::findHomography(bool placeholder)
 		homographyFound.set(true);
 	}
 }
-void personalRobotics::EyeKin::calibrate(bool placeholder)
+void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHeight)
 {
+	// Setup
+	screenWidth = inWidth;
+	screenHeight = inHeight;
+	numCheckerPtsX = 0;
+	numCheckerPtsY = 0;
+	personalRobotics::createCheckerboard(checkerboard, screenWidth, screenHeight, numCheckerPtsX, numCheckerPtsY);
+
+	// Calibration
 	while (isCalibrating.get())
 	{
 		if (!tablePlaneFound.get() && segmentor.isDepthAllocated.get())

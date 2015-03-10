@@ -85,13 +85,14 @@ void personalRobotics::Tcp::write(int length, char* bufferPtr)
 		}
 	}
 }
-void personalRobotics::Tcp::read(int length, char* bufferPtr)
+bool personalRobotics::Tcp::read(int length, char* bufferPtr)
 {
 	if (recvChannelOpen.get())
 	{
-		while ()
+		int recvLen = 0;
+		while (recvLen<length)
 		{
-			int returnCode = recv(dataSocket, bufferPtr, length, 0);
+			int returnCode = recv(dataSocket, &bufferPtr[recvLen], length - recvLen, 0);
 			if (returnCode == 0)
 			{
 				// Shutdown the socket's receive stream if not already being shutdown
@@ -101,9 +102,9 @@ void personalRobotics::Tcp::read(int length, char* bufferPtr)
 					remoteTerminatedConnection.set(true);
 					shutdown(dataSocket, SD_RECEIVE);
 					cleanup();
-					return;
+					return false;
 				}
-				return;
+				return false;
 			}
 			else if (returnCode == SOCKET_ERROR)
 			{
@@ -115,13 +116,14 @@ void personalRobotics::Tcp::read(int length, char* bufferPtr)
 				std::cout << "Error in reading data from the socket. Error code: " << WSAGetLastError() << std::endl;
 				// Reset the soceket
 				reset();
-				return;
+				return false;
 			}
 			else
 			{
-
+				recvLen += returnCode;
 			}
 		}
+		return true;
 	}
 }
 void personalRobotics::Tcp::asyncSend(int length, char* bufferPtr, std::mutex &bufferMutex, bool lock, bool unlock)

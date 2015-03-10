@@ -5,28 +5,54 @@
 personalRobotics::MutexType<int> personalRobotics::Tcp::socketCount = 0;
 
 // Globals for managing socket streaming and calibration
-std::thread sendThread;			// SenderThread
-personalRobotics::MutexBool sendData;	// Data control flag
-personalRobotics::EyeKin eyeKin;		// Eyekin object to handle all vision calls
-void sendThreadRoutine();				// Thread for sending data
-void startStreaming();					// Sends data to currently connected client
-void stopStreaming();					// Stops the server and resets the state
-
+std::thread sendThread;							// SenderThread
+personalRobotics::MutexBool sendData;			// Data control flag
+personalRobotics::EyeKin eyeKin;				// Eyekin object to handle all vision calls
+void sendRoutine();								// Routine for sending messages to client
+bool readRoutine(procamPRL::EntityList &list);	// Routine for reading messages from client
+void startStreaming();							// Sends data to currently connected client
+void stopStreaming();							// Stops the server and resets the state
 
 void main(int argC, char **argV)
 {
 	// Do a placeholdercalibration
 	sendData.set(false);
-	eyeKin.calibrate(true);
+	eyeKin.calibrate();
 
 	// Look for incoming commands and change the state of the machine
 	startStreaming();
-
-	
+	while (true)
+	{
+		procamPRL::EntityList commandList;
+		readRoutine(commandList);
+		switch(commandList.command)
+		{
+		case procamPRL::EntityList::NONE:
+			break;
+		case procamPRL::EntityList::START_CALIBRATION:
+			std::cout << "starting calibration" << std::endl;
+			break;
+		case procamPRL::EntityList::CALIBRATION_COMPLETE:
+			std::cout << "stopping calibration" << std::endl;
+			break;
+		case procamPRL::EntityList::START_STREAM:
+			std::cout << "starting stream" << std::endl;
+			break;
+		case procamPRL::EntityList::STOP_STREAM:
+			std::cout << "stopping stream" << std::endl;
+			break;
+		case procamPRL::EntityList::SEND_DISPLAY_INFO_PACKET:
+			std::cout << "sending display info packet" << std::endl;
+			break;
+		case procamPRL::EntityList::DISCONNECT:
+			std::cout << "disconnecting ..." << std::endl;
+			break;
+		}
+	}
 }
 
 
-void sendThreadRoutine()
+void sendRoutine()
 {
 	while (sendData.get())
 	{
@@ -61,10 +87,24 @@ void sendThreadRoutine()
 		Sleep(25);
 	}
 }
+bool readRoutine(procamPRL::EntityList &list)
+{
+	// Clear the list
+	list.Clear();
+
+	// Read 4 bytes, cast to int and convert to host byte ordering
+	char sizeBuffer[4];
+	eyeKin.getServer()->read(4, sizeBuffer);
+	int size = ntohl((int)sizeBuffer);
+	std::string messageString;
+	messageString.reserve(size);
+	eyeKin.getServer()->read(size, &messageString[0]);
+	list.ParseFromArray((void*)&messageString[0], size);
+}
 void startStreaming()
 {
 	sendData.set(true);
-	sendThread = std::thread(&sendThreadRoutine);
+	sendThread = std::thread(&sendRoutine);
 }
 void stopStreaming()
 {

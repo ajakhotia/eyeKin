@@ -40,11 +40,12 @@ namespace personalRobotics
 		// Constructor and destructor
 		EyeKin();
 		~EyeKin();
+		void reset();
 
 		// Calibration methods
 		void findTable();
 		void findHomography(bool placeholder);
-		void calibrate(bool placeholder);
+		void calibrate(bool placeholder=true, int inWidth = DEFAULT_SCREEN_WIDTH, int inHeight = DEFAULT_SCREEN_HEIGHT);
 
 		// Routines
 		void generateSerializableList(procamPRL::EntityList &serializableList);
