@@ -23,30 +23,39 @@ void main(int argC, char **argV)
 	startStreaming();
 	while (true)
 	{
-		procamPRL::EntityList commandList;
-		readRoutine(commandList);
-		switch(commandList.command)
+		if (eyeKin.getServer()->isConnected.get())
 		{
-		case procamPRL::EntityList::NONE:
-			break;
-		case procamPRL::EntityList::START_CALIBRATION:
-			std::cout << "starting calibration" << std::endl;
-			break;
-		case procamPRL::EntityList::CALIBRATION_COMPLETE:
-			std::cout << "stopping calibration" << std::endl;
-			break;
-		case procamPRL::EntityList::START_STREAM:
-			std::cout << "starting stream" << std::endl;
-			break;
-		case procamPRL::EntityList::STOP_STREAM:
-			std::cout << "stopping stream" << std::endl;
-			break;
-		case procamPRL::EntityList::SEND_DISPLAY_INFO_PACKET:
-			std::cout << "sending display info packet" << std::endl;
-			break;
-		case procamPRL::EntityList::DISCONNECT:
-			std::cout << "disconnecting ..." << std::endl;
-			break;
+			procamPRL::EntityList commandList;
+			if (readRoutine(commandList))
+			{
+				switch (commandList.command())
+				{
+				case procamPRL::EntityList::NONE:
+					break;
+				case procamPRL::EntityList::START_CALIBRATION:
+					std::cout << "starting calibration" << std::endl;
+					break;
+				case procamPRL::EntityList::CALIBRATION_COMPLETE:
+					std::cout << "stopping calibration" << std::endl;
+					break;
+				case procamPRL::EntityList::START_STREAM:
+					std::cout << "starting stream" << std::endl;
+					break;
+				case procamPRL::EntityList::STOP_STREAM:
+					std::cout << "stopping stream" << std::endl;
+					break;
+				case procamPRL::EntityList::SEND_DISPLAY_INFO_PACKET:
+					std::cout << "sending display info packet" << std::endl;
+					break;
+				case procamPRL::EntityList::DISCONNECT:
+					std::cout << "disconnecting ..." << std::endl;
+					break;
+				}
+			}
+		}
+		else
+		{
+			Sleep(50);
 		}
 	}
 }
@@ -94,12 +103,17 @@ bool readRoutine(procamPRL::EntityList &list)
 
 	// Read 4 bytes, cast to int and convert to host byte ordering
 	char sizeBuffer[4];
-	eyeKin.getServer()->read(4, sizeBuffer);
-	int size = ntohl((int)sizeBuffer);
-	std::string messageString;
-	messageString.reserve(size);
-	eyeKin.getServer()->read(size, &messageString[0]);
-	list.ParseFromArray((void*)&messageString[0], size);
+	if (eyeKin.getServer()->read(4, sizeBuffer))
+	{
+		int size = ntohl(*((int*)(sizeBuffer)));
+		std::string messageString;
+		messageString.reserve(size);
+		eyeKin.getServer()->read(size, &messageString[0]);
+		list.ParseFromArray((void*)&messageString[0], size);
+		return true;
+	}
+	else
+		return false;
 }
 void startStreaming()
 {

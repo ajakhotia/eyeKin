@@ -58,9 +58,6 @@ void personalRobotics::Tcp::write(int length, char* bufferPtr)
 		int returnCode = send(dataSocket, bufferPtr, length, 0);
 		if (returnCode == SOCKET_ERROR)
 		{
-			// Gather error data
-			std::cout << "Error sending data over the socket. Attempting to shutdown send stream. Error code: " << WSAGetLastError() << std::endl;
-
 			// Shutdown the socket's send stream stream if its not already being closed else simply exit.
 			if (sendChannelOpen.get())
 			{
@@ -70,7 +67,6 @@ void personalRobotics::Tcp::write(int length, char* bufferPtr)
 					// Set the flags to crash the entire socket
 					sendChannelOpen.set(false);
 					recvChannelOpen.set(false);
-					std::cout << "Error in closing socket. Error code: " << WSAGetLastError() << std::endl;
 					reset();
 					return;
 				}
@@ -112,8 +108,7 @@ bool personalRobotics::Tcp::read(int length, char* bufferPtr)
 				recvChannelOpen.set(false);
 				sendChannelOpen.set(false);
 				remoteTerminatedConnection.set(true);
-				// Gather error data
-				std::cout << "Error in reading data from the socket. Error code: " << WSAGetLastError() << std::endl;
+				
 				// Reset the soceket
 				reset();
 				return false;
