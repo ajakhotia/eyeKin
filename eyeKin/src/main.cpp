@@ -6,13 +6,14 @@ personalRobotics::MutexType<int> personalRobotics::Tcp::socketCount = 0;
 
 // Globals for managing socket streaming and calibration
 std::thread sendThread;							// SenderThread
-personalRobotics::MutexBool sendData;			// Data control flag
+personalRobotics::MutexBool stream;				// Controls streaming of data over network
+personalRobotics::MutexBool runSenderThread;	// Send thread control flag
 personalRobotics::EyeKin eyeKin;				// Eyekin object to handle all vision calls
 void sendRoutine();								// Routine for sending messages to client
 bool readMessage(procamPRL::EntityList &list);	// Routine for reading messages from client
 void writeMessage(procamPRL::EntityList &list);	// Routine for writing message to client
-void startStreaming();							// Sends data to currently connected client
-void stopStreaming();							// Stops the server and resets the state
+void startSenderThread();						// Sends data to currently connected client
+void stopSenderThread();						// Stops the server and resets the state
 
 // Global handy commands
 procamPRL::EntityList SendDisplayInfoPacket;
@@ -22,8 +23,12 @@ procamPRL::EntityList CalibrationComplete;
 void main(int argC, char **argV)
 {
 	// Do a placeholdercalibration
-	sendData.set(false);
+	stream.set(false);
+	runSenderThread.set(false);
 	eyeKin.calibrate();
+
+	// Start the sender thread. This doesn't mean that the data is actually being sent
+	startSenderThread();
 
 	// Set the values for global commands
 	SendDisplayInfoPacket.set_command(procamPRL::EntityList::SEND_DISPLAY_INFO_PACKET);
@@ -50,7 +55,7 @@ void main(int argC, char **argV)
 				case procamPRL::EntityList::START_CALIBRATION:
 				{
 					std::cout << "Stopping stream and starting calibration" << std::endl;
-					stopStreaming();
+					stream.set(false);
 					writeMessage(SendDisplayInfoPacket);
 					procamPRL::EntityList temp;
 					int counter = 0;
@@ -88,14 +93,14 @@ void main(int argC, char **argV)
 				case procamPRL::EntityList::START_STREAM:
 				{
 					std::cout << "Starting stream" << std::endl;
-					startStreaming();
+					stream.set(true);
 				}
 				break;
 
 				case procamPRL::EntityList::STOP_STREAM:
 				{
 					std::cout << "Stopping stream" << std::endl;
-					stopStreaming();
+					stream.set(false);
 				}
 				break;
 
@@ -108,8 +113,7 @@ void main(int argC, char **argV)
 				case procamPRL::EntityList::DISCONNECT:
 				{
 					std::cout << "Disconnecting ..." << std::endl;
-					writeMessage(Disconnect);
-					stopStreaming();
+					stream.set(false);
 					eyeKin.getServer()->disconnect();
 				}
 				break;
@@ -122,25 +126,30 @@ void main(int argC, char **argV)
 			Sleep(25);
 		}
 	}
+	std::cout << "Stopping all threads and exiting" << std::endl;
+	stopSenderThread();
 }
 
 
 void sendRoutine()
 {
-	while (sendData.get())
+	while (runSenderThread.get())
 	{
-		if (eyeKin.getSegmentor()->newListGenerated.get())
+		if (stream.get())
 		{
 			if (eyeKin.getServer()->isConnected.get())
 			{
-				if (eyeKin.getSegmentor()->getEntityList()->size() != 0)
+				if (eyeKin.getSegmentor()->newListGenerated.get())
 				{
-					// Generate the list
-					procamPRL::EntityList serializableList;
-					eyeKin.generateSerializableList(serializableList);
+					if (eyeKin.getSegmentor()->getEntityList()->size() != 0)
+					{
+						// Generate the list
+						procamPRL::EntityList serializableList;
+						eyeKin.generateSerializableList(serializableList);
 
-					// Send the message over socket
-					writeMessage(serializableList);
+						// Send the message over socket
+						writeMessage(serializableList);
+					}
 				}
 			}
 			else
@@ -148,14 +157,12 @@ void sendRoutine()
 				// Expire the frame
 				eyeKin.getSegmentor()->newListGenerated.set(false);
 
-				// Stop streaming
-				//sendData.set(false);
-
-				// Disconnect
-				writeMessage(Disconnect);
+				// Stop the stream
+				std::cout << "Client disconnected. Stopping the stream" << std::endl;
+				stream.set(false);
 			}
 		}
-		Sleep(25);
+		Sleep(15);
 	}
 }
 bool readMessage(procamPRL::EntityList &list)
@@ -189,14 +196,14 @@ void writeMessage(procamPRL::EntityList &list)
 		eyeKin.getServer()->write(dataLenght, (char*)outString.c_str());
 	}
 }
-void startStreaming()
+void startSenderThread()
 {
-	sendData.set(true);
+	runSenderThread.set(true);
 	sendThread = std::thread(&sendRoutine);
 }
-void stopStreaming()
+void stopSenderThread()
 {
-	sendData.set(false);
+	runSenderThread.set(false);
 	if (sendThread.joinable())
 		sendThread.join();
 }

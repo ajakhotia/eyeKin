@@ -75,10 +75,7 @@ void personalRobotics::Entity::generateData(cv::Mat& homography, cv::Mat& rgbIma
 		cv::approxPolyDP(vectorOfContours[largestContourIdx],contour,5,true);
 	cv::Mat mask2 = cv::Mat::zeros(maskChannel.size(),CV_8UC1);
 	cv::drawContours(mask2, vectorOfContours, largestContourIdx, cv::Scalar(255), CV_FILLED);
-	cv::imshow("disp", mask2);
-	cv::rectangle(rgbPatch, yoRect, cv::Scalar(255,0,0,0));
-	cv::imshow("disp2", rgbPatch);
-	cv::waitKey(20);
+	cv::rectangle(rgbPatch, yoRect, cv::Scalar(255,0,0,0));// Should be removed to eliminate the blue rectangle in images
 	patch.create(rgbPatch.rows, rgbPatch.cols, CV_8UC4);
 	int fromTo[] = {0,0, 1,1, 2,2, 3,3};
 	cv::Mat inMatArray[] = { rgbPatch, mask2 };

@@ -59,13 +59,16 @@ void personalRobotics::EyeKin::findHomography(bool placeholder)
 }
 void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHeight)
 {
+	// Reset
+	reset();
+	
 	// Setup
 	screenWidth = inWidth;
 	screenHeight = inHeight;
 	numCheckerPtsX = 0;
 	numCheckerPtsY = 0;
 	personalRobotics::createCheckerboard(checkerboard, screenWidth, screenHeight, numCheckerPtsX, numCheckerPtsY);
-
+	
 	// Calibration
 	while (isCalibrating.get())
 	{
@@ -91,7 +94,6 @@ void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHe
 			projPixelSize.x = colorPixelSize.x * delX;
 			projPixelSize.y = colorPixelSize.y * delY;
 			segmentor.startSegmentor();
-			std::cout << "Calibration complete" << std::endl;
 		}
 	}
 }

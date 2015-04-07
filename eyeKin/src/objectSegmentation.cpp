@@ -279,14 +279,12 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					cameraSpacePoints[pointNum++] = { projDsCloud->points[*pit].x, projDsCloud->points[*pit].y, projDsCloud->points[*pit].z };
 				else
 				{
-					//std::cout << "marking cluster for deletion" << std::endl;
 					validCluster = false;
 					break;
 				}
 			}
 			if (!validCluster)
 			{
-				//std::cout << "*******************deleting cluster********************" << std::endl;
 				delete[] cameraSpacePoints;
 				continue;
 			}
@@ -429,9 +427,6 @@ void personalRobotics::ObjectSegmentor::startSegmentor()
 }
 void personalRobotics::ObjectSegmentor::segmentorThreadRoutine()
 {
-	cv::namedWindow("disp");
-	cv::namedWindow("disp2");
-	cv::startWindowThread();
 	while (!stopSegmentorFlag.get())
 	{
 		planeSegment();
