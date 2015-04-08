@@ -20,14 +20,6 @@ namespace personalRobotics
 		// Reader thread
 		std::thread readerThread;
 
-		// Thread safety locks
-		std::mutex rgbMutex;
-		std::mutex rgbaMutex;
-		std::mutex depthMutex;
-		std::mutex irMutex;
-		std::mutex pointCloudMutex;
-		std::mutex depth2colorMappingMutex;
-
 		// Parameters
 		int rgbWidth;
 		int rgbHeight;
@@ -60,6 +52,14 @@ namespace personalRobotics
 		MutexBool isColorAllocated;
 		MutexBool isDepthAllocated;
 		MutexBool isIRallocated;
+
+		// Thread safety locks
+		std::mutex rgbMutex;
+		std::mutex rgbaMutex;
+		std::mutex depthMutex;
+		std::mutex irMutex;
+		std::mutex pointCloudMutex;
+		std::mutex depth2colorMappingMutex;
 
 		// Accessors
 		ICoordinateMapper* getCoordinateMapper();

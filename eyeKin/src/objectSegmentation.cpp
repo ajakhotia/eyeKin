@@ -78,7 +78,7 @@ bool personalRobotics::ObjectSegmentor::getStatic()
 }
 
 // Setters
-void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
+void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int width, int height)
 {
 	homography = inHomography.clone();
 	homographySetFlag.set(true);
@@ -97,10 +97,11 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography)
 	rgbToKeyPoints.at<float>(1, 1) = projectedKeyPoints[2].Y - projectedKeyPoints[0].Y;
 
 	std::vector<cv::Point2f> projCornersInProj, projCornersInRGB;
+
 	projCornersInProj.push_back(cv::Point2f(0, 0));
-	projCornersInProj.push_back(cv::Point2f(1920, 0));
-	projCornersInProj.push_back(cv::Point2f(1920, 1080));
-	projCornersInProj.push_back(cv::Point2f(0, 1080));
+	projCornersInProj.push_back(cv::Point2f(width, 0));
+	projCornersInProj.push_back(cv::Point2f(width, height));
+	projCornersInProj.push_back(cv::Point2f(0, height));
 
 	cv::perspectiveTransform(projCornersInProj, projCornersInRGB, homography.inv());
 	cv::Mat projCornersInRGBMat(2, 4, CV_32FC1);
@@ -211,9 +212,6 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 				}
 			}
 		}
-
-		/*std::cout << "maxXbyZ: " << maxXbyZ << std::endl;
-		std::cout << "maxYbyZ: " << maxYbyZ << std::endl;*/
 
 		pointCloudMutex.unlock();
 		pclPtr->resize(dstPoint);
@@ -405,6 +403,12 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	planePtr->values[2] = planePtr->values[2] * signOfD;
 	planePtr->values[3] = planePtr->values[3] * signOfD;
 
+	std::cout << "findTablePlane() computed plane values: "
+		  << planePtr->values[0] << " "
+		  << planePtr->values[1] << " "
+		  << planePtr->values[2] << " "
+		  << planePtr->values[3] << std::endl;
+	
 	// Find pixel size
 	CameraSpacePoint keyPoints[3];
 	ColorSpacePoint projectedKeyPoints[3];
@@ -414,9 +418,12 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 	coordinateMapperPtr->MapCameraPointsToColorSpace(3, keyPoints, 3, projectedKeyPoints);
 	double delX = sqrt((projectedKeyPoints[1].X - projectedKeyPoints[0].X)*(projectedKeyPoints[1].X - projectedKeyPoints[0].X) + (projectedKeyPoints[1].Y - projectedKeyPoints[0].Y)*(projectedKeyPoints[1].Y - projectedKeyPoints[0].Y));
 	double delY = sqrt((projectedKeyPoints[2].X - projectedKeyPoints[0].X)*(projectedKeyPoints[2].X - projectedKeyPoints[0].X) + (projectedKeyPoints[2].Y - projectedKeyPoints[0].Y)*(projectedKeyPoints[2].Y - projectedKeyPoints[0].Y));
+
+	// Value of 0.1 used above is in meters, to get pixel size in mm, divide 100 by delX and delY
 	rgbPixelSize.x = 100 / delX;
 	rgbPixelSize.y = 100 / delY;
 
+	std::cout << "findTablePlane() computed rgbPixelSize: " << rgbPixelSize.x << ", " << rgbPixelSize.y << std::endl;
 	// Return
 	return true;
 }

@@ -1,4 +1,5 @@
 #include "eyeKin.h"
+#include <Windows.h>
 
 // Constructor and Destructor
 personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
@@ -43,12 +44,19 @@ void personalRobotics::EyeKin::findHomography(bool placeholder)
 	if (!placeholder)
 	{
 		std::vector<cv::Point2f> detectedCorners, checkerboardCorners;
+		std::cout << "findHomography() about to call CV findChessboardCorners.\n";
+		// FIXME: the following is simply crashing when the projector image size is 1280x800 but the default is 1920x1080
+		segmentor.rgbMutex.lock();
 		bool foundCorners = findChessboardCorners(*segmentor.getColorImagePtr(), cv::Size(numCheckerPtsX, numCheckerPtsY), detectedCorners, CV_CALIB_CB_ADAPTIVE_THRESH);
+		segmentor.rgbMutex.unlock();
 		bool foundProjectedCorners = findChessboardCorners(checkerboard, cv::Size(numCheckerPtsX, numCheckerPtsY), checkerboardCorners, CV_CALIB_CB_ADAPTIVE_THRESH);
+
 		if (foundCorners && foundProjectedCorners)
 		{
+			std::cout << "findHomography() about to call cv::findHomography.\n";
 			homography = cv::findHomography(detectedCorners, checkerboardCorners, CV_RANSAC);
 			homographyFound.set(true);
+			std::cout << "findHomography() returning computed values.\n";
 		}
 	}
 	else
@@ -70,16 +78,29 @@ void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHe
 	personalRobotics::createCheckerboard(checkerboard, screenWidth, screenHeight, numCheckerPtsX, numCheckerPtsY);
 	
 	// Calibration
+	int attempts = 0;
+	int maxAttempts = 15;
 	while (isCalibrating.get())
-	{
+	{	    
 		if (!tablePlaneFound.get() && segmentor.isDepthAllocated.get())
 			findTable();
+
 		if (!homographyFound.get() && segmentor.isColorAllocated.get())
+		{
 			findHomography(placeholder);
+			attempts++;
+			if (attempts > maxAttempts)
+			{
+				std::cout << "Calibration failed " << attempts << " times. Performing a placeholder cailbration.\n";
+				findHomography(true);
+			}
+		}
+		
+
 		if (tablePlaneFound.get() && homographyFound.get())
 		{
 			isCalibrating.set(false);
-			segmentor.setHomography(homography);
+			segmentor.setHomography(homography, screenWidth, screenHeight);
 
 			// Map size of rgb and projector pixels
 			std::vector<cv::Point2f> rgbKeyPoints;
@@ -95,6 +116,8 @@ void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHe
 			projPixelSize.y = colorPixelSize.y * delY;
 			segmentor.startSegmentor();
 		}
+		else
+			Sleep(25);
 	}
 }
 

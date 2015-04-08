@@ -14,6 +14,8 @@
 //---OpenFrameworks settings---//
 #define DEFAULT_SCREEN_WIDTH 1920
 #define DEFAULT_SCREEN_HEIGHT 1080
+// #define DEFAULT_SCREEN_WIDTH 1280
+// #define DEFAULT_SCREEN_HEIGHT 800
 
 //---RANSAC & Threshold settings---//
 #define DEFAULT_MIN_DEPTH_LIMIT 0.8

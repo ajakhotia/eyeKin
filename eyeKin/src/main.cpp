@@ -1,5 +1,7 @@
 #include "eyeKin.h"
 #include <Windows.h>
+#include <iostream>
+#include <fstream>
 
 // Socket counter for managing loading and unloading of resources
 personalRobotics::MutexType<int> personalRobotics::Tcp::socketCount = 0;
@@ -22,6 +24,16 @@ procamPRL::EntityList CalibrationComplete;
 
 void main(int argC, char **argV)
 {
+  // Generate a log file to record messages and point cout to it.
+  std::cout << "Opening eyeKin log file and redirecting output.\n";
+  std::ofstream logfile("c:\\Temp\\eyeKin.log");   // create a log file
+  logfile.rdbuf()->pubsetbuf(0, 0);                // set log file output to unbuffered mode
+  std::cout.rdbuf(logfile.rdbuf());                // redirect cout to logfile
+  std::cout << "Opened eyeKin log file.\n";
+  std::cout << "cout now redirected to log file.\n";
+  std::cerr.rdbuf(logfile.rdbuf());                // redirect cerr to logfile
+  std::cout << "cerr now redirected to log file.\n";
+  
 	// Do a placeholdercalibration
 	stream.set(false);
 	runSenderThread.set(false);
@@ -56,12 +68,14 @@ void main(int argC, char **argV)
 				{
 					std::cout << "Stopping stream and starting calibration" << std::endl;
 					stream.set(false);
+					std::cout << "Requesting the display size information" << std::endl;
 					writeMessage(SendDisplayInfoPacket);
 					procamPRL::EntityList temp;
 					int counter = 0;
 					while (temp.command() != procamPRL::EntityList::SEND_DISPLAY_INFO_PACKET && counter++ < 2)
 					{
 						temp.Clear();
+						std::cout << "Waitiing to read message with display information" << std::endl;
 						readMessage(temp);
 					}
 					if (temp.command() == procamPRL::EntityList::SEND_DISPLAY_INFO_PACKET)
@@ -71,7 +85,7 @@ void main(int argC, char **argV)
 							eyeKin.calibrate(false, entity.image().width(), entity.image().height());
 						else
 						{
-							std::cout << "No display size was sent.\nPerforming a dummy calibration" << std::endl;
+							std::cout << "No display size was sent. Performing a dummy calibration" << std::endl;
 							eyeKin.calibrate();
 						}
 					}
@@ -80,6 +94,7 @@ void main(int argC, char **argV)
 						std::cout << "No display information packet was sent.\nPerforming a dummy calibration" << std::endl;
 						eyeKin.calibrate();
 					}
+					std::cout << "Completed calibartion and notifying the client of the same." << std::endl;
 					writeMessage(CalibrationComplete);
 				}
 				break;
