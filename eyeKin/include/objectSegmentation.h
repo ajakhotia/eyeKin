@@ -77,6 +77,7 @@ namespace personalRobotics
 		void lockPcl();
 		void unlockPcl();
 		MutexBool newListGenerated;
+		MutexBool pauseThreadFlag;
 
 		// Accessors
 		std::vector<personalRobotics::Entity>* getEntityList();
@@ -92,6 +93,8 @@ namespace personalRobotics
 		void startSegmentor();
 		void segmentorThreadRoutine();
 		void stopSegmentor();
+		void pauseSegmentor();
+		void resumeSegmentor();
 		bool calculateOverallChangeInFrames(std::vector<IDLookUp> cIDList);
 		float calculateEntityDifferences(cv::Point2f IDcentroid, cv::Point2f objectCentroid, float IDangle, float objectAngle, cv::Size2f IDBoundingSize, cv::Size2f objectBoundingSize);
 		bool onBoundingEdges(pcl::PointXYZ point);

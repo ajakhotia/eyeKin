@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "eyeKin.h"
 #include <Windows.h>
 #include <iostream>
@@ -25,14 +26,19 @@ procamPRL::EntityList CalibrationComplete;
 void main(int argC, char **argV)
 {
   // Generate a log file to record messages and point cout to it.
-  std::cout << "Opening eyeKin log file and redirecting output.\n";
-  std::ofstream logfile("c:\\Temp\\eyeKin.log");   // create a log file
-  logfile.rdbuf()->pubsetbuf(0, 0);                // set log file output to unbuffered mode
-  std::cout.rdbuf(logfile.rdbuf());                // redirect cout to logfile
-  std::cout << "Opened eyeKin log file.\n";
-  std::cout << "cout now redirected to log file.\n";
-  std::cerr.rdbuf(logfile.rdbuf());                // redirect cerr to logfile
-  std::cout << "cerr now redirected to log file.\n";
+	time_t t = time(0);
+	struct tm *now = localtime(&t);
+	std::string name;
+	name = std::to_string(now->tm_year + 1900) + "-" + std::to_string(now->tm_mon) + "-" + std::to_string(now->tm_mday) + "-" + std::to_string(now->tm_hour) + "-" + std::to_string(now->tm_min) + "-" + std::to_string(now->tm_sec);
+	std::cout << name << std::endl;
+	std::cout << "Opening eyeKin log file and redirecting output.\n";
+	std::ofstream logfile("c:\\Temp\\" + name +".log");	// create a log file
+	logfile.rdbuf()->pubsetbuf(0, 0);					// set log file output to unbuffered mode
+	std::cout.rdbuf(logfile.rdbuf());					// redirect cout to logfile
+	std::cout << "Opened eyeKin log file.\n";
+	std::cout << "cout now redirected to log file.\n";
+	std::cerr.rdbuf(logfile.rdbuf());                // redirect cerr to logfile
+	std::cout << "cerr now redirected to log file.\n";
   
 	// Do a placeholdercalibration
 	stream.set(false);
@@ -80,6 +86,7 @@ void main(int argC, char **argV)
 					}
 					if (temp.command() == procamPRL::EntityList::SEND_DISPLAY_INFO_PACKET)
 					{
+						std::cout << "Received message with display information" << std::endl;
 						const procamPRL::Entity& entity = temp.entitylist(0);
 						if (entity.image().width() > 0 && entity.image().height() > 0)
 							eyeKin.calibrate(false, entity.image().width(), entity.image().height());

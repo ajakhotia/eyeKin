@@ -32,6 +32,7 @@ namespace personalRobotics
 		MutexBool tablePlaneFound;
 		MutexBool homographyFound;
 		MutexBool isCalibrating;
+		MutexBool segmentorEverStarted;
 	
 		// Configurations
 		int screenWidth;

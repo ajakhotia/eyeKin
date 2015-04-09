@@ -11,6 +11,7 @@ personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 	tablePlaneFound.set(false);
 	homographyFound.set(false);
 	isCalibrating.set(true);
+	segmentorEverStarted.set(false);
 
 	// Counters
 	epoch = 0;
@@ -21,7 +22,7 @@ personalRobotics::EyeKin::~EyeKin()
 void personalRobotics::EyeKin::reset()
 {
 	// Stop segmentor
-	segmentor.stopSegmentor();
+	segmentor.pauseSegmentor();
 
 	// Reset the flags
 	tablePlaneFound.set(false);
@@ -44,8 +45,6 @@ void personalRobotics::EyeKin::findHomography(bool placeholder)
 	if (!placeholder)
 	{
 		std::vector<cv::Point2f> detectedCorners, checkerboardCorners;
-		std::cout << "findHomography() about to call CV findChessboardCorners.\n";
-		// FIXME: the following is simply crashing when the projector image size is 1280x800 but the default is 1920x1080
 		segmentor.rgbMutex.lock();
 		bool foundCorners = findChessboardCorners(*segmentor.getColorImagePtr(), cv::Size(numCheckerPtsX, numCheckerPtsY), detectedCorners, CV_CALIB_CB_ADAPTIVE_THRESH);
 		segmentor.rgbMutex.unlock();
@@ -53,10 +52,12 @@ void personalRobotics::EyeKin::findHomography(bool placeholder)
 
 		if (foundCorners && foundProjectedCorners)
 		{
-			std::cout << "findHomography() about to call cv::findHomography.\n";
 			homography = cv::findHomography(detectedCorners, checkerboardCorners, CV_RANSAC);
 			homographyFound.set(true);
-			std::cout << "findHomography() returning computed values.\n";
+		}
+		else
+		{
+			std::cout << "Failed to find chessboard corners in the image.\n";
 		}
 	}
 	else
@@ -79,7 +80,8 @@ void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHe
 	
 	// Calibration
 	int attempts = 0;
-	int maxAttempts = 15;
+	int maxAttempts = 5;
+	std::cout << "Starting calibration with\nwidth: " << screenWidth << " height: " << screenHeight << " numXCorners: " << numCheckerPtsX << " numYCorners: " << numCheckerPtsY << std::endl;
 	while (isCalibrating.get())
 	{	    
 		if (!tablePlaneFound.get() && segmentor.isDepthAllocated.get())
@@ -91,7 +93,7 @@ void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHe
 			attempts++;
 			if (attempts > maxAttempts)
 			{
-				std::cout << "Calibration failed " << attempts << " times. Performing a placeholder cailbration.\n";
+				std::cout << "Calibration failed " << attempts-1 << " times. Performing a placeholder cailbration.\n";
 				findHomography(true);
 			}
 		}
@@ -114,7 +116,19 @@ void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHe
 			colorPixelSize = *(segmentor.getRGBpixelSize());
 			projPixelSize.x = colorPixelSize.x * delX;
 			projPixelSize.y = colorPixelSize.y * delY;
-			segmentor.startSegmentor();
+			std::cout << "Calibration complete. Projector pixel size is: (" << projPixelSize.x << "," << projPixelSize.y << ")\n";
+			if (segmentorEverStarted.get())
+			{
+				segmentor.resumeSegmentor();
+				std::cout << "Resumed segmentation routine" << std::endl;
+			}
+			else
+			{
+				segmentorEverStarted.set(true);
+				segmentor.startSegmentor();
+				std::cout << "Started segmentation routine" << std::endl;
+			}
+			
 		}
 		else
 			Sleep(25);
