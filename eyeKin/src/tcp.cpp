@@ -353,13 +353,13 @@ void personalRobotics::TcpServer::start()
 	{
 		listenerStopped.set(false);
 		listenerThread = std::thread(&TcpServer::listenRoutine, this);
+		listenerStopped.set(true);
 	}
 }
 void personalRobotics::TcpServer::stop()
 {
 	if (!listenerStopped.get())
 	{
-		listenerStopped.set(true);
 		if (listenerThread.joinable())
 			listenerThread.join();
 	}

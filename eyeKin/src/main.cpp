@@ -17,13 +17,15 @@ bool readMessage(procamPRL::EntityList &list);	// Routine for reading messages f
 void writeMessage(procamPRL::EntityList &list);	// Routine for writing message to client
 void startSenderThread();						// Sends data to currently connected client
 void stopSenderThread();						// Stops the server and resets the state
+BOOL controlEventsHandler(DWORD wtf);
+bool controlFlag;
 
 // Global handy commands
 procamPRL::EntityList SendDisplayInfoPacket;
 procamPRL::EntityList Disconnect;
 procamPRL::EntityList CalibrationComplete;
 
-void main(int argC, char **argV)
+int main(int argC, char **argV)
 {
   // Generate a log file to record messages and point cout to it.
 	time_t t = time(0);
@@ -53,8 +55,12 @@ void main(int argC, char **argV)
 	Disconnect.set_command(procamPRL::EntityList::DISCONNECT);
 	CalibrationComplete.set_command(procamPRL::EntityList::CALIBRATION_COMPLETE);
 
+	controlFlag = true;
+	SetConsoleCtrlHandler((PHANDLER_ROUTINE)controlEventsHandler, TRUE);
+	int counter = 0;
+
 	// Look for incoming commands and change the state of the machine
-	while (true)
+	while (controlFlag)
 	{
 		if (eyeKin.getServer()->isConnected.get())
 		{
@@ -148,10 +154,48 @@ void main(int argC, char **argV)
 			Sleep(25);
 		}
 	}
+	
 	std::cout << "Stopping all threads and exiting" << std::endl;
-	stopSenderThread();
+	return 0;
 }
 
+BOOL controlEventsHandler(DWORD wtf)
+{
+	switch (wtf)
+	{
+	case CTRL_C_EVENT:
+		std::cout << "ctrl + c received" << std::endl;
+		stopSenderThread();
+		controlFlag = false;
+		break;
+	case CTRL_CLOSE_EVENT:
+		std::cout << "close received" << std::endl;
+		stopSenderThread();
+		controlFlag = false;
+		std::cout << "about to break" << std::endl;
+		break;
+	case CTRL_BREAK_EVENT:
+		std::cout << "close received" << std::endl;
+		stopSenderThread();
+		controlFlag = false;
+		break;
+	case CTRL_LOGOFF_EVENT:
+		std::cout << "close received" << std::endl;
+		stopSenderThread();
+		controlFlag = false;
+		break;
+	case CTRL_SHUTDOWN_EVENT:
+		std::cout << "close received" << std::endl;
+		stopSenderThread();
+		controlFlag = false;
+		break;
+	default:
+		std::cout << "Behen" << std::endl;
+		break;
+	}
+	std::cout << "broke" << std::endl;
+	return TRUE;
+}
 
 void sendRoutine()
 {

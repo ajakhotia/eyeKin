@@ -34,11 +34,11 @@ personalRobotics::ObjectSegmentor::ObjectSegmentor()
 }
 personalRobotics::ObjectSegmentor::~ObjectSegmentor()
 {
-	// Stop the kinect
-	stopKinect();
-
 	// Stop segmentation thread
 	stopSegmentor();
+	
+	// Stop the kinect
+	stopKinect();
 }
 
 // Thread safety measures
