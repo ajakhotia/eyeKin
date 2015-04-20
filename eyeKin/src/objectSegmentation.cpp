@@ -36,9 +36,14 @@ personalRobotics::ObjectSegmentor::~ObjectSegmentor()
 {
 	// Stop segmentation thread
 	stopSegmentor();
+
+	std::cout << "stopped segmentor " << std::endl;
 	
 	// Stop the kinect
 	stopKinect();
+
+	std::cout << "stopped kinect" << std::endl;
+	
 }
 
 // Thread safety measures
@@ -454,6 +459,7 @@ void personalRobotics::ObjectSegmentor::stopSegmentor()
 	pauseThreadFlag.set(true);
 	if (segementorThread.joinable())
 		segementorThread.join();
+	std::cout << "done deleting segmentorthread" << std::endl;
 }
 void personalRobotics::ObjectSegmentor::pauseSegmentor()
 {

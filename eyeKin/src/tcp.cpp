@@ -344,6 +344,8 @@ personalRobotics::TcpServer::~TcpServer()
 	// stop the listener thread
 	stop();
 
+	shutdown(dataSocket, SD_BOTH);
+
 	// Close the listener socket
 	closesocket(listener);
 }
@@ -353,16 +355,14 @@ void personalRobotics::TcpServer::start()
 	{
 		listenerStopped.set(false);
 		listenerThread = std::thread(&TcpServer::listenRoutine, this);
-		listenerStopped.set(true);
 	}
 }
 void personalRobotics::TcpServer::stop()
 {
-	if (!listenerStopped.get())
-	{
-		if (listenerThread.joinable())
-			listenerThread.join();
-	}
+	listenerStopped.set(true);
+	if (listenerThread.joinable())
+		listenerThread.join();
+	std::cout << "done deleting listenerthread" << std::endl;
 }
 void personalRobotics::TcpServer::listenRoutine()
 {

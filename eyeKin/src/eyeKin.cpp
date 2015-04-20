@@ -18,6 +18,7 @@ personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 }
 personalRobotics::EyeKin::~EyeKin()
 {
+	std::cout << "hi" << std::endl;
 }
 void personalRobotics::EyeKin::reset()
 {
