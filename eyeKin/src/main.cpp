@@ -31,11 +31,9 @@ void main(int argC, char **argV)
 	// Generate a log file to record messages and point cout to it.
 	time_t t = time(0);
 	struct tm *now = localtime(&t);
-	std::string name;
-	name = std::to_string(now->tm_year + 1900) + "-" + std::to_string(now->tm_mon) + "-" + std::to_string(now->tm_mday) + "-" + std::to_string(now->tm_hour) + "-" + std::to_string(now->tm_min) + "-" + std::to_string(now->tm_sec);
-	std::cout << name << std::endl;
-	std::cout << "Opening eyeKin log file and redirecting output.\n";
-	std::ofstream logfile("c:\\Temp\\" + name +".log");	// create a log file
+	std::string name = "c:\\Temp\\eyeKin-" + personalRobotics::full_date_string() + ".log";
+	std::cout << "Opening eyeKin log file and redirecting output to it: " << name << std::endl;
+	std::ofstream logfile( name );	// create a log file
 	logfile.rdbuf()->pubsetbuf(0, 0);					// set log file output to unbuffered mode
 	std::cout.rdbuf(logfile.rdbuf());					// redirect cout to logfile
 	std::cout << "Opened eyeKin log file.\n";

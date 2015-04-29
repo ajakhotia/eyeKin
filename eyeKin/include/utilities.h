@@ -113,5 +113,9 @@ namespace personalRobotics
 	};
 
 	typedef MutexType<bool> MutexBool;
+
+
+        /// Return the current date to the second in a standard format.
+        std::string full_date_string(void);
 }
 #endif
