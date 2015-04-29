@@ -85,11 +85,14 @@ void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHe
 	std::cout << "Starting calibration with\nwidth: " << screenWidth << " height: " << screenHeight << " numXCorners: " << numCheckerPtsX << " numYCorners: " << numCheckerPtsY << std::endl;
 	while (isCalibrating.get())
 	{	    
-		if (!tablePlaneFound.get() && segmentor.isDepthAllocated.get())
+	  if (!tablePlaneFound.get() && segmentor.isDepthAllocated.get()) {
+	         std::cout << "calling findTable()" << std::endl;
 			findTable();
+	  }				
 
 		if (!homographyFound.get() && segmentor.isColorAllocated.get())
 		{
+		  	    std::cout << "calling findHomography()" << std::endl;
 			findHomography(placeholder);
 			attempts++;
 			if (attempts > maxAttempts)
