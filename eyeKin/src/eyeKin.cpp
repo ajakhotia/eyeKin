@@ -22,6 +22,8 @@ personalRobotics::EyeKin::~EyeKin()
 }
 void personalRobotics::EyeKin::reset()
 {
+	// Log
+	std::cout << "Resetting eyeking by pausing segmentor, resetting all calbration flags" << std::endl;
 	// Stop segmentor
 	segmentor.pauseSegmentor();
 
@@ -63,6 +65,7 @@ void personalRobotics::EyeKin::findHomography(bool placeholder)
 	}
 	else
 	{
+		std::cout << "Performing a placeholder calibration" << std::endl;
 		homography = (cv::Mat_<double>(3, 3) << 1.7456, 0.0337, -837.4711, 0.0143, 1.7469, -331.6242, 0.0, 0.0, 1) * (cv::Mat_<double>(3, 3) << 1, 0, 0, 0, 1, 0, 0, 0, 1);
 		homographyFound.set(true);
 	}
@@ -121,13 +124,11 @@ void personalRobotics::EyeKin::calibrate(bool placeholder, int inWidth, int inHe
 			if (segmentorEverStarted.get())
 			{
 				segmentor.resumeSegmentor();
-				std::cout << "Resumed segmentation routine" << std::endl;
 			}
 			else
 			{
 				segmentorEverStarted.set(true);
 				segmentor.startSegmentor();
-				std::cout << "Started segmentation routine" << std::endl;
 			}
 			
 		}
@@ -154,8 +155,11 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 		serializableList.set_frameid(++epoch);
 		serializableList.set_timestamp(((double)std::chrono::system_clock::now().time_since_epoch().count())/1000000.f);
 		
-		
-		for (std::vector<personalRobotics::Entity>::iterator entityPtr = listPtr->begin(); entityPtr != listPtr->end(); entityPtr++)
+		// Logging
+		std::cout << "A new frame created with frame id: " << epoch << " and timestamp: " << serializableList.timestamp() << " with following entity attributes:" << std::endl;
+		int counter = 0;
+
+		for (std::vector<personalRobotics::Entity>::iterator entityPtr = listPtr->begin(); entityPtr != listPtr->end(); entityPtr++,counter++)
 		{
 			// Add an serializable entity to serializable entity list
 			procamPRL::Entity* serializableEntityPtr = serializableList.add_entitylist();
@@ -202,6 +206,8 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 			image->set_allocated_rgbpixelsize(rgbPixelSizeSerializable);
 			image->set_data((void*)entityPtr->patch.data, entityPtr->patch.channels() * entityPtr->patch.rows * entityPtr->patch.cols);
 			serializableEntityPtr->set_allocated_image(image);
+
+			std::cout << "\t" << counter << ": " << "Pose: " << pose << ", " << "Image size: (" << image->width() << ", " << image->height() << ") " << std::endl;
 		}
 
 		// Unlock the lists

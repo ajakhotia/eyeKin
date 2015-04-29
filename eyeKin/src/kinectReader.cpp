@@ -27,8 +27,14 @@ personalRobotics::KinectReader::KinectReader() :	kinectPtr(NULL),
 			HRESULT hrOMSFR = kinectPtr->OpenMultiSourceFrameReader(FrameSourceTypes::FrameSourceTypes_Color | FrameSourceTypes::FrameSourceTypes_Depth | FrameSourceTypes::FrameSourceTypes_Infrared, &readerPtr);
 			if (FAILED(hrOMSFR))
 			{
+				std::cout << "Failed to open a frame reader. Exiting application" << std::endl;
 				exit(-1);
 			}
+		}
+		else
+		{
+			std::cout << "Failed to open kinect. Exiting application" << std::endl;
+			exit(-1);
 		}
 	}
 }
@@ -223,14 +229,18 @@ void personalRobotics::KinectReader::kinectThreadRoutine()
 }
 void personalRobotics::KinectReader::startKinect()
 {
+	std::cout << "Starting kinect reader thread" << std::endl;
 	stopKinectFlag.set(false);
 	readerThread = std::thread(&personalRobotics::KinectReader::kinectThreadRoutine, this);
+	std::cout << "Started kinect reader thread" << std::endl;
 }
 void personalRobotics::KinectReader::stopKinect()
 {
+	std::cout << "Stopping kinect reader thread" << std::endl;
 	stopKinectFlag.set(true);
 	if (readerThread.joinable())
 		readerThread.join();
+	std::cout << "Stopped kinect reader thread" << std::endl;
 }
 
 // Accessors

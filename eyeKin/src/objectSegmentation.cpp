@@ -36,14 +36,9 @@ personalRobotics::ObjectSegmentor::~ObjectSegmentor()
 {
 	// Stop segmentation thread
 	stopSegmentor();
-
-	std::cout << "stopped segmentor " << std::endl;
 	
 	// Stop the kinect
-	stopKinect();
-
-	std::cout << "stopped kinect" << std::endl;
-	
+	stopKinect();	
 }
 
 // Thread safety measures
@@ -441,9 +436,11 @@ bool personalRobotics::ObjectSegmentor::findTablePlane()
 }
 void personalRobotics::ObjectSegmentor::startSegmentor()
 {
+	std::cout << "Starting object segmentor thread" << std::endl;
 	pauseThreadFlag.set(false);
 	stopSegmentorFlag.set(false);
 	segementorThread = std::thread(&personalRobotics::ObjectSegmentor::segmentorThreadRoutine, this);
+	std::cout << "Started object segmentor thread" << std::endl;
 }
 void personalRobotics::ObjectSegmentor::segmentorThreadRoutine()
 {
@@ -455,19 +452,22 @@ void personalRobotics::ObjectSegmentor::segmentorThreadRoutine()
 }
 void personalRobotics::ObjectSegmentor::stopSegmentor()
 {
+	std::cout << "Stopping object segmentor thread" << std::endl;
 	stopSegmentorFlag.set(true);
 	pauseThreadFlag.set(true);
 	if (segementorThread.joinable())
 		segementorThread.join();
-	std::cout << "done deleting segmentorthread" << std::endl;
+	std::cout << "Stopped object segmentor thread" << std::endl;
 }
 void personalRobotics::ObjectSegmentor::pauseSegmentor()
 {
 	pauseThreadFlag.set(true);
+	std::cout << "Paused object segmentor thread" << std::endl;
 }
 void personalRobotics::ObjectSegmentor::resumeSegmentor()
 {
 	pauseThreadFlag.set(false);
+	std::cout << "Resumed object segmentor thread" << std::endl;
 }
 
 // Helper functions
