@@ -41,7 +41,7 @@ namespace personalRobotics
 
 		// Routines
 		void mapInfraredToColor(std::vector<cv::Point> &infraredPoints, std::vector<cv::Point> &colorPoints, ColorSpacePoint *mapping);
-		void pollFrames();
+		void pollFrames(bool save);
 		void kinectThreadRoutine();
 		void startKinect();
 		void stopKinect();
