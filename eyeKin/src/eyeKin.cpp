@@ -210,7 +210,7 @@ void personalRobotics::EyeKin::generateSerializableList(procamPRL::EntityList &s
 			image->set_data((void*)entityPtr->patch.data, entityPtr->patch.channels() * entityPtr->patch.rows * entityPtr->patch.cols);
 			serializableEntityPtr->set_allocated_image(image);
 
-			std::cout << "\t" << counter << ": " << "Pose: " << pose << ", " << "Image size: (" << image->width() << ", " << image->height() << ") " << std::endl;
+			std::cout << "\t" << counter << ": " << "Pose: (" << pose->position().x() << ", " << pose->position().y()<< ") , " << "Image size: (" << image->width() << ", " << image->height() << ") " << std::endl;
 		}
 
 		// Unlock the lists
