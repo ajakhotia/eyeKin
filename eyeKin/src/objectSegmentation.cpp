@@ -161,6 +161,9 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 		float a = testPoint.dot(planeNormals[i]);
 		planeNormals[i] *= a / abs(a);
 	}
+
+	// Log
+	std::cout << "Finished settting the homography and computing the frustum" << std::endl;
 }
 
 // Routines
@@ -350,8 +353,6 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			frameStatic = calculateOverallChangeInFrames(currentIDList);
 			previousIDList = currentIDList;
 
-			// Check for static condition here and set new list to true for static frames only
-
 			// Generate patch and geometric data for each of the entity
 			if (frameStatic && !prevFrameStatic)
 			{
@@ -360,6 +361,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					entityPtr->generateData(homography, rgbImageCopy);
 				}
 				newListGenerated.set(true);
+				std::cout << "New static frame generated." << std::endl;
 			}
 			unlockList();
 			currentIDList.clear();
@@ -368,7 +370,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			Sleep(15);
 	}
 	else
-		Sleep(30);
+		Sleep(20);
 }
 bool personalRobotics::ObjectSegmentor::findTablePlane()
 {

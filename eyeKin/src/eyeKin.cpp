@@ -18,12 +18,12 @@ personalRobotics::EyeKin::EyeKin() : tcpServer(PORT1, ADDRESS_FAMILY)
 }
 personalRobotics::EyeKin::~EyeKin()
 {
-	std::cout << "hi" << std::endl;
+
 }
 void personalRobotics::EyeKin::reset()
 {
 	// Log
-	std::cout << "Resetting eyeking by pausing segmentor, resetting all calbration flags" << std::endl;
+	std::cout << "Resetting eyekin by pausing segmentor and resetting all calbration flags" << std::endl;
 	// Stop segmentor
 	segmentor.pauseSegmentor();
 
