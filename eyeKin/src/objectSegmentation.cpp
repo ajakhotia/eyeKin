@@ -150,16 +150,22 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 2), projCornersInCam.at<float>(1, 2), projCornersInCam.at<float>(2, 2)));
 	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 3), projCornersInCam.at<float>(1, 3), projCornersInCam.at<float>(2, 3)));
 
+	std::cout << "Projected screen corner points are: " << std::endl;
 	for (int i = 0; i < 4; i++)
 	{
+		std::cout << cornerPoints[i] << std::endl;
 		planeNormals.push_back(cornerPoints[i].cross(cornerPoints[(i + 1) % 4]));
 	}
 
 	cv::Point3f testPoint(keyPoints[0].X, keyPoints[0].Y, keyPoints[0].Z);
+
+	std::cout << "The sign corrected frustrum normals are:" << std::endl;
 	for (int i = 0; i < 4; i++)
 	{
 		float a = testPoint.dot(planeNormals[i]);
 		planeNormals[i] *= a / abs(a);
+		planeNormals[i] *= 1 / sqrt(pow(planeNormals[i].x, 2) + pow(planeNormals[i].y, 2) + pow(planeNormals[i].z, 2));
+		std::cout << planeNormals[i] << std::endl;
 	}
 
 	// Log
@@ -182,7 +188,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			pclPtr->clear();
 			pclPtr->resize(numPoints);
 			size_t dstPoint = 0;
-
+			std::cout << "Segmentor running" << std::endl;
 			// Copy the RGB image
 			pointCloudMutex.lock();
 			rgbMutex.lock();
@@ -269,7 +275,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			entityList.clear();
 
 			// Vector to track valid clusters
-
+			int clusterCounter = 0;
 			for (std::vector<pcl::PointIndices>::const_iterator it = clusterIndices.begin(); it != clusterIndices.end(); ++it)
 			{
 				// Convert PCL to kinect camera point representation
@@ -292,6 +298,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					continue;
 				}
 
+				clusterCounter++;
 				// Map the points to RGB space and infrared space
 				cv::Mat colorSpacePoints(pointNum, 2, CV_32F);
 				coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)colorSpacePoints.data);
@@ -348,6 +355,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 				}
 			}
 
+			std::cout << "Generated " << clusterCounter << " cluster" << std::endl;
 			// See if frames are static
 			prevFrameStatic = frameStatic;
 			frameStatic = calculateOverallChangeInFrames(currentIDList);
