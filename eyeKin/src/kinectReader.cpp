@@ -232,7 +232,7 @@ void personalRobotics::KinectReader::kinectThreadRoutine()
 	int numFrames = 0;
 	while (!stopKinectFlag.get())
 	{
-		if (numFrames > 30)
+		if (numFrames > 100)
 		{
 			numFrames = 0;
 			pollFrames(true);
@@ -242,7 +242,7 @@ void personalRobotics::KinectReader::kinectThreadRoutine()
 			pollFrames(false);
 		}
 		numFrames++;
-		Sleep(25);
+		Sleep(15);
 	};
 }
 void personalRobotics::KinectReader::startKinect()
