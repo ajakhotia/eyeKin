@@ -242,7 +242,7 @@ void personalRobotics::KinectReader::kinectThreadRoutine()
 			pollFrames(false);
 		}
 		numFrames++;
-		Sleep(15);
+		Sleep(25);
 	};
 }
 void personalRobotics::KinectReader::startKinect()
