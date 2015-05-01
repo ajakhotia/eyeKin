@@ -196,7 +196,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			rgbImage.copyTo(rgbImageCopy);
 			rgbMutex.unlock();
 
-			// Add line based rejection
+			// Add plane based rejection
 			// Convert points to pointcloud and plane segment as well
 			for (size_t point = 0; point < numPoints; point++)
 			{
@@ -275,10 +275,12 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			entityList.clear();
 
 			// Vector to track valid clusters
-			int clusterCounter = 0;
+			int validClusterCounter = 0;
+			int allClusterCounter = 0;
 			for (std::vector<pcl::PointIndices>::const_iterator it = clusterIndices.begin(); it != clusterIndices.end(); ++it)
 			{
 				// Convert PCL to kinect camera point representation
+				allClusterCounter++;
 				CameraSpacePoint *cameraSpacePoints = new CameraSpacePoint[it->indices.size()];
 				int pointNum = 0;
 				bool validCluster = true;
@@ -298,7 +300,7 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					continue;
 				}
 
-				clusterCounter++;
+				validClusterCounter++;
 				// Map the points to RGB space and infrared space
 				cv::Mat colorSpacePoints(pointNum, 2, CV_32F);
 				coordinateMapperPtr->MapCameraPointsToColorSpace(pointNum, cameraSpacePoints, pointNum, (ColorSpacePoint*)colorSpacePoints.data);
@@ -354,8 +356,8 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					entityList.push_back(personalRobotics::Entity(objectCentroid, objectAngle, objectBoundingSize, iLU.id));
 				}
 			}
-
-			std::cout << "Generated " << clusterCounter << " cluster" << std::endl;
+			std::cout << "Generated " << allClusterCounter << " cluster" << std::endl;
+			std::cout << "Generated " << validClusterCounter << " valid cluster" << std::endl;
 			// See if frames are static
 			prevFrameStatic = frameStatic;
 			frameStatic = calculateOverallChangeInFrames(currentIDList);
