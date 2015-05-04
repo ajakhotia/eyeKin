@@ -51,6 +51,7 @@ void personalRobotics::EyeKin::findHomography(bool placeholder)
 		segmentor.rgbMutex.lock();
 		bool foundCorners = findChessboardCorners(*segmentor.getColorImagePtr(), cv::Size(numCheckerPtsX, numCheckerPtsY), detectedCorners, CV_CALIB_CB_ADAPTIVE_THRESH);
 		segmentor.rgbMutex.unlock();
+		std::cout << "Size of checkerboard being used in findHomography is: (" << checkerboard.cols << ", " << checkerboard.rows << ")" << std::endl;
 		bool foundProjectedCorners = findChessboardCorners(checkerboard, cv::Size(numCheckerPtsX, numCheckerPtsY), checkerboardCorners, CV_CALIB_CB_ADAPTIVE_THRESH);
 
 		if (foundCorners && foundProjectedCorners)

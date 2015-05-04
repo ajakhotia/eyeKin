@@ -86,7 +86,7 @@ namespace personalRobotics
 		bool getStatic();
 
 		// Setters
-		void setHomography(cv::Mat &inhomography, int width, int height);
+		void setHomography(cv::Mat inhomography, int width, int height);
 
 		// Routines
 		bool findTablePlane();

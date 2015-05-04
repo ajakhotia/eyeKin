@@ -78,7 +78,7 @@ bool personalRobotics::ObjectSegmentor::getStatic()
 }
 
 // Setters
-void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int width, int height)
+void personalRobotics::ObjectSegmentor::setHomography(cv::Mat inHomography, int width, int height)
 {
 	homography = inHomography.clone();
 	homographySetFlag.set(true);
@@ -88,7 +88,18 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 	keyPoints[0] = { 0, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0) / planePtr->values[2]) };	//(0  , 0   ,z1)
 	keyPoints[1] = { 0.1, 0, (-1 * (planePtr->values[3] + planePtr->values[0] * 0.1 + planePtr->values[1] * 0) / planePtr->values[2]) };	//(0.1, 0   ,z2)
 	keyPoints[2] = { 0, 0.1, (-1 * (planePtr->values[3] + planePtr->values[0] * 0 + planePtr->values[1] * 0.1) / planePtr->values[2]) };	//(0  , 0.1 ,z3)
+	std::cout << "The keyPoints are: " << std::endl;
+	for (int i = 0; i < 3; i++)
+	{
+		std::cout << "(" << keyPoints[i].X << ", " << keyPoints[i].Y << ", " << keyPoints[i].Z << ")" << std::endl;
+	}
 	coordinateMapperPtr->MapCameraPointsToColorSpace(3, keyPoints, 3, projectedKeyPoints);
+
+	std::cout << "The projected keyPoints are: " << std::endl;
+	for (int i = 0; i < 3; i++)
+	{
+		std::cout << "(" << projectedKeyPoints[i].X << ", " << projectedKeyPoints[i].Y << ")" << std::endl;
+	}
 
 	cv::Mat rgbToKeyPoints(2, 2, CV_32FC1);
 	rgbToKeyPoints.at<float>(0, 0) = projectedKeyPoints[1].X - projectedKeyPoints[0].X;
@@ -96,15 +107,24 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 	rgbToKeyPoints.at<float>(0, 1) = projectedKeyPoints[2].X - projectedKeyPoints[0].X;
 	rgbToKeyPoints.at<float>(1, 1) = projectedKeyPoints[2].Y - projectedKeyPoints[0].Y;
 
+	std::cout << "RGB frame to keypoints conversion matrix is:" << std::endl;
+	std::cout << rgbToKeyPoints << std::endl;
+
 	std::vector<cv::Point2f> projCornersInProj, projCornersInRGB;
 
+	std::cout << "setting homography with width: " << width << " height: " << height << " H = " << inHomography << std::endl;
 	projCornersInProj.push_back(cv::Point2f(0, 0));
 	projCornersInProj.push_back(cv::Point2f(width, 0));
 	projCornersInProj.push_back(cv::Point2f(width, height));
 	projCornersInProj.push_back(cv::Point2f(0, height));
 
 	cv::perspectiveTransform(projCornersInProj, projCornersInRGB, homography.inv());
-	
+
+	std::cout << "Projector corners in projector frame are at:" << std::endl;
+	for (std::vector<cv::Point2f>::iterator iter = projCornersInProj.begin(); iter != projCornersInProj.end(); iter++)
+	{
+		std::cout << *iter << std::endl;
+	}
 	std::cout << "Projector corners in RGB image are at:" << std::endl;
 	for (std::vector<cv::Point2f>::iterator iter = projCornersInRGB.begin(); iter != projCornersInRGB.end(); iter++)
 	{
@@ -120,6 +140,9 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 	projCornersInRGBMat.at<float>(1, 2) = projCornersInRGB[2].y - projectedKeyPoints[0].Y;
 	projCornersInRGBMat.at<float>(0, 3) = projCornersInRGB[3].x - projectedKeyPoints[0].X;
 	projCornersInRGBMat.at<float>(1, 3) = projCornersInRGB[3].y - projectedKeyPoints[0].Y;
+
+	std::cout << "Projector's corners represented as vectors from center of projected origin is:" << std::endl;
+	std::cout << projCornersInRGBMat << std::endl;
 
 	cv::Mat weights (2, 4, CV_32FC1);
 	weights = rgbToKeyPoints.inv() * projCornersInRGBMat;
@@ -169,11 +192,16 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 2), projCornersInCam.at<float>(1, 2), projCornersInCam.at<float>(2, 2)));
 	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 3), projCornersInCam.at<float>(1, 3), projCornersInCam.at<float>(2, 3)));
 	*/
-	std::cout << "Projected screen corner points are: " << std::endl;
+	std::cout << "Projected screen edge point pairs are: " << std::endl;
+	planeNormals.clear();
 	for (int i = 0; i < 4; i++)
 	{
-		std::cout << cornerPoints[i] << std::endl;
-		planeNormals.push_back(cornerPoints[i].cross(cornerPoints[(i + 1) % 4]));
+		std::cout << "(" << cornerPoints[i] << "," << cornerPoints[(i + 1) % 4] << ")" << std::endl;
+		float X, Y, Z;
+		X = cornerPoints[i].y * cornerPoints[(i + 1) % 4].z - cornerPoints[i].z * cornerPoints[(i + 1) % 4].y;
+		Y = cornerPoints[i].z * cornerPoints[(i + 1) % 4].x - cornerPoints[i].x * cornerPoints[(i + 1) % 4].z;
+		Z = cornerPoints[i].x * cornerPoints[(i + 1) % 4].y - cornerPoints[i].y * cornerPoints[(i + 1) % 4].x;
+		planeNormals.push_back(cv::Point3f(X, Y, Z));
 	}
 
 	cv::Point3f testPoint(keyPoints[0].X, keyPoints[0].Y, keyPoints[0].Z);
@@ -181,9 +209,11 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 	std::cout << "The sign corrected frustrum normals are:" << std::endl;
 	for (int i = 0; i < 4; i++)
 	{
-		float a = testPoint.dot(planeNormals[i]);
-		planeNormals[i] *= a / abs(a);
-		planeNormals[i] *= 1 / sqrt(pow(planeNormals[i].x, 2) + pow(planeNormals[i].y, 2) + pow(planeNormals[i].z, 2));
+		float a = planeNormals[i].x*keyPoints[0].X + planeNormals[i].y*keyPoints[0].Y + planeNormals[i].z*keyPoints[0].Z;
+		float signOfA = a / abs(a);
+		planeNormals[i].x = planeNormals[i].x*signOfA;
+		planeNormals[i].y = planeNormals[i].y*signOfA;
+		planeNormals[i].z = planeNormals[i].z*signOfA;
 		std::cout << planeNormals[i] << std::endl;
 	}
 
@@ -552,6 +582,7 @@ void personalRobotics::createCheckerboard(cv::Mat& checkerboard, int width, int 
 			numBlocksY = height / blockSize;
 		}
 	}
+	std::cout << "Creating checkerboard with width: " << width << " height: " << height << " block size: " << blockSize << std::endl;
 	int color = 0;
 	for (int row = 0; row<(numBlocksY); row++)
 	{
