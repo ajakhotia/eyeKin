@@ -104,6 +104,13 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 	projCornersInProj.push_back(cv::Point2f(0, height));
 
 	cv::perspectiveTransform(projCornersInProj, projCornersInRGB, homography.inv());
+	
+	std::cout << "Projector corners in RGB image are at:" << std::endl;
+	for (std::vector<cv::Point2f>::iterator iter = projCornersInRGB.begin(); iter != projCornersInRGB.end(); iter++)
+	{
+		std::cout << *iter << std::endl;
+	}
+	
 	cv::Mat projCornersInRGBMat(2, 4, CV_32FC1);
 	projCornersInRGBMat.at<float>(0, 0) = projCornersInRGB[0].x - projectedKeyPoints[0].X;
 	projCornersInRGBMat.at<float>(1, 0) = projCornersInRGB[0].y - projectedKeyPoints[0].Y;
@@ -118,7 +125,10 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 	weights = rgbToKeyPoints.inv() * projCornersInRGBMat;
 	cv::Mat keyPointsVectors (3, 2, CV_32FC1);
 
-	keyPointsVectors.at<float>(0, 0) = keyPoints[1].X - keyPoints[0].X;
+	std::cout << "The weights matrix is:" << std::endl;
+	std::cout << weights << std::endl;
+
+	/*keyPointsVectors.at<float>(0, 0) = keyPoints[1].X - keyPoints[0].X;
 	keyPointsVectors.at<float>(1, 0) = keyPoints[1].Y - keyPoints[0].Y;
 	keyPointsVectors.at<float>(2, 0) = keyPoints[1].Z - keyPoints[0].Z;
 	keyPointsVectors.at<float>(0, 1) = keyPoints[2].X - keyPoints[0].X;
@@ -142,14 +152,23 @@ void personalRobotics::ObjectSegmentor::setHomography(cv::Mat &inHomography, int
 	
 	weightMultVectors = keyPointsVectors * weights;
 	cv::Mat projCornersInCam(3, 4, CV_32FC1);
-	cv::add(origin, weightMultVectors, projCornersInCam);
+	cv::add(origin, weightMultVectors, projCornersInCam);*/
 
 	std::vector <cv::Point3f> cornerPoints;
+	for (int i = 0; i < 4; i++)
+	{
+		float X, Y, Z;
+		X = weights.at<float>(0, i)*keyPoints[1].X + weights.at<float>(1, i)*keyPoints[2].X + (1.f - weights.at<float>(0, i) - weights.at<float>(1, i))*keyPoints[0].X;
+		Y = weights.at<float>(0, i)*keyPoints[1].Y + weights.at<float>(1, i)*keyPoints[2].Y + (1.f - weights.at<float>(0, i) - weights.at<float>(1, i))*keyPoints[0].Y;
+		Z = weights.at<float>(0, i)*keyPoints[1].Z + weights.at<float>(1, i)*keyPoints[2].Z + (1.f - weights.at<float>(0, i) - weights.at<float>(1, i))*keyPoints[0].Z;
+		cornerPoints.push_back(cv::Point3f(X, Y, Z));
+	}
+	/*
 	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 0), projCornersInCam.at<float>(1, 0), projCornersInCam.at<float>(2, 0)));
 	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 1), projCornersInCam.at<float>(1, 1), projCornersInCam.at<float>(2, 1)));
 	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 2), projCornersInCam.at<float>(1, 2), projCornersInCam.at<float>(2, 2)));
 	cornerPoints.push_back(cv::Point3f(projCornersInCam.at<float>(0, 3), projCornersInCam.at<float>(1, 3), projCornersInCam.at<float>(2, 3)));
-
+	*/
 	std::cout << "Projected screen corner points are: " << std::endl;
 	for (int i = 0; i < 4; i++)
 	{
