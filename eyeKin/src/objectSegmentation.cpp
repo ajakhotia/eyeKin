@@ -237,7 +237,10 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 			pclPtr->clear();
 			pclPtr->resize(numPoints);
 			size_t dstPoint = 0;
-			std::cout << "Segmentor running" << std::endl;
+			{
+			  static int count = 50;
+			  if (--count < 0) { std::cout << "Segmentor still running" << std::endl; count = 50; }
+			}
 			// Copy the RGB image
 			pointCloudMutex.lock();
 			rgbMutex.lock();
@@ -405,8 +408,17 @@ void personalRobotics::ObjectSegmentor::planeSegment()
 					entityList.push_back(personalRobotics::Entity(objectCentroid, objectAngle, objectBoundingSize, iLU.id));
 				}
 			}
-			std::cout << "Generated " << allClusterCounter << " cluster" << std::endl;
-			std::cout << "Generated " << validClusterCounter << " valid cluster" << std::endl;
+			{
+			  // FIXME: this is a simple decimation counter to reduce the amount of log output; this would be
+			  // better implemented by a logging routine which can instead emit summaries only when the state changes,
+			  // and then emit a time-stamped message with an event count.
+			  static int count = 50;
+			  if (--count < 0) {
+			    count = 50;
+			    std::cout << "Generated " << allClusterCounter << " cluster" << std::endl;
+			    std::cout << "Generated " << validClusterCounter << " valid cluster" << std::endl;
+			  }
+			}
 			// See if frames are static
 			prevFrameStatic = frameStatic;
 			frameStatic = calculateOverallChangeInFrames(currentIDList);
