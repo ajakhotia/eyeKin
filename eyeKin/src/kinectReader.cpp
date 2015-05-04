@@ -148,7 +148,7 @@ void personalRobotics::KinectReader::pollFrames(bool save)
 			mixChannels(&rgbaImage, 1, &rgbImage, 1, fromTo, 3);
 			if (save)
 			{
-				//cv::imwrite("c:\\Temp\\eyeKin-" + personalRobotics::full_date_string() + "color.png", rgbImage);
+			  cv::imwrite("c:\\Temp\\eyeKin-" + personalRobotics::full_date_string() + "color.png", rgbImage);
 			}
 			rgbMutex.unlock();
 			rgbaMutex.unlock();
@@ -183,7 +183,7 @@ void personalRobotics::KinectReader::pollFrames(bool save)
 			depthFramePtr->CopyFrameDataToArray(depthWidth*depthHeight, (UINT16*)depthImage.data);
 			if (save)
 			{
-				//cv::imwrite("c:\\Temp\\eyeKin-" + personalRobotics::full_date_string() + "depth.png", depthImage);
+			  cv::imwrite("c:\\Temp\\eyeKin-" + personalRobotics::full_date_string() + "depth.png", depthImage);
 			}
 			pointCloudMutex.lock();
 			coordinateMapperPtr->MapDepthFrameToCameraSpace(depthWidth*depthHeight, (UINT16*)depthImage.data, depthWidth*depthHeight, pointCloudPtr);
@@ -232,7 +232,7 @@ void personalRobotics::KinectReader::kinectThreadRoutine()
 	int numFrames = 0;
 	while (!stopKinectFlag.get())
 	{
-		if (numFrames > 100)
+		if (numFrames > 500)
 		{
 			numFrames = 0;
 			pollFrames(true);
