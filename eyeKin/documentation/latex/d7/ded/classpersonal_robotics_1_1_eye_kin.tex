@@ -1,0 +1,87 @@
+\hypertarget{classpersonal_robotics_1_1_eye_kin}{}\section{personal\+Robotics\+:\+:Eye\+Kin Class Reference}
+\label{classpersonal_robotics_1_1_eye_kin}\index{personal\+Robotics\+::\+Eye\+Kin@{personal\+Robotics\+::\+Eye\+Kin}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_ae73f964eff8b9b589eb98e114837d0e8}{}void {\bfseries reset} ()\label{classpersonal_robotics_1_1_eye_kin_ae73f964eff8b9b589eb98e114837d0e8}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a2d45936cb7b2286c2d85f19259d44a79}{}void {\bfseries find\+Table} ()\label{classpersonal_robotics_1_1_eye_kin_a2d45936cb7b2286c2d85f19259d44a79}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a3e225c90169e0a32938a25d673d2824e}{}void {\bfseries find\+Homography} (bool placeholder)\label{classpersonal_robotics_1_1_eye_kin_a3e225c90169e0a32938a25d673d2824e}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_abb215dc174bbf71fc0a473137e75414d}{}void {\bfseries calibrate} (bool placeholder=true, int in\+Width=D\+E\+F\+A\+U\+L\+T\+\_\+\+S\+C\+R\+E\+E\+N\+\_\+\+W\+I\+D\+T\+H, int in\+Height=D\+E\+F\+A\+U\+L\+T\+\_\+\+S\+C\+R\+E\+E\+N\+\_\+\+H\+E\+I\+G\+H\+T)\label{classpersonal_robotics_1_1_eye_kin_abb215dc174bbf71fc0a473137e75414d}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a8de20b9f3bfc167e49ed3e134a8d9372}{}void {\bfseries generate\+Serializable\+List} (procam\+P\+R\+L\+::\+Entity\+List \&serializable\+List)\label{classpersonal_robotics_1_1_eye_kin_a8de20b9f3bfc167e49ed3e134a8d9372}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_ab1bfd02a55adaba65d91b776f594d3c3}{}\hyperlink{classpersonal_robotics_1_1_tcp_server}{Tcp\+Server} $\ast$ {\bfseries get\+Server} ()\label{classpersonal_robotics_1_1_eye_kin_ab1bfd02a55adaba65d91b776f594d3c3}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a4579c0cb661be45631e1769f3008a6cb}{}\hyperlink{classpersonal_robotics_1_1_object_segmentor}{Object\+Segmentor} $\ast$ {\bfseries get\+Segmentor} ()\label{classpersonal_robotics_1_1_eye_kin_a4579c0cb661be45631e1769f3008a6cb}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_ac3e84dec9b41e7901c2f2da2c953e3fc}{}\hyperlink{classpersonal_robotics_1_1_object_segmentor}{Object\+Segmentor} {\bfseries segmentor}\label{classpersonal_robotics_1_1_eye_kin_ac3e84dec9b41e7901c2f2da2c953e3fc}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_af5cc2ba461c167653569a102fc96ecf4}{}\hyperlink{classpersonal_robotics_1_1_tcp_server}{Tcp\+Server} {\bfseries tcp\+Server}\label{classpersonal_robotics_1_1_eye_kin_af5cc2ba461c167653569a102fc96ecf4}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a4252fde5e0f07b474f351d2f43766577}{}cv\+::\+Mat {\bfseries checkerboard}\label{classpersonal_robotics_1_1_eye_kin_a4252fde5e0f07b474f351d2f43766577}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a9af1a3ed80b025d38673d288eaebe5f1}{}int {\bfseries num\+Checker\+Pts\+X}\label{classpersonal_robotics_1_1_eye_kin_a9af1a3ed80b025d38673d288eaebe5f1}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_ad0237b6706f69ec81563f20defd8562c}{}int {\bfseries num\+Checker\+Pts\+Y}\label{classpersonal_robotics_1_1_eye_kin_ad0237b6706f69ec81563f20defd8562c}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_aeb4f299594a4fa75663333de625f81f0}{}cv\+::\+Mat {\bfseries homography}\label{classpersonal_robotics_1_1_eye_kin_aeb4f299594a4fa75663333de625f81f0}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_aafc55acc57afee505cbb724b9e175ae9}{}cv\+::\+Point2f {\bfseries proj\+Pixel\+Size}\label{classpersonal_robotics_1_1_eye_kin_aafc55acc57afee505cbb724b9e175ae9}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a02e2831d603224ef51c8f3bdb529e801}{}cv\+::\+Point2f {\bfseries color\+Pixel\+Size}\label{classpersonal_robotics_1_1_eye_kin_a02e2831d603224ef51c8f3bdb529e801}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a85285e7415be2ea06f94a8c857603613}{}long {\bfseries epoch}\label{classpersonal_robotics_1_1_eye_kin_a85285e7415be2ea06f94a8c857603613}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a4af23689d80c4102000b41030a5c8b06}{}\hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Bool} {\bfseries table\+Plane\+Found}\label{classpersonal_robotics_1_1_eye_kin_a4af23689d80c4102000b41030a5c8b06}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a0f90b8527f9de27bc5bdd37bcf7be82d}{}\hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Bool} {\bfseries homography\+Found}\label{classpersonal_robotics_1_1_eye_kin_a0f90b8527f9de27bc5bdd37bcf7be82d}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a90ca304356ed45488ce8fb9b745c5ba1}{}\hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Bool} {\bfseries is\+Calibrating}\label{classpersonal_robotics_1_1_eye_kin_a90ca304356ed45488ce8fb9b745c5ba1}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a57b240362da5adbe6b57f17ecdfc4b01}{}\hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Bool} {\bfseries segmentor\+Ever\+Started}\label{classpersonal_robotics_1_1_eye_kin_a57b240362da5adbe6b57f17ecdfc4b01}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a2948bf30ea2e7059bf27478d40845de3}{}int {\bfseries screen\+Width}\label{classpersonal_robotics_1_1_eye_kin_a2948bf30ea2e7059bf27478d40845de3}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_eye_kin_a01bb34694b7f1bab38f44729c3c3364c}{}int {\bfseries screen\+Height}\label{classpersonal_robotics_1_1_eye_kin_a01bb34694b7f1bab38f44729c3c3364c}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 13 of file eye\+Kin.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/eye\+Kin.\+h\item 
+src/eye\+Kin.\+cpp\end{DoxyCompactItemize}

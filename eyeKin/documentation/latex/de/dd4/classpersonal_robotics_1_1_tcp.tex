@@ -1,0 +1,88 @@
+\hypertarget{classpersonal_robotics_1_1_tcp}{}\section{personal\+Robotics\+:\+:Tcp Class Reference}
+\label{classpersonal_robotics_1_1_tcp}\index{personal\+Robotics\+::\+Tcp@{personal\+Robotics\+::\+Tcp}}
+Inheritance diagram for personal\+Robotics\+:\+:Tcp\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{de/dd4/classpersonal_robotics_1_1_tcp}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_a44ff0fd6cf8d2374d9c93002c40e2eea}{}void {\bfseries write} (int length, char $\ast$buffer\+Ptr)\label{classpersonal_robotics_1_1_tcp_a44ff0fd6cf8d2374d9c93002c40e2eea}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_ad66433ec27e099670667dec2b7684543}{}bool {\bfseries read} (int length, char $\ast$buffer\+Ptr)\label{classpersonal_robotics_1_1_tcp_ad66433ec27e099670667dec2b7684543}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_ad998f98df05e6e9db7bb9f8ab4df9268}{}void {\bfseries async\+Send} (int length, char $\ast$buffer\+Ptr, std\+::mutex \&buffer\+Mutex, bool lock=false, bool unlock=true)\label{classpersonal_robotics_1_1_tcp_ad998f98df05e6e9db7bb9f8ab4df9268}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_a6442eb84d70478d374685b5638358d57}{}void {\bfseries async\+Read} (int length, char $\ast$buffer\+Ptr, std\+::mutex \&buffer\+Mutex, bool lock=false, bool unlock=true)\label{classpersonal_robotics_1_1_tcp_a6442eb84d70478d374685b5638358d57}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_acf15c96134bcda539cfef8fe98cba20b}{}void {\bfseries cleanup} ()\label{classpersonal_robotics_1_1_tcp_acf15c96134bcda539cfef8fe98cba20b}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_a62043b28ed7a7158c10e62e73c552cd7}{}void {\bfseries disconnect} ()\label{classpersonal_robotics_1_1_tcp_a62043b28ed7a7158c10e62e73c552cd7}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_ade9cef8167d53d198ac84cb1c934d5fd}{}void {\bfseries reset} ()\label{classpersonal_robotics_1_1_tcp_ade9cef8167d53d198ac84cb1c934d5fd}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_abc65bf1a68082b72e728c018fc1f4a24}{}\hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Bool} {\bfseries is\+Connected}\label{classpersonal_robotics_1_1_tcp_abc65bf1a68082b72e728c018fc1f4a24}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_aab864e12f1998209bebd60a0599af30a}{}\hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Bool} {\bfseries send\+Channel\+Open}\label{classpersonal_robotics_1_1_tcp_aab864e12f1998209bebd60a0599af30a}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_a2b5c42953b01f452a562e9f83606717e}{}\hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Bool} {\bfseries recv\+Channel\+Open}\label{classpersonal_robotics_1_1_tcp_a2b5c42953b01f452a562e9f83606717e}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_a2ac0ad00a81c0f462ffd6d5d87f1a41f}{}\hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Bool} {\bfseries remote\+Terminated\+Connection}\label{classpersonal_robotics_1_1_tcp_a2ac0ad00a81c0f462ffd6d5d87f1a41f}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_a485934a2d97243ae1cf40b0191454975}{}struct addrinfo {\bfseries hints}\label{classpersonal_robotics_1_1_tcp_a485934a2d97243ae1cf40b0191454975}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_aa22ed1c8a0ba5346baeb6bb99501890b}{}struct addrinfo $\ast$ {\bfseries result}\label{classpersonal_robotics_1_1_tcp_aa22ed1c8a0ba5346baeb6bb99501890b}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_a3d5f0f540b53d0afeff9351d3c803355}{}struct addrinfo $\ast$ {\bfseries ptr}\label{classpersonal_robotics_1_1_tcp_a3d5f0f540b53d0afeff9351d3c803355}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_a2da418dc4a1a5f0f5203042faca7d411}{}S\+O\+C\+K\+E\+T {\bfseries data\+Socket}\label{classpersonal_robotics_1_1_tcp_a2da418dc4a1a5f0f5203042faca7d411}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_acb8526298559a4c1ed190489319ee214}{}std\+::thread {\bfseries send\+Thread}\label{classpersonal_robotics_1_1_tcp_acb8526298559a4c1ed190489319ee214}
+
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_a60ddfe1ff552e790a686002e1b741d37}{}std\+::thread {\bfseries recv\+Thread}\label{classpersonal_robotics_1_1_tcp_a60ddfe1ff552e790a686002e1b741d37}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classpersonal_robotics_1_1_tcp_ab4c9fa15800238ee07083ba03afb9ca3}{}static \hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Type}$<$ int $>$ {\bfseries socket\+Count} = 0\label{classpersonal_robotics_1_1_tcp_ab4c9fa15800238ee07083ba03afb9ca3}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 51 of file tcp.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/tcp.\+h\item 
+src/main.\+cpp\item 
+src/tcp.\+cpp\end{DoxyCompactItemize}

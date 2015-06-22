@@ -1,0 +1,85 @@
+\hypertarget{namespacepersonal_robotics}{}\section{personal\+Robotics Namespace Reference}
+\label{namespacepersonal_robotics}\index{personal\+Robotics@{personal\+Robotics}}
+
+
+Defines a namespace to contain non project specific functionality developed at Personal Robotics Lab.  
+
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classpersonal_robotics_1_1_entity}{Entity}
+\item 
+class \hyperlink{classpersonal_robotics_1_1_eye_kin}{Eye\+Kin}
+\item 
+struct \hyperlink{structpersonal_robotics_1_1_i_d_look_up}{I\+D\+Look\+Up}
+\begin{DoxyCompactList}\small\item\em Stores characteristic information regarding an \hyperlink{classpersonal_robotics_1_1_entity}{Entity}. \end{DoxyCompactList}\item 
+class \hyperlink{classpersonal_robotics_1_1_kinect_reader}{Kinect\+Reader}
+\begin{DoxyCompactList}\small\item\em This class provides an polling based interface to retrieve image frames from Kinect v2.\+0 for Windows(8.\+1) \end{DoxyCompactList}\item 
+class \hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Type}
+\item 
+class \hyperlink{classpersonal_robotics_1_1_object_segmentor}{Object\+Segmentor}
+\item 
+struct \hyperlink{structpersonal_robotics_1_1_pose2_dim}{Pose2\+Dim}
+\item 
+class \hyperlink{classpersonal_robotics_1_1_socket_exception}{Socket\+Exception}
+\item 
+class \hyperlink{classpersonal_robotics_1_1_tcp}{Tcp}
+\item 
+class \hyperlink{classpersonal_robotics_1_1_tcp_server}{Tcp\+Server}
+\item 
+class \hyperlink{classpersonal_robotics_1_1_timer}{Timer}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{namespacepersonal_robotics_a1ef569ada10ae2d7dbbb214211e23e37}{}typedef \hyperlink{classpersonal_robotics_1_1_mutex_type}{Mutex\+Type}$<$ bool $>$ {\bfseries Mutex\+Bool}\label{namespacepersonal_robotics_a1ef569ada10ae2d7dbbb214211e23e37}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class Interface $>$ }\\void \hyperlink{namespacepersonal_robotics_a10bc590dad378d8a84fd97546b331d62}{safe\+Release} (Interface in\+Interface)
+\begin{DoxyCompactList}\small\item\em Safely releases dynamically allocated interfaces. \end{DoxyCompactList}\item 
+\hypertarget{namespacepersonal_robotics_a2c3daa4285088463c734b34b33465a60}{}void \hyperlink{namespacepersonal_robotics_a2c3daa4285088463c734b34b33465a60}{create\+Checkerboard} (cv\+::\+Mat \&checkerboard, int width, int height, int \&num\+Blocks\+X, int \&num\+Blocks\+Y)\label{namespacepersonal_robotics_a2c3daa4285088463c734b34b33465a60}
+
+\begin{DoxyCompactList}\small\item\em Creates a white bordered checkerboard pattern with the specified width and height in pixels and fills the num\+Blocks\+X and num\+Blocks\+Y with the numbers of interior points in the generated checkerboard in X and Y direction respectively. \end{DoxyCompactList}\item 
+\hypertarget{namespacepersonal_robotics_a22e343fb26c5ce54021c2af44388a75b}{}long int {\bfseries gcd} (long int a\+In, long int b\+In)\label{namespacepersonal_robotics_a22e343fb26c5ce54021c2af44388a75b}
+
+\item 
+\hypertarget{namespacepersonal_robotics_abdd1f29ea0e1761e9a426fed113d0eaa}{}long int {\bfseries gcdr} (long int a, long int b)\label{namespacepersonal_robotics_abdd1f29ea0e1761e9a426fed113d0eaa}
+
+\item 
+\hypertarget{namespacepersonal_robotics_ace1a0119740afc85c3eb8b3235af3229}{}{\footnotesize template$<$class \+\_\+t $>$ }\\void {\bfseries log\+Message} (\+\_\+t in\+Message)\label{namespacepersonal_robotics_ace1a0119740afc85c3eb8b3235af3229}
+
+\item 
+\hypertarget{namespacepersonal_robotics_abfee8a47277d7cdb6c25ea3c1398ec68}{}std\+::string \hyperlink{namespacepersonal_robotics_abfee8a47277d7cdb6c25ea3c1398ec68}{full\+\_\+date\+\_\+string} (void)\label{namespacepersonal_robotics_abfee8a47277d7cdb6c25ea3c1398ec68}
+
+\begin{DoxyCompactList}\small\item\em Return the current date to the second in a standard format. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Define a namespace to contain generic code and fuctionality developed at Personal Robotics Lab which is not specific to a particular project and can be used as it is across multiple projects. 
+
+\subsection{Function Documentation}
+\hypertarget{namespacepersonal_robotics_a10bc590dad378d8a84fd97546b331d62}{}\index{personal\+Robotics@{personal\+Robotics}!safe\+Release@{safe\+Release}}
+\index{safe\+Release@{safe\+Release}!personal\+Robotics@{personal\+Robotics}}
+\subsubsection[{safe\+Release}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Interface $>$ void personal\+Robotics\+::safe\+Release (
+\begin{DoxyParamCaption}
+\item[{Interface}]{in\+Interface}
+\end{DoxyParamCaption}
+)}\label{namespacepersonal_robotics_a10bc590dad378d8a84fd97546b331d62}
+Safely releases dynamically allocated interfaces and sets them to nullptr as required by all kinect interfaces. The class, to which the object belongs to, should implement Release() method which deallocates the memory used by the object appropriately.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em in\+Interface} & pointer to the object to be released. The class to which the object belongs should implement a Release() method which deallocates the memory used by the object appropriately.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void 
+\end{DoxyReturn}
+
+
+Definition at line 119 of file kinect\+Reader.\+h.
+
