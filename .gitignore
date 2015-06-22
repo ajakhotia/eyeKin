@@ -80,3 +80,14 @@ boost/boost/boost_1_57_0/bin.v2/standalone/ac/zlib.h.cpp
 boost/boost/boost_1_57_0/project-config.jam
 *.opensdf
 *.cache
+*.png
+*.js
+*.eps
+eyeKin/documentation/latex/d2/d0e/classpersonal_robotics_1_1_kinect_reader.pdf
+*.tex
+eyeKin/documentation/latex/d2/d19/classpersonal_robotics_1_1_tcp_server.pdf
+*.pdf
+eyeKin/documentation/latex/make.bat
+*.css
+eyeKin/documentation/latex/doxygen.sty
+eyeKin/documentation/latex/Makefile
